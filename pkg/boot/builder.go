@@ -87,22 +87,23 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
 		},
 		DatasourceContext: func(appCtx *ApplicationContext) datasource.DatasourceContext {
-			if appCtx.Enablers.DatabaseEnabled {
-				if appCtx.DatabaseConfig == nil {
-					log.Fatal("starting up - error setting up configuration: database config is nil")
-					return nil
-				}
+			if !appCtx.Enablers.DatabaseEnabled {
+				return nil
+			}
+
+			if appCtx.DatabaseConfig != nil {
 				return datasource.NewDefaultDatasourceContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
 			}
+
+			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
 		Datasource: func(appCtx *ApplicationContext) datasource.Datasource {
-			if appCtx.Enablers.DatabaseEnabled {
-				if appCtx.DatabaseConfig == nil {
-					log.Fatal("starting up - error setting up configuration: database config is nil")
-					return nil
-				}
+			if !appCtx.Enablers.DatabaseEnabled {
+				return nil
+			}
 
+			if appCtx.DatabaseConfig != nil {
 				config := &gorm.Config{
 					SkipDefaultTransaction: true,
 					Logger:                 slogGorm.New(slogGorm.WithHandler(appCtx.Logger.RetrieveLogger().(*slog.Logger).Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
@@ -110,16 +111,20 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
 				return datasource.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.GetUrl()), config)
 			}
+
+			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
 		TransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler {
-			if appCtx.Enablers.DatabaseEnabled {
-				if appCtx.DatabaseConfig == nil {
-					log.Fatal("starting up - error setting up configuration: database config is nil")
-					return nil
-				}
+			if !appCtx.Enablers.DatabaseEnabled {
+				return nil
+			}
+
+			if appCtx.DatabaseConfig != nil {
 				return datasource.NewTransactionHandler(appCtx.Datasource)
 			}
+
+			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
 		PasswordEncoder: func(appCtx *ApplicationContext) security.PasswordEncoder {
@@ -132,14 +137,16 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return security.NewDefaultPasswordManager(appCtx.PasswordEncoder, appCtx.PasswordGenerator)
 		},
 		PrincipalManager: func(appCtx *ApplicationContext) security.PrincipalManager {
-			if appCtx.Enablers.DatabaseEnabled {
-				if appCtx.DatabaseConfig == nil {
-					log.Fatal("starting up - error setting up configuration: database config is nil")
-					return nil
-				}
+			if !appCtx.Enablers.DatabaseEnabled {
+				return security.NewInMemoryPrincipalManager(appCtx.PasswordManager)
+			}
+
+			if appCtx.DatabaseConfig != nil {
 				return security.NewGormPrincipalManager(appCtx.TransactionHandler, appCtx.PasswordManager)
 			}
-			return security.NewInMemoryPrincipalManager(appCtx.PasswordManager)
+
+			log.Fatal("starting up - error setting up configuration: database config is nil")
+			return nil
 		},
 		TokenManager: func(appCtx *ApplicationContext) security.TokenManager {
 			return security.NewJwtTokenManager(security.WithIssuer(appCtx.AppName),
@@ -159,35 +166,37 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return security.NewDefaultAuthorizationFilter(appCtx.AuthorizationService)
 		},
 		HttpServer: func(appCtx *ApplicationContext) (*gin.Engine, *gin.RouterGroup) {
-			if appCtx.Enablers.HttpServerEnabled {
-				recoveryFilter := gin.Recovery()
-				loggerFilter := sloggin.New(appCtx.Logger.RetrieveLogger().(*slog.Logger).WithGroup("http"))
-				customFilter := func(ctx *gin.Context) {
-					security.AddApplicationToContext(ctx, appCtx.AppName)
-					ctx.Next()
-				}
-
-				engine := gin.New()
-				engine.Use(loggerFilter, recoveryFilter, customFilter)
-				engine.POST("/login", appCtx.AuthenticationEndpoint.Authenticate)
-				engine.GET("/health", func(ctx *gin.Context) {
-					ctx.JSON(http.StatusOK, gin.H{"status": "alive"})
-				})
-				engine.NoRoute(func(c *gin.Context) {
-					c.JSON(http.StatusNotFound, rest.NotFoundException("resource not found"))
-				})
-				engine.GET("/info", func(ctx *gin.Context) {
-					ctx.JSON(http.StatusOK, gin.H{"appName": appCtx.AppName})
-				})
-				return engine, engine.Group("/api", appCtx.AuthorizationFilter.Authorize)
-			}
-			return nil, nil
-		},
-		GrpcServer: func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any) {
-			if appCtx.Enablers.GrpcServerEnabled {
-				log.Fatal("starting up - error setting up grpc configuration: grpc server function not implemented")
+			if !appCtx.Enablers.HttpServerEnabled {
 				return nil, nil
 			}
+
+			recoveryFilter := gin.Recovery()
+			loggerFilter := sloggin.New(appCtx.Logger.RetrieveLogger().(*slog.Logger).WithGroup("http"))
+			customFilter := func(ctx *gin.Context) {
+				security.AddApplicationToContext(ctx, appCtx.AppName)
+				ctx.Next()
+			}
+
+			engine := gin.New()
+			engine.Use(loggerFilter, recoveryFilter, customFilter)
+			engine.POST("/login", appCtx.AuthenticationEndpoint.Authenticate)
+			engine.GET("/health", func(ctx *gin.Context) {
+				ctx.JSON(http.StatusOK, gin.H{"status": "alive"})
+			})
+			engine.NoRoute(func(c *gin.Context) {
+				c.JSON(http.StatusNotFound, rest.NotFoundException("resource not found"))
+			})
+			engine.GET("/info", func(ctx *gin.Context) {
+				ctx.JSON(http.StatusOK, gin.H{"appName": appCtx.AppName})
+			})
+
+			return engine, engine.Group("/api", appCtx.AuthorizationFilter.Authorize)
+		},
+		GrpcServer: func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any) {
+			if !appCtx.Enablers.GrpcServerEnabled {
+				return nil, nil
+			}
+			log.Fatal("starting up - error setting up grpc configuration: grpc server function not implemented")
 			return nil, nil
 		},
 	}
