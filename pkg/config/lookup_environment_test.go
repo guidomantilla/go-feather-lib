@@ -24,7 +24,7 @@ func TestEnvironmentLookup_Lookup(t *testing.T) {
 			lookuper: &EnvironmentLookup{
 				environment: func() environment.Environment {
 					if err := os.Setenv("SOME_ENV_VAR", "some-value"); err != nil {
-						t.Errorf(err.Error())
+						t.Error(err.Error())
 					}
 					return environment.Default()
 				}(),

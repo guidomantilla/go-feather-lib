@@ -5,12 +5,12 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/xorcare/pointer"
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/config"
 	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/util"
 )
 
 type GormPrincipalManager struct {
@@ -83,10 +83,10 @@ func (manager *GormPrincipalManager) Find(ctx context.Context, username string) 
 			Password:           principal.Password,
 			Passphrase:         principal.Passphrase,
 			Enabled:            principal.Enabled,
-			NonLocked:          util.TruePrt(),
-			NonExpired:         util.TruePrt(),
-			PasswordNonExpired: util.TruePrt(),
-			SignUpDone:         util.TruePrt(),
+			NonLocked:          pointer.Bool(true),
+			NonExpired:         pointer.Bool(true),
+			PasswordNonExpired: pointer.Bool(true),
+			SignUpDone:         pointer.Bool(true),
 			Resources:          resources,
 		}
 

@@ -4,25 +4,18 @@ import (
 	"context"
 	"testing"
 
-	envconfig "github.com/sethvargo/go-envconfig"
+	"github.com/xorcare/pointer"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/environment"
 )
 
 func TestProcess(t *testing.T) {
 	env := environment.Default()
-	config := &envconfig.Config{
-		Target: &struct {
-			SomeEnvVar string `envconfig:"SOME_ENV_VAR"`
-		}{
-			SomeEnvVar: "some-value",
-		},
-	}
 
 	type args struct {
 		ctx         context.Context
 		environment environment.Environment
-		config      *envconfig.Config
+		config      *Config
 	}
 	tests := []struct {
 		name    string
@@ -34,7 +27,20 @@ func TestProcess(t *testing.T) {
 			args: args{
 				ctx:         context.TODO(),
 				environment: env,
-				config:      config,
+				config: &Config{
+					Host:                 pointer.Of("localhost"),
+					HttpPort:             nil,
+					GrpcPort:             nil,
+					TokenSignatureKey:    nil,
+					TokenVerificationKey: nil,
+					TokenTimeout:         nil,
+					DatasourceDriver:     nil,
+					DatasourceUsername:   nil,
+					DatasourcePassword:   nil,
+					DatasourceServer:     nil,
+					DatasourceService:    nil,
+					DatasourceUrl:        nil,
+				},
 			},
 			wantErr: false,
 		},

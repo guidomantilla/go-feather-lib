@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xorcare/pointer"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
-	"github.com/guidomantilla/go-feather-lib/pkg/util"
 )
 
 type Enablers struct {
@@ -115,16 +115,16 @@ func NewApplicationContext(appName string, version string, args []string, logger
 		Logger:     logger,
 		Enablers:   enablers,
 		SecurityConfig: &SecurityConfig{
-			TokenSignatureKey:    util.ValueToPtr("SecretYouShouldHide"),
-			TokenVerificationKey: util.ValueToPtr("SecretYouShouldHide"),
+			TokenSignatureKey:    pointer.Of("SecretYouShouldHide"),
+			TokenVerificationKey: pointer.Of("SecretYouShouldHide"),
 		},
 		HttpConfig: &HttpConfig{
-			Host: util.ValueToPtr("localhost"),
-			Port: util.ValueToPtr("8080"),
+			Host: pointer.Of("localhost"),
+			Port: pointer.Of("8080"),
 		},
 		GrpcConfig: &GrpcConfig{
-			Host: util.ValueToPtr("localhost"),
-			Port: util.ValueToPtr("50051"),
+			Host: pointer.Of("localhost"),
+			Port: pointer.Of("50051"),
 		},
 	}
 

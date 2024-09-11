@@ -8,9 +8,12 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/environment"
 )
 
-func Process(ctx context.Context, environment environment.Environment, config *envconfig.Config) error {
-	config.Lookuper = &EnvironmentLookup{
-		environment: environment,
+func Process(ctx context.Context, environment environment.Environment, cfg *Config) error {
+
+	internalConfig := &envconfig.Config{Target: cfg, Lookuper: &EnvironmentLookup{environment: environment}}
+	if err := envconfig.ProcessWith(ctx, internalConfig); err != nil {
+		return err
 	}
-	return envconfig.ProcessWith(ctx, config)
+
+	return nil
 }

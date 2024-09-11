@@ -5,8 +5,7 @@ import (
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/util"
+	"github.com/xorcare/pointer"
 )
 
 type DefaultClaims struct {
@@ -156,8 +155,8 @@ func (manager *JwtTokenManager) Validate(tokenString string) (*Principal, error)
 	}
 
 	principal := &Principal{
-		Username:  util.ValueToPtr(username),
-		Role:      util.ValueToPtr(role),
+		Username:  pointer.Of(username),
+		Role:      pointer.Of(role),
 		Resources: resources,
 	}
 
