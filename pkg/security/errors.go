@@ -3,7 +3,7 @@ package security
 import (
 	"errors"
 
-	cerrors "github.com/guidomantilla/go-feather-lib/pkg/errors"
+	secerrors "github.com/guidomantilla/go-feather-lib/pkg/errors"
 )
 
 var (
@@ -46,33 +46,33 @@ var (
 )
 
 func ErrAuthenticationFailed(errs ...error) error {
-	return errors.New("authentication failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("authentication failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrAuthorizationFailed(errs ...error) error {
-	return errors.New("authorization failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("authorization failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrTokenGenerationFailed(errs ...error) error {
-	return errors.New("token generation failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("token generation failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrTokenValidationFailed(errs ...error) error {
-	return errors.New("token validation failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("token validation failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordEncodingFailed(errs ...error) error {
-	return errors.New("password encoding failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("password encoding failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordMatchingFailed(errs ...error) error {
-	return errors.New("password matching failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("password matching failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordUpgradeEncodingValidationFailed(errs ...error) error {
-	return errors.New("password upgrade encoding validation failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("password upgrade encoding validation failed: " + secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordValidationFailed(errs ...error) error {
-	return errors.New("password validation failed: " + cerrors.ErrJoin(errs...).Error())
+	return errors.New("password validation failed: " + secerrors.ErrJoin(errs...).Error())
 }
