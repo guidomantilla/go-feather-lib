@@ -10,10 +10,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-const (
-	makeConnectionDelay = 2 * time.Second
-)
-
 type DefaultRabbitMQQueueConnection struct {
 	url                      string
 	connection               *amqp.Connection
@@ -29,7 +25,7 @@ type DefaultRabbitMQQueueConnection struct {
 func NewDefaultRabbitMQQueueConnection(url string, username string, password string, queueName string) *DefaultRabbitMQQueueConnection {
 
 	if strings.TrimSpace(url) == "" {
-		log.Fatal("starting up - error setting up rabbitmq connection: rabbitMQUrl is empty")
+		log.Fatal("starting up - error setting up rabbitmq connection: url is empty")
 	}
 
 	if strings.TrimSpace(username) == "" {
