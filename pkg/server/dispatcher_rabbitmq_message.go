@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/qmdx00/lifecycle"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -14,25 +13,6 @@ import (
 
 //
 
-var _ RabbitMQMessageListener = (*DefaultRabbitMQMessageListener)(nil)
-
-type RabbitMQMessageListener interface {
-	OnMessage(message *amqp.Delivery) error
-}
-
-type DefaultRabbitMQMessageListener struct {
-}
-
-func NewDefaultRabbitMQMessageListener() *DefaultRabbitMQMessageListener {
-	return &DefaultRabbitMQMessageListener{}
-}
-
-func (listener *DefaultRabbitMQMessageListener) OnMessage(message *amqp.Delivery) error {
-	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
-	<-time.After(5 * time.Second)
-	return nil
-}
-
 //
 
 var _ lifecycle.Server = (*RabbitMQMessageDispatcher)(nil)
@@ -40,11 +20,11 @@ var _ lifecycle.Server = (*RabbitMQMessageDispatcher)(nil)
 type RabbitMQMessageDispatcher struct {
 	ctx                  context.Context
 	connection           messaging.RabbitMQQueueConnection
-	listener             RabbitMQMessageListener
+	listener             messaging.RabbitMQMessageListener
 	receivedMessagesChan <-chan amqp.Delivery
 }
 
-func BuildRabbitMQMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener RabbitMQMessageListener) lifecycle.Server {
+func BuildRabbitMQMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener messaging.RabbitMQMessageListener) lifecycle.Server {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq dispatcher: connection is nil")
