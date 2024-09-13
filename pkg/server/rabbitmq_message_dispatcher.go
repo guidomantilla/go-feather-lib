@@ -3,12 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"time"
 
 	"github.com/qmdx00/lifecycle"
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 //
