@@ -2,6 +2,7 @@
 phony-goal: ; @echo $@
 
 validate: generate sort-import format vet lint coverage
+	go mod tidy
 
 generate:
 	go generate ./pkg/... ./tools/...
