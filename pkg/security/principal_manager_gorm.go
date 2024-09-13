@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/config"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 )
 
 type GormPrincipalManager struct {

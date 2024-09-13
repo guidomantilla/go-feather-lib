@@ -5,22 +5,22 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
+	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 )
 
-func BuildMockGormTransactionHandler() (datasource2.TransactionHandler, sqlmock.Sqlmock) {
+func BuildMockGormTransactionHandler() (datasource.TransactionHandler, sqlmock.Sqlmock) {
 	db, mock := BuildMockGormDatasource()
-	return datasource2.NewTransactionHandler(db), mock
+	return datasource.NewTransactionHandler(db), mock
 }
 
-func BuildMockGormDatasource() (datasource2.Datasource, sqlmock.Sqlmock) {
+func BuildMockGormDatasource() (datasource.Datasource, sqlmock.Sqlmock) {
 	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	dialector := mysql.New(mysql.Config{
 		Conn:                      db,
 		DriverName:                "mock",
 		SkipInitializeWithVersion: true,
 	})
-	datasourceContext := datasource2.NewDefaultDatasourceContext("some url", "some username", "some password", "some server", "some service")
-	datasrc := datasource2.NewDefaultDatasource(datasourceContext, dialector, &gorm.Config{})
+	datasourceContext := datasource.NewDefaultDatasourceContext("some url", "some username", "some password", "some server", "some service")
+	datasrc := datasource.NewDefaultDatasource(datasourceContext, dialector, &gorm.Config{})
 	return datasrc, mock
 }

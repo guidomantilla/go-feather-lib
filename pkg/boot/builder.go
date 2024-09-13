@@ -13,9 +13,9 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
 	environment2 "github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
@@ -24,11 +24,11 @@ type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment2.Enviro
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
-type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource2.DatasourceContext
+type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource.DatasourceContext
 
-type DatasourceBuilderFunc func(appCtx *ApplicationContext) datasource2.Datasource
+type DatasourceBuilderFunc func(appCtx *ApplicationContext) datasource.Datasource
 
-type TransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource2.TransactionHandler
+type TransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.TransactionHandler
 
 type PasswordGeneratorBuilderFunc func(appCtx *ApplicationContext) security.PasswordGenerator
 
@@ -86,19 +86,19 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
 		},
-		DatasourceContext: func(appCtx *ApplicationContext) datasource2.DatasourceContext {
+		DatasourceContext: func(appCtx *ApplicationContext) datasource.DatasourceContext {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource2.NewDefaultDatasourceContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
+				return datasource.NewDefaultDatasourceContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		Datasource: func(appCtx *ApplicationContext) datasource2.Datasource {
+		Datasource: func(appCtx *ApplicationContext) datasource.Datasource {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
@@ -109,19 +109,19 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 					Logger:                 slogGorm.New(slogGorm.WithHandler(appCtx.Logger.RetrieveLogger().(*slog.Logger).Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
-				return datasource2.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.GetUrl()), config)
+				return datasource.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.GetUrl()), config)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		TransactionHandler: func(appCtx *ApplicationContext) datasource2.TransactionHandler {
+		TransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource2.NewTransactionHandler(appCtx.Datasource)
+				return datasource.NewTransactionHandler(appCtx.Datasource)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")

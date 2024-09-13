@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 
