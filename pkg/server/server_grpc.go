@@ -8,13 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/qmdx00/lifecycle"
 	"google.golang.org/grpc"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
-
-var _ lifecycle.Server = (*GrpcServer)(nil)
 
 type GrpcServer struct {
 	ctx      context.Context
@@ -22,7 +19,7 @@ type GrpcServer struct {
 	internal *grpc.Server
 }
 
-func BuildGrpcServer(address string, server *grpc.Server) lifecycle.Server {
+func BuildGrpcServer(address string, server *grpc.Server) Server {
 
 	if strings.TrimSpace(address) == "" {
 		log.Fatal("starting up - error setting up grpc server: address is empty")

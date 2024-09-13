@@ -6,19 +6,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/qmdx00/lifecycle"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
-
-var _ lifecycle.Server = (*HttpServer)(nil)
 
 type HttpServer struct {
 	ctx      context.Context
 	internal *http.Server
 }
 
-func BuildHttpServer(server *http.Server) lifecycle.Server {
+func BuildHttpServer(server *http.Server) Server {
 
 	if server == nil {
 		log.Fatal("starting up - error setting up http server: server is nil")

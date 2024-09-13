@@ -11,8 +11,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-var _ lifecycle.Server = (*RabbitMQQueueMessageDispatcher)(nil)
-
 type RabbitMQQueueMessageDispatcher struct {
 	ctx                  context.Context
 	connection           messaging.RabbitMQQueueConnection
@@ -20,7 +18,7 @@ type RabbitMQQueueMessageDispatcher struct {
 	receivedMessagesChan <-chan amqp.Delivery
 }
 
-func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener messaging.RabbitMQQueueMessageListener) lifecycle.Server {
+func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener messaging.RabbitMQQueueMessageListener) Server {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: connection is nil")

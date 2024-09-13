@@ -11,8 +11,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-var _ lifecycle.Server = (*NatsMessageDispatcher)(nil)
-
 type NatsMessageDispatcher struct {
 	ctx                  context.Context
 	connection           messaging.NatsSubjectConnection
@@ -20,7 +18,7 @@ type NatsMessageDispatcher struct {
 	receivedMessagesChan <-chan *nats.Msg
 }
 
-func BuildNatsMessageDispatcher(connection messaging.NatsSubjectConnection, listener messaging.NatsMessageListener) lifecycle.Server {
+func BuildNatsMessageDispatcher(connection messaging.NatsSubjectConnection, listener messaging.NatsMessageListener) Server {
 	return &NatsMessageDispatcher{
 		connection:           connection,
 		listener:             listener,

@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 
-	"github.com/qmdx00/lifecycle"
 	cron "github.com/robfig/cron/v3"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -14,7 +13,7 @@ type CronServer struct {
 	internal *cron.Cron
 }
 
-func BuildCronServer(cron *cron.Cron) lifecycle.Server {
+func BuildCronServer(cron *cron.Cron) Server {
 
 	if cron == nil {
 		log.Fatal("starting up - error setting up cron server: cron is nil")
