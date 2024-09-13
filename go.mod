@@ -8,6 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/qmdx00/lifecycle v1.1.1
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/slog-gin v1.13.4
 	github.com/sethvargo/go-envconfig v1.1.0
 	github.com/stretchr/testify v1.9.0

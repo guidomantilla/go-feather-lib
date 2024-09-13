@@ -11,6 +11,20 @@ const (
 
 type DefaultEnvironmentOption func(environment *DefaultEnvironment)
 
+func WithOsArgsArray(osArgsArray []string) DefaultEnvironmentOption {
+	return func(environment *DefaultEnvironment) {
+		source := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))
+		environment.propertySources = append(environment.propertySources, source)
+	}
+}
+
+func WithCmdArgsArray(cmdArgsArray []string) DefaultEnvironmentOption {
+	return func(environment *DefaultEnvironment) {
+		source := properties.NewDefaultPropertySource(CmdPropertySourceName, properties.NewDefaultProperties(properties.FromArray(cmdArgsArray)))
+		environment.propertySources = append(environment.propertySources, source)
+	}
+}
+
 func WithArrays(osArgsArray []string, cmdArgsArray []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
 		osSource := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))

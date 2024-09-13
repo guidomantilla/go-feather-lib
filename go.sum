@@ -72,6 +72,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/qmdx00/lifecycle v1.1.1 h1:e9pnb08AlG/1lyXAkZv4rY/mAj4D40aEmk9yGTG8lNA=
 github.com/qmdx00/lifecycle v1.1.1/go.mod h1:VN47vftI9dgjk6E8Skep0GKUsS6aVIivo7VEUBS7agE=
+github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
+github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/samber/slog-gin v1.13.4 h1:L3tkid2T+km1hjXGka8pVmqqdIH3K+AT9jWifEHlOl8=
 github.com/samber/slog-gin v1.13.4/go.mod h1:vqUCcni2o7z/miSF3uj904ZL8+hVBiwnPKP8Id0RNe8=
 github.com/sethvargo/go-envconfig v1.1.0 h1:cWZiJxeTm7AlCvzGXrEXaSTCNgip5oJepekh/BOQuog=

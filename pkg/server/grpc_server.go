@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/qmdx00/lifecycle"
 	"google.golang.org/grpc"
@@ -21,6 +22,15 @@ type GrpcServer struct {
 }
 
 func BuildGrpcServer(address string, server *grpc.Server) lifecycle.Server {
+
+	if strings.TrimSpace(address) == "" {
+		log.Fatal("starting up - error setting up grpc server: address is empty")
+	}
+
+	if server == nil {
+		log.Fatal("starting up - error setting up grpc server: server is nil")
+	}
+
 	return &GrpcServer{
 		address:  address,
 		internal: server,

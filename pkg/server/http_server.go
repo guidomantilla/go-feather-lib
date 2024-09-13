@@ -18,6 +18,11 @@ type HttpServer struct {
 }
 
 func BuildHttpServer(server *http.Server) lifecycle.Server {
+
+	if server == nil {
+		log.Fatal("starting up - error setting up http server: server is nil")
+	}
+
 	return &HttpServer{
 		internal: server,
 	}
