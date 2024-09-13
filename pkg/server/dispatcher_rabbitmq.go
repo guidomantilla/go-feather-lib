@@ -11,10 +11,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-//
-
-//
-
 var _ lifecycle.Server = (*RabbitMQMessageDispatcher)(nil)
 
 type RabbitMQMessageDispatcher struct {
