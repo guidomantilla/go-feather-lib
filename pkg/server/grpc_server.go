@@ -37,7 +37,7 @@ func BuildGrpcServer(address string, server *grpc.Server) lifecycle.Server {
 	}
 }
 
-func (server *GrpcServer) Run(ctx context.Context) error {
+func (server *GrpcServer) Run(_ context.Context) error {
 
 	log.Info(fmt.Sprintf("starting up - starting grpc server: %s", server.address))
 
@@ -56,7 +56,7 @@ func (server *GrpcServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *GrpcServer) Stop(ctx context.Context) error {
+func (server *GrpcServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping grpc server")
 	server.internal.GracefulStop()
