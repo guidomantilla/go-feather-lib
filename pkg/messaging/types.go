@@ -10,8 +10,8 @@ type RabbitMQQueueConnection interface {
 	Connect() (*amqp.Connection, *amqp.Channel, *amqp.Queue, error)
 }
 
-var _ RabbitMQMessageListener = (*DefaultRabbitMQMessageListener)(nil)
+var _ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
 
-type RabbitMQMessageListener interface {
+type RabbitMQQueueMessageListener interface {
 	OnMessage(message *amqp.Delivery) error
 }
