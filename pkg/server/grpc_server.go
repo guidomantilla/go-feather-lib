@@ -17,6 +17,7 @@ import (
 var _ lifecycle.Server = (*GrpcServer)(nil)
 
 type GrpcServer struct {
+	ctx      context.Context
 	address  string
 	internal *grpc.Server
 }
@@ -37,8 +38,9 @@ func BuildGrpcServer(address string, server *grpc.Server) lifecycle.Server {
 	}
 }
 
-func (server *GrpcServer) Run(_ context.Context) error {
+func (server *GrpcServer) Run(ctx context.Context) error {
 
+	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting grpc server: %s", server.address))
 
 	var err error

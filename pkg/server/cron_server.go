@@ -10,6 +10,7 @@ import (
 )
 
 type CronServer struct {
+	ctx      context.Context
 	internal *cron.Cron
 }
 
@@ -24,8 +25,9 @@ func BuildCronServer(cron *cron.Cron) lifecycle.Server {
 	}
 }
 
-func (server *CronServer) Run(_ context.Context) error {
+func (server *CronServer) Run(ctx context.Context) error {
 
+	server.ctx = ctx
 	log.Info("starting up - starting cron server")
 
 	server.internal.Start()

@@ -14,6 +14,7 @@ import (
 var _ lifecycle.Server = (*HttpServer)(nil)
 
 type HttpServer struct {
+	ctx      context.Context
 	internal *http.Server
 }
 
@@ -30,6 +31,7 @@ func BuildHttpServer(server *http.Server) lifecycle.Server {
 
 func (server *HttpServer) Run(ctx context.Context) error {
 
+	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting http server: %s", server.internal.Addr))
 
 	if err := server.internal.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {

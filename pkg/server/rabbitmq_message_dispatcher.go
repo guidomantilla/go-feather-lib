@@ -38,16 +38,25 @@ func (listener *DefaultRabbitMQMessageListener) OnMessage(message *amqp.Delivery
 var _ lifecycle.Server = (*RabbitMQMessageDispatcher)(nil)
 
 type RabbitMQMessageDispatcher struct {
-	rabbitmqConnection   messaging.RabbitMQQueueConnection
-	rabbitmqListener     RabbitMQMessageListener
 	ctx                  context.Context
+	connection           messaging.RabbitMQQueueConnection
+	listener             RabbitMQMessageListener
 	receivedMessagesChan <-chan amqp.Delivery
 }
 
-func BuildRabbitMQMessageDispatcher(rabbitmqConnection messaging.RabbitMQQueueConnection, rabbitmqListener RabbitMQMessageListener) lifecycle.Server {
+func BuildRabbitMQMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener RabbitMQMessageListener) lifecycle.Server {
+
+	if connection == nil {
+		log.Fatal("starting up - error setting up rabbitmq dispatcher: connection is nil")
+	}
+
+	if listener == nil {
+		log.Fatal("starting up - error setting up rabbitmq dispatcher: listener is nil")
+	}
+
 	return &RabbitMQMessageDispatcher{
-		rabbitmqConnection:   rabbitmqConnection,
-		rabbitmqListener:     rabbitmqListener,
+		connection:           connection,
+		listener:             listener,
 		receivedMessagesChan: make(<-chan amqp.Delivery),
 	}
 }
@@ -58,13 +67,13 @@ func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server starting up - starting rabbitmq dispatcher %s, v.%s", info.Name(), info.Version()))
 
-	server.rabbitmqConnection.Start()
+	server.connection.Start()
 
 	var err error
 	var channel *amqp.Channel
 	var queue *amqp.Queue
 
-	if _, channel, queue, err = server.rabbitmqConnection.Connect(); err != nil {
+	if _, channel, queue, err = server.connection.Connect(); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq dispatcher - error: %s", err.Error()))
 		return err
 	}
@@ -97,7 +106,7 @@ func (server *RabbitMQMessageDispatcher) ListenAndDispatch() error {
 func (server *RabbitMQMessageDispatcher) Dispatch(message *amqp.Delivery) {
 
 	var err error
-	if err = server.rabbitmqListener.OnMessage(message); err != nil {
+	if err = server.listener.OnMessage(message); err != nil {
 		log.Error(fmt.Sprintf("rabbitmq listener - error: %s, message: %s", err.Error(), message.Body))
 	}
 }
@@ -107,7 +116,7 @@ func (server *RabbitMQMessageDispatcher) Stop(ctx context.Context) error {
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server shutting down - stopping rabbitmq dispatcher %s, v.%s", info.Name(), info.Version()))
 
-	server.rabbitmqConnection.Close()
+	server.connection.Close()
 
 	log.Info("server shutting down - rabbitmq dispatcher stopped")
 	return nil
