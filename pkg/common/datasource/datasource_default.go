@@ -2,10 +2,9 @@ package datasource
 
 import (
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 
 	"gorm.io/gorm"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/log"
 )
 
 type DefaultDatasource struct {

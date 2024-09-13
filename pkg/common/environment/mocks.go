@@ -10,9 +10,9 @@
 package environment
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/common/properties"
 	reflect "reflect"
 
-	properties "github.com/guidomantilla/go-feather-lib/pkg/properties"
 	gomock "go.uber.org/mock/gomock"
 )
 

@@ -3,14 +3,13 @@ package security
 import (
 	"context"
 	"errors"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/config"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"strings"
 
 	"github.com/xorcare/pointer"
 	"gorm.io/gorm"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/config"
-	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
-	"github.com/guidomantilla/go-feather-lib/pkg/log"
 )
 
 type GormPrincipalManager struct {

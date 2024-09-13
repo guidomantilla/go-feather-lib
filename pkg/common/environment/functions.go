@@ -1,10 +1,9 @@
 package environment
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/common/properties"
 	"os"
 	"sync/atomic"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/properties"
 )
 
 var singleton atomic.Value

@@ -1,7 +1,7 @@
 package security
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type DefaultPasswordManager struct {

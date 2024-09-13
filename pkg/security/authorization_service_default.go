@@ -2,8 +2,7 @@ package security
 
 import (
 	"context"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type DefaultAuthorizationService struct {

@@ -1,7 +1,7 @@
 package environment
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/properties"
+	properties2 "github.com/guidomantilla/go-feather-lib/pkg/common/properties"
 )
 
 const (
@@ -13,46 +13,46 @@ type DefaultEnvironmentOption func(environment *DefaultEnvironment)
 
 func WithOsArgsArray(osArgsArray []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))
+		source := properties2.NewDefaultPropertySource(OsPropertySourceName, properties2.NewDefaultProperties(properties2.FromArray(osArgsArray)))
 		environment.propertySources = append(environment.propertySources, source)
 	}
 }
 
 func WithCmdArgsArray(cmdArgsArray []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(CmdPropertySourceName, properties.NewDefaultProperties(properties.FromArray(cmdArgsArray)))
+		source := properties2.NewDefaultPropertySource(CmdPropertySourceName, properties2.NewDefaultProperties(properties2.FromArray(cmdArgsArray)))
 		environment.propertySources = append(environment.propertySources, source)
 	}
 }
 
 func WithArrays(osArgsArray []string, cmdArgsArray []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		osSource := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))
-		cmdSource := properties.NewDefaultPropertySource(CmdPropertySourceName, properties.NewDefaultProperties(properties.FromArray(cmdArgsArray)))
+		osSource := properties2.NewDefaultPropertySource(OsPropertySourceName, properties2.NewDefaultProperties(properties2.FromArray(osArgsArray)))
+		cmdSource := properties2.NewDefaultPropertySource(CmdPropertySourceName, properties2.NewDefaultProperties(properties2.FromArray(cmdArgsArray)))
 		environment.propertySources = append(environment.propertySources, osSource, cmdSource)
 	}
 }
 
 func WithArraySource(name string, array []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(name, properties.NewDefaultProperties(properties.FromArray(array)))
+		source := properties2.NewDefaultPropertySource(name, properties2.NewDefaultProperties(properties2.FromArray(array)))
 		environment.propertySources = append(environment.propertySources, source)
 	}
 }
 
-func WithPropertySources(propertySources ...properties.PropertySource) DefaultEnvironmentOption {
+func WithPropertySources(propertySources ...properties2.PropertySource) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
 		environment.propertySources = propertySources
 	}
 }
 
 type DefaultEnvironment struct {
-	propertySources []properties.PropertySource
+	propertySources []properties2.PropertySource
 }
 
 func NewDefaultEnvironment(options ...DefaultEnvironmentOption) *DefaultEnvironment {
 	environment := &DefaultEnvironment{
-		propertySources: make([]properties.PropertySource, 0),
+		propertySources: make([]properties2.PropertySource, 0),
 	}
 	for _, opt := range options {
 		opt(environment)
@@ -83,10 +83,10 @@ func (environment *DefaultEnvironment) GetValueOrDefault(property string, defaul
 	return NewEnvVar(defaultValue)
 }
 
-func (environment *DefaultEnvironment) GetPropertySources() []properties.PropertySource {
+func (environment *DefaultEnvironment) GetPropertySources() []properties2.PropertySource {
 	return environment.propertySources
 }
 
-func (environment *DefaultEnvironment) AppendPropertySources(propertySources ...properties.PropertySource) {
+func (environment *DefaultEnvironment) AppendPropertySources(propertySources ...properties2.PropertySource) {
 	environment.propertySources = append(environment.propertySources, propertySources...)
 }

@@ -2,8 +2,7 @@ package security
 
 import (
 	"errors"
-
-	secerrors "github.com/guidomantilla/go-feather-lib/pkg/errors"
+	secerrors "github.com/guidomantilla/go-feather-lib/pkg/common/errors"
 )
 
 var (

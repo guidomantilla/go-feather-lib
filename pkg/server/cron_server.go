@@ -2,11 +2,10 @@ package server
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 
 	"github.com/qmdx00/lifecycle"
 	cron "github.com/robfig/cron/v3"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/log"
 )
 
 type CronServer struct {
