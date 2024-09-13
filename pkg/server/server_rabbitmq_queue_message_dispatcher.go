@@ -79,11 +79,12 @@ func (server *RabbitMQQueueMessageDispatcher) ListenAndDispatch() error {
 	}
 }
 
-func (server *RabbitMQQueueMessageDispatcher) Dispatch(message *amqp.Delivery) {
+func (server *RabbitMQQueueMessageDispatcher) Dispatch(message any) {
 
 	var err error
-	if err = server.listener.OnMessage(message); err != nil {
-		log.Error(fmt.Sprintf("rabbitmq queue dispatcher - error: %s, message: %s", err.Error(), message.Body))
+	msg := message.(*amqp.Delivery)
+	if err = server.listener.OnMessage(msg); err != nil {
+		log.Error(fmt.Sprintf("rabbitmq queue dispatcher - error: %s, message: %s", err.Error(), msg.Body))
 	}
 }
 

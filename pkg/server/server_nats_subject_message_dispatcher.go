@@ -60,11 +60,12 @@ func (server *NatsMessageDispatcher) ListenAndDispatch() error {
 	}
 }
 
-func (server *NatsMessageDispatcher) Dispatch(message *nats.Msg) {
+func (server *NatsMessageDispatcher) Dispatch(message any) {
 
 	var err error
-	if err = server.listener.OnMessage(message); err != nil {
-		log.Error(fmt.Sprintf("nats listener - error: %s, message: %s", err.Error(), message.Data))
+	msg := message.(*nats.Msg)
+	if err = server.listener.OnMessage(msg); err != nil {
+		log.Error(fmt.Sprintf("nats listener - error: %s, message: %s", err.Error(), msg.Data))
 	}
 }
 
