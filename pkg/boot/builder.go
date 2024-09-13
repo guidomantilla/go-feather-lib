@@ -2,9 +2,6 @@ package boot
 
 import (
 	"context"
-	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
-	environment2 "github.com/guidomantilla/go-feather-lib/pkg/common/environment"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,6 +13,9 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
+	environment2 "github.com/guidomantilla/go-feather-lib/pkg/common/environment"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )

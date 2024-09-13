@@ -3,9 +3,6 @@ package boot
 import (
 	"database/sql"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
-	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
+	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 

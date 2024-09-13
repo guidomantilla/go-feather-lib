@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"net"
 	"net/http"
 	"strings"
 
 	"github.com/qmdx00/lifecycle"
 	"google.golang.org/grpc"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 var _ lifecycle.Server = (*GrpcServer)(nil)

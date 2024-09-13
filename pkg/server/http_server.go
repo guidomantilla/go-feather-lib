@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"net/http"
 
 	"github.com/qmdx00/lifecycle"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 var _ lifecycle.Server = (*HttpServer)(nil)

@@ -2,9 +2,10 @@ package config
 
 import (
 	"context"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 
 	envconfig "github.com/sethvargo/go-envconfig"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 )
 
 func Process(ctx context.Context, environment environment.Environment, cfg *Config) error {

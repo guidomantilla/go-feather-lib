@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	envconfig "github.com/sethvargo/go-envconfig"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 )
 
 var (

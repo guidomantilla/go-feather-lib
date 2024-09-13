@@ -1,8 +1,9 @@
 package security
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"strings"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 var SupportedDecoders = map[string]PasswordEncoder{

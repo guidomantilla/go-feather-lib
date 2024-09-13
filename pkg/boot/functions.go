@@ -2,7 +2,6 @@ package boot
 
 import (
 	"fmt"
-	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"net"
 	"net/http"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 

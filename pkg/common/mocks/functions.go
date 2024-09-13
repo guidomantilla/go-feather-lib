@@ -2,9 +2,10 @@ package mocks
 
 import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	datasource2 "github.com/guidomantilla/go-feather-lib/pkg/common/datasource"
 )
 
 func BuildMockGormTransactionHandler() (datasource2.TransactionHandler, sqlmock.Sqlmock) {

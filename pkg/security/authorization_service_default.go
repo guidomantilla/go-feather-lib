@@ -2,6 +2,7 @@ package security
 
 import (
 	"context"
+
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
