@@ -20,10 +20,12 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	connection := messaging.NewDefaultRabbitMQQueueConnection("amqp://:username::password@170.187.157.212:5672/", "raven-dev", "raven-dev*+", "my-queue")
-	listener := messaging.NewDefaultRabbitMQQueueMessageListener()
-	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(connection, listener)
-	app.Attach("RabbitMQDispatcher", dispatcher)
+	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
+	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
+	connection.Connect()
+	//listener := messaging.NewDefaultRabbitMQQueueMessageListener()
+	//dispatcher := server.BuildRabbitMQQueueMessageDispatcher(connection, listener)
+	app.Attach("RabbitMQDispatcher", server.BuildDummyServer())
 
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())

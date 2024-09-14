@@ -28,23 +28,32 @@ func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRab
 	}
 }
 
+func (connection *DefaultRabbitMQConnection) Close() {
+	if connection.connection != nil {
+		if err := connection.connection.Close(); err != nil {
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.server, err.Error()))
+			return
+		}
+	}
+}
+
 func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error) {
 
 	if connection.connection == nil {
 
 		err := retry.Do(connection.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
-				log.Info("rabbitmq connection - failed to connect")
-				log.Info(fmt.Sprintf("rabbitmq connection - trying reconnection to %s", connection.server))
+				log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
+				log.Debug(fmt.Sprintf("rabbitmq connection - trying reconnection to %s", connection.server))
 			}),
 		)
 
 		if err != nil {
-			log.Error(fmt.Sprintf("connection - failed connection to %s: %s", connection.server, err.Error()))
+			log.Error(fmt.Sprintf("rabbitmq connection - failed connection to %s", connection.server))
 			return nil, err
 		}
 
-		go connection.reconnect()
+		//go connection.reconnect()
 	}
 
 	return connection.connection, nil
@@ -54,7 +63,6 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 
 	var err error
 	if connection.connection, err = amqp.Dial(connection.url); err != nil {
-		log.Error(err.Error())
 		return err
 	}
 
