@@ -61,7 +61,7 @@ func Fatal(msg string, args ...any) {
 
 //
 
-func GetSlogLogger() *slog.Logger {
+func AsSlogLogger() *slog.Logger {
 	slogLogger := retrieveSingleton()
-	return slogLogger.GetLogger().(*slog.Logger)
+	return slogLogger.Logger().(*slog.Logger)
 }

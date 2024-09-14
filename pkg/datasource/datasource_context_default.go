@@ -46,14 +46,14 @@ func NewDefaultDatasourceContext(url string, username string, password string, s
 	}
 }
 
-func (context *DefaultDatasourceContext) GetUrl() string {
+func (context *DefaultDatasourceContext) Url() string {
 	return context.url
 }
 
-func (context *DefaultDatasourceContext) GetServer() string {
+func (context *DefaultDatasourceContext) Server() string {
 	return context.server
 }
 
-func (context *DefaultDatasourceContext) GetService() string {
+func (context *DefaultDatasourceContext) Service() string {
 	return context.service
 }

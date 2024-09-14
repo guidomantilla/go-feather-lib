@@ -15,6 +15,6 @@ type EnvironmentLookup struct {
 }
 
 func (lookuper *EnvironmentLookup) Lookup(key string) (string, bool) {
-	value := lookuper.environment.GetValue(key).AsString()
+	value := lookuper.environment.Value(key).AsString()
 	return value, value != ""
 }

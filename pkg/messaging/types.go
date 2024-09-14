@@ -12,8 +12,8 @@ const (
 )
 
 type RabbitMQContext interface {
-	GetUrl() string
-	GetServer() string
+	Url() string
+	Server() string
 }
 
 //

@@ -90,20 +90,6 @@ func (mr *MockLoggerMockRecorder) Fatal(ctx, msg any, args ...any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fatal", reflect.TypeOf((*MockLogger)(nil).Fatal), varargs...)
 }
 
-// GetLogger mocks base method.
-func (m *MockLogger) GetLogger() any {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLogger")
-	ret0, _ := ret[0].(any)
-	return ret0
-}
-
-// GetLogger indicates an expected call of GetLogger.
-func (mr *MockLoggerMockRecorder) GetLogger() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogger", reflect.TypeOf((*MockLogger)(nil).GetLogger))
-}
-
 // Info mocks base method.
 func (m *MockLogger) Info(ctx context.Context, msg string, args ...any) {
 	m.ctrl.T.Helper()
@@ -119,6 +105,20 @@ func (mr *MockLoggerMockRecorder) Info(ctx, msg any, args ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, msg}, args...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), varargs...)
+}
+
+// Logger mocks base method.
+func (m *MockLogger) Logger() any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logger")
+	ret0, _ := ret[0].(any)
+	return ret0
+}
+
+// Logger indicates an expected call of Logger.
+func (mr *MockLoggerMockRecorder) Logger() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logger", reflect.TypeOf((*MockLogger)(nil).Logger))
 }
 
 // Warn mocks base method.

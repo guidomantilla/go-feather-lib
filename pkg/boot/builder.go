@@ -105,10 +105,10 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			if appCtx.DatabaseConfig != nil {
 				config := &gorm.Config{
 					SkipDefaultTransaction: true,
-					Logger:                 slogGorm.New(slogGorm.WithHandler(log.GetSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
+					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
-				return datasource.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.GetUrl()), config)
+				return datasource.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
@@ -170,7 +170,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			}
 
 			recoveryFilter := gin.Recovery()
-			loggerFilter := sloggin.New(log.GetSlogLogger().WithGroup("http"))
+			loggerFilter := sloggin.New(log.AsSlogLogger().WithGroup("http"))
 			customFilter := func(ctx *gin.Context) {
 				security.AddApplicationToContext(ctx, appCtx.AppName)
 				ctx.Next()

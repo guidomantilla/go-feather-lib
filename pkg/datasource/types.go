@@ -13,9 +13,9 @@ var (
 )
 
 type DatasourceContext interface {
-	GetUrl() string
-	GetServer() string
-	GetService() string
+	Url() string
+	Server() string
+	Service() string
 }
 
 //

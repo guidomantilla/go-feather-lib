@@ -39,10 +39,10 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 	}
 }
 
-func (context *DefaultRabbitMQContext) GetUrl() string {
+func (context *DefaultRabbitMQContext) Url() string {
 	return context.url
 }
 
-func (context *DefaultRabbitMQContext) GetServer() string {
+func (context *DefaultRabbitMQContext) Server() string {
 	return context.server
 }

@@ -14,5 +14,5 @@ type Logger interface {
 	Warn(ctx context.Context, msg string, args ...any)
 	Error(ctx context.Context, msg string, args ...any)
 	Fatal(ctx context.Context, msg string, args ...any)
-	GetLogger() any
+	Logger() any
 }

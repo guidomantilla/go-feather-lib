@@ -37,7 +37,7 @@ func (datasource *DefaultDatasource) Connect() (*gorm.DB, error) {
 		err := retry.Do(datasource.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
 				log.Info("datasource connection - failed to connect")
-				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService()))
+				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service()))
 			}),
 		)
 
@@ -56,7 +56,7 @@ func (datasource *DefaultDatasource) connect() error {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService()))
+	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service()))
 
 	return nil
 }
@@ -66,7 +66,7 @@ func (datasource *DefaultDatasource) Close() {
 	if datasource.database != nil {
 		sqlDB, _ := datasource.database.DB()
 		if err := sqlDB.Close(); err != nil {
-			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService(), err.Error()))
+			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service(), err.Error()))
 		}
 	}
 }

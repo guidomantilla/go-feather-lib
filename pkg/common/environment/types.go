@@ -9,9 +9,9 @@ import (
 var _ Environment = (*DefaultEnvironment)(nil)
 
 type Environment interface {
-	GetValue(property string) EnvVar
-	GetValueOrDefault(property string, defaultValue string) EnvVar
-	GetPropertySources() []properties.PropertySource
+	Value(property string) EnvVar
+	ValueOrDefault(property string, defaultValue string) EnvVar
+	PropertySources() []properties.PropertySource
 	AppendPropertySources(propertySources ...properties.PropertySource)
 }
 

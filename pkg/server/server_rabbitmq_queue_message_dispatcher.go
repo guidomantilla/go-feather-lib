@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/qmdx00/lifecycle"
 	amqp "github.com/rabbitmq/amqp091-go"
 

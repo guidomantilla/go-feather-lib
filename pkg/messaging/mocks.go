@@ -17,55 +17,55 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockMessagingContext is a mock of MessagingContext interface.
-type MockMessagingContext struct {
+// MockRabbitMQContext is a mock of RabbitMQContext interface.
+type MockRabbitMQContext struct {
 	ctrl     *gomock.Controller
-	recorder *MockMessagingContextMockRecorder
+	recorder *MockRabbitMQContextMockRecorder
 }
 
-// MockMessagingContextMockRecorder is the mock recorder for MockMessagingContext.
-type MockMessagingContextMockRecorder struct {
-	mock *MockMessagingContext
+// MockRabbitMQContextMockRecorder is the mock recorder for MockRabbitMQContext.
+type MockRabbitMQContextMockRecorder struct {
+	mock *MockRabbitMQContext
 }
 
-// NewMockMessagingContext creates a new mock instance.
-func NewMockMessagingContext(ctrl *gomock.Controller) *MockMessagingContext {
-	mock := &MockMessagingContext{ctrl: ctrl}
-	mock.recorder = &MockMessagingContextMockRecorder{mock}
+// NewMockRabbitMQContext creates a new mock instance.
+func NewMockRabbitMQContext(ctrl *gomock.Controller) *MockRabbitMQContext {
+	mock := &MockRabbitMQContext{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQContextMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockMessagingContext) EXPECT() *MockMessagingContextMockRecorder {
+func (m *MockRabbitMQContext) EXPECT() *MockRabbitMQContextMockRecorder {
 	return m.recorder
 }
 
-// GetServer mocks base method.
-func (m *MockMessagingContext) GetServer() string {
+// Server mocks base method.
+func (m *MockRabbitMQContext) Server() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetServer")
+	ret := m.ctrl.Call(m, "Server")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetServer indicates an expected call of GetServer.
-func (mr *MockMessagingContextMockRecorder) GetServer() *gomock.Call {
+// Server indicates an expected call of Server.
+func (mr *MockRabbitMQContextMockRecorder) Server() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockMessagingContext)(nil).GetServer))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockRabbitMQContext)(nil).Server))
 }
 
-// GetUrl mocks base method.
-func (m *MockMessagingContext) GetUrl() string {
+// Url mocks base method.
+func (m *MockRabbitMQContext) Url() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUrl")
+	ret := m.ctrl.Call(m, "Url")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetUrl indicates an expected call of GetUrl.
-func (mr *MockMessagingContextMockRecorder) GetUrl() *gomock.Call {
+// Url indicates an expected call of Url.
+func (mr *MockRabbitMQContextMockRecorder) Url() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUrl", reflect.TypeOf((*MockMessagingContext)(nil).GetUrl))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockRabbitMQContext)(nil).Url))
 }
 
 // MockRabbitMQConnection is a mock of RabbitMQConnection interface.
@@ -116,6 +116,148 @@ func (m *MockRabbitMQConnection) Connect() (*amqp091.Connection, error) {
 func (mr *MockRabbitMQConnectionMockRecorder) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQConnection)(nil).Connect))
+}
+
+// RabbitMQContext mocks base method.
+func (m *MockRabbitMQConnection) RabbitMQContext() RabbitMQContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RabbitMQContext")
+	ret0, _ := ret[0].(RabbitMQContext)
+	return ret0
+}
+
+// RabbitMQContext indicates an expected call of RabbitMQContext.
+func (mr *MockRabbitMQConnectionMockRecorder) RabbitMQContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQConnection)(nil).RabbitMQContext))
+}
+
+// MockRabbitMQChannel is a mock of RabbitMQChannel interface.
+type MockRabbitMQChannel struct {
+	ctrl     *gomock.Controller
+	recorder *MockRabbitMQChannelMockRecorder
+}
+
+// MockRabbitMQChannelMockRecorder is the mock recorder for MockRabbitMQChannel.
+type MockRabbitMQChannelMockRecorder struct {
+	mock *MockRabbitMQChannel
+}
+
+// NewMockRabbitMQChannel creates a new mock instance.
+func NewMockRabbitMQChannel(ctrl *gomock.Controller) *MockRabbitMQChannel {
+	mock := &MockRabbitMQChannel{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQChannelMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRabbitMQChannel) EXPECT() *MockRabbitMQChannelMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockRabbitMQChannel) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRabbitMQChannelMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQChannel)(nil).Close))
+}
+
+// Connect mocks base method.
+func (m *MockRabbitMQChannel) Connect() (*amqp091.Channel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Connect")
+	ret0, _ := ret[0].(*amqp091.Channel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockRabbitMQChannelMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQChannel)(nil).Connect))
+}
+
+// RabbitMQContext mocks base method.
+func (m *MockRabbitMQChannel) RabbitMQContext() RabbitMQContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RabbitMQContext")
+	ret0, _ := ret[0].(RabbitMQContext)
+	return ret0
+}
+
+// RabbitMQContext indicates an expected call of RabbitMQContext.
+func (mr *MockRabbitMQChannelMockRecorder) RabbitMQContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQChannel)(nil).RabbitMQContext))
+}
+
+// MockRabbitMQQueue is a mock of RabbitMQQueue interface.
+type MockRabbitMQQueue struct {
+	ctrl     *gomock.Controller
+	recorder *MockRabbitMQQueueMockRecorder
+}
+
+// MockRabbitMQQueueMockRecorder is the mock recorder for MockRabbitMQQueue.
+type MockRabbitMQQueueMockRecorder struct {
+	mock *MockRabbitMQQueue
+}
+
+// NewMockRabbitMQQueue creates a new mock instance.
+func NewMockRabbitMQQueue(ctrl *gomock.Controller) *MockRabbitMQQueue {
+	mock := &MockRabbitMQQueue{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQQueueMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRabbitMQQueue) EXPECT() *MockRabbitMQQueueMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockRabbitMQQueue) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRabbitMQQueueMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQQueue)(nil).Close))
+}
+
+// Connect mocks base method.
+func (m *MockRabbitMQQueue) Connect() (*amqp091.Queue, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Connect")
+	ret0, _ := ret[0].(*amqp091.Queue)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockRabbitMQQueueMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQQueue)(nil).Connect))
+}
+
+// RabbitMQContext mocks base method.
+func (m *MockRabbitMQQueue) RabbitMQContext() RabbitMQContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RabbitMQContext")
+	ret0, _ := ret[0].(RabbitMQContext)
+	return ret0
+}
+
+// RabbitMQContext indicates an expected call of RabbitMQContext.
+func (mr *MockRabbitMQQueueMockRecorder) RabbitMQContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQQueue)(nil).RabbitMQContext))
 }
 
 // MockRabbitMQQueueConnection is a mock of RabbitMQQueueConnection interface.
@@ -218,6 +360,20 @@ func (m *MockRabbitMQQueueMessageListener) OnMessage(message *amqp091.Delivery) 
 func (mr *MockRabbitMQQueueMessageListenerMockRecorder) OnMessage(message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockRabbitMQQueueMessageListener)(nil).OnMessage), message)
+}
+
+// Queue mocks base method.
+func (m *MockRabbitMQQueueMessageListener) Queue() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Queue")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Queue indicates an expected call of Queue.
+func (mr *MockRabbitMQQueueMessageListenerMockRecorder) Queue() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Queue", reflect.TypeOf((*MockRabbitMQQueueMessageListener)(nil).Queue))
 }
 
 // MockNatsSubjectConnection is a mock of NatsSubjectConnection interface.

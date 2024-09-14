@@ -61,7 +61,7 @@ func NewDefaultEnvironment(options ...DefaultEnvironmentOption) *DefaultEnvironm
 	return environment
 }
 
-func (environment *DefaultEnvironment) GetValue(property string) EnvVar {
+func (environment *DefaultEnvironment) Value(property string) EnvVar {
 
 	var value string
 	for _, source := range environment.propertySources {
@@ -74,16 +74,16 @@ func (environment *DefaultEnvironment) GetValue(property string) EnvVar {
 	return NewEnvVar(value)
 }
 
-func (environment *DefaultEnvironment) GetValueOrDefault(property string, defaultValue string) EnvVar {
+func (environment *DefaultEnvironment) ValueOrDefault(property string, defaultValue string) EnvVar {
 
-	envVar := environment.GetValue(property)
+	envVar := environment.Value(property)
 	if envVar != "" {
 		return envVar
 	}
 	return NewEnvVar(defaultValue)
 }
 
-func (environment *DefaultEnvironment) GetPropertySources() []properties.PropertySource {
+func (environment *DefaultEnvironment) PropertySources() []properties.PropertySource {
 	return environment.propertySources
 }
 

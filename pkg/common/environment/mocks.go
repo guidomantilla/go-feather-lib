@@ -55,44 +55,44 @@ func (mr *MockEnvironmentMockRecorder) AppendPropertySources(propertySources ...
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendPropertySources", reflect.TypeOf((*MockEnvironment)(nil).AppendPropertySources), propertySources...)
 }
 
-// GetPropertySources mocks base method.
-func (m *MockEnvironment) GetPropertySources() []properties.PropertySource {
+// PropertySources mocks base method.
+func (m *MockEnvironment) PropertySources() []properties.PropertySource {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPropertySources")
+	ret := m.ctrl.Call(m, "PropertySources")
 	ret0, _ := ret[0].([]properties.PropertySource)
 	return ret0
 }
 
-// GetPropertySources indicates an expected call of GetPropertySources.
-func (mr *MockEnvironmentMockRecorder) GetPropertySources() *gomock.Call {
+// PropertySources indicates an expected call of PropertySources.
+func (mr *MockEnvironmentMockRecorder) PropertySources() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPropertySources", reflect.TypeOf((*MockEnvironment)(nil).GetPropertySources))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PropertySources", reflect.TypeOf((*MockEnvironment)(nil).PropertySources))
 }
 
-// GetValue mocks base method.
-func (m *MockEnvironment) GetValue(property string) EnvVar {
+// Value mocks base method.
+func (m *MockEnvironment) Value(property string) EnvVar {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetValue", property)
+	ret := m.ctrl.Call(m, "Value", property)
 	ret0, _ := ret[0].(EnvVar)
 	return ret0
 }
 
-// GetValue indicates an expected call of GetValue.
-func (mr *MockEnvironmentMockRecorder) GetValue(property any) *gomock.Call {
+// Value indicates an expected call of Value.
+func (mr *MockEnvironmentMockRecorder) Value(property any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValue", reflect.TypeOf((*MockEnvironment)(nil).GetValue), property)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Value", reflect.TypeOf((*MockEnvironment)(nil).Value), property)
 }
 
-// GetValueOrDefault mocks base method.
-func (m *MockEnvironment) GetValueOrDefault(property, defaultValue string) EnvVar {
+// ValueOrDefault mocks base method.
+func (m *MockEnvironment) ValueOrDefault(property, defaultValue string) EnvVar {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetValueOrDefault", property, defaultValue)
+	ret := m.ctrl.Call(m, "ValueOrDefault", property, defaultValue)
 	ret0, _ := ret[0].(EnvVar)
 	return ret0
 }
 
-// GetValueOrDefault indicates an expected call of GetValueOrDefault.
-func (mr *MockEnvironmentMockRecorder) GetValueOrDefault(property, defaultValue any) *gomock.Call {
+// ValueOrDefault indicates an expected call of ValueOrDefault.
+func (mr *MockEnvironmentMockRecorder) ValueOrDefault(property, defaultValue any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValueOrDefault", reflect.TypeOf((*MockEnvironment)(nil).GetValueOrDefault), property, defaultValue)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValueOrDefault", reflect.TypeOf((*MockEnvironment)(nil).ValueOrDefault), property, defaultValue)
 }

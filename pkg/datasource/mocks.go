@@ -40,46 +40,46 @@ func (m *MockDatasourceContext) EXPECT() *MockDatasourceContextMockRecorder {
 	return m.recorder
 }
 
-// GetServer mocks base method.
-func (m *MockDatasourceContext) GetServer() string {
+// Server mocks base method.
+func (m *MockDatasourceContext) Server() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetServer")
+	ret := m.ctrl.Call(m, "Server")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetServer indicates an expected call of GetServer.
-func (mr *MockDatasourceContextMockRecorder) GetServer() *gomock.Call {
+// Server indicates an expected call of Server.
+func (mr *MockDatasourceContextMockRecorder) Server() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockDatasourceContext)(nil).GetServer))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockDatasourceContext)(nil).Server))
 }
 
-// GetService mocks base method.
-func (m *MockDatasourceContext) GetService() string {
+// Service mocks base method.
+func (m *MockDatasourceContext) Service() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetService")
+	ret := m.ctrl.Call(m, "Service")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetService indicates an expected call of GetService.
-func (mr *MockDatasourceContextMockRecorder) GetService() *gomock.Call {
+// Service indicates an expected call of Service.
+func (mr *MockDatasourceContextMockRecorder) Service() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetService", reflect.TypeOf((*MockDatasourceContext)(nil).GetService))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockDatasourceContext)(nil).Service))
 }
 
-// GetUrl mocks base method.
-func (m *MockDatasourceContext) GetUrl() string {
+// Url mocks base method.
+func (m *MockDatasourceContext) Url() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUrl")
+	ret := m.ctrl.Call(m, "Url")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetUrl indicates an expected call of GetUrl.
-func (mr *MockDatasourceContextMockRecorder) GetUrl() *gomock.Call {
+// Url indicates an expected call of Url.
+func (mr *MockDatasourceContextMockRecorder) Url() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUrl", reflect.TypeOf((*MockDatasourceContext)(nil).GetUrl))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockDatasourceContext)(nil).Url))
 }
 
 // MockDatasource is a mock of Datasource interface.
@@ -130,6 +130,20 @@ func (m *MockDatasource) Connect() (*gorm.DB, error) {
 func (mr *MockDatasourceMockRecorder) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockDatasource)(nil).Connect))
+}
+
+// DatasourceContext mocks base method.
+func (m *MockDatasource) DatasourceContext() DatasourceContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DatasourceContext")
+	ret0, _ := ret[0].(DatasourceContext)
+	return ret0
+}
+
+// DatasourceContext indicates an expected call of DatasourceContext.
+func (mr *MockDatasourceMockRecorder) DatasourceContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatasourceContext", reflect.TypeOf((*MockDatasource)(nil).DatasourceContext))
 }
 
 // MockTransactionHandler is a mock of TransactionHandler interface.
