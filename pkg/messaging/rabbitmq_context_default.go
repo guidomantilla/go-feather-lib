@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -14,11 +15,18 @@ func WithFailOver(failOver bool) RabbitMQContextOption {
 	}
 }
 
+func WithInternalObserver(internalObserver bool) RabbitMQContextOption {
+	return func(rabbitMQContext *DefaultRabbitMQContext) {
+		rabbitMQContext.internalObserver = internalObserver
+	}
+}
+
 type DefaultRabbitMQContext struct {
 	url                       string
 	server                    string
 	failOver                  bool
 	notifyOnFaiOverConnection chan string
+	internalObserver          bool
 }
 
 func NewDefaultRabbitMQContext(url string, username string, password string, server string, options ...RabbitMQContextOption) *DefaultRabbitMQContext {
@@ -53,6 +61,10 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 		opt(rabbitMQContext)
 	}
 
+	if rabbitMQContext.internalObserver {
+		go rabbitMQContext.observe()
+	}
+
 	return rabbitMQContext
 }
 
@@ -70,4 +82,13 @@ func (context *DefaultRabbitMQContext) FailOver() bool {
 
 func (context *DefaultRabbitMQContext) NotifyOnFaiOverConnection() chan string {
 	return context.notifyOnFaiOverConnection
+}
+
+func (context *DefaultRabbitMQContext) observe() {
+	for {
+		select {
+		case <-context.notifyOnFaiOverConnection:
+			log.Debug(fmt.Sprintf("rabbitmq context - reconnected"))
+		}
+	}
 }

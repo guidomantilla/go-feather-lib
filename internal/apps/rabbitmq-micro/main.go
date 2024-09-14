@@ -22,14 +22,18 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	option := messaging.WithFailOver(true)
-	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672", option)
+	options := []messaging.RabbitMQContextOption{
+		messaging.WithFailOver(true),
+		//messaging.WithInternalObserver(true),
+	}
+	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672", options...)
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	defer connection.Close()
 
 	channel := messaging.NewDefaultRabbitMQChannel(connection)
 	defer channel.Close()
 
+	//connection.Connect()
 	channel.Connect()
 	app.Attach("DummyServer", server.BuildDummyServer())
 

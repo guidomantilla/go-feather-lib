@@ -84,6 +84,7 @@ func (channel *DefaultRabbitMQChannel) reconnect() {
 		channel.Close()
 
 		<-channel.RabbitMQContext().NotifyOnFaiOverConnection()
+		log.Debug(fmt.Sprintf("rabbitmq channel - trying reconnection to channel"))
 
 		for {
 			time.Sleep(time.Duration(1) * time.Second)
@@ -91,7 +92,7 @@ func (channel *DefaultRabbitMQChannel) reconnect() {
 				log.Error(fmt.Sprintf("rabbitmq channel - failed reconnection to channel: %s", err.Error()))
 				continue
 			}
-
+			log.Info(fmt.Sprintf("rabbitmq channel - reconnected to channel"))
 			break
 		}
 	}
