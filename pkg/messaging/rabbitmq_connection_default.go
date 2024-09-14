@@ -66,13 +66,17 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 
 func (connection *DefaultRabbitMQConnection) reconnect() {
 
+	if !connection.rabbitmqContext.FailOver() {
+		return
+	}
+
 	for {
 		var ok bool
 		var reason *amqp.Error
 		if reason, ok = <-connection.notifyOnClosedConnection; !ok {
-			continue
+			break
 		}
-		log.Warn(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
+		log.Debug(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
 		connection.Close()
 
 		for {
@@ -82,7 +86,6 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 				continue
 			}
 
-			log.Info(fmt.Sprintf("rabbitmq connection - reconnected to %s", connection.rabbitmqContext.Server()))
 			break
 		}
 	}
@@ -95,6 +98,7 @@ func (connection *DefaultRabbitMQConnection) Close() {
 			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.rabbitmqContext.Server(), err.Error()))
 		}
 	}
+	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.rabbitmqContext.Server()))
 }
 
 func (connection *DefaultRabbitMQConnection) RabbitMQContext() RabbitMQContext {

@@ -14,26 +14,27 @@ const (
 type RabbitMQContext interface {
 	Url() string
 	Server() string
+	FailOver() bool
 }
 
 //
 
 type RabbitMQConnection interface {
+	RabbitMQContext() RabbitMQContext
 	Connect() (*amqp.Connection, error)
 	Close()
-	RabbitMQContext() RabbitMQContext
 }
 
 type RabbitMQChannel interface {
+	RabbitMQContext() RabbitMQContext
 	Connect() (*amqp.Channel, error)
 	Close()
-	RabbitMQContext() RabbitMQContext
 }
 
 type RabbitMQQueue interface {
+	RabbitMQContext() RabbitMQContext
 	Connect() (*amqp.Queue, error)
 	Close()
-	RabbitMQContext() RabbitMQContext
 }
 
 //

@@ -6,12 +6,21 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultRabbitMQContext struct {
-	url    string
-	server string
+type RabbitMQContextOption func(rabbitMQContext *DefaultRabbitMQContext)
+
+func WithFailOver(failOver bool) RabbitMQContextOption {
+	return func(rabbitMQContext *DefaultRabbitMQContext) {
+		rabbitMQContext.failOver = failOver
+	}
 }
 
-func NewDefaultRabbitMQContext(url string, username string, password string, server string) *DefaultRabbitMQContext {
+type DefaultRabbitMQContext struct {
+	url      string
+	server   string
+	failOver bool
+}
+
+func NewDefaultRabbitMQContext(url string, username string, password string, server string, options ...RabbitMQContextOption) *DefaultRabbitMQContext {
 
 	if strings.TrimSpace(url) == "" {
 		log.Fatal("starting up - error setting up rabbitMQContext: url is empty")
@@ -33,10 +42,16 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 	url = strings.Replace(url, ":password", password, 1)
 	url = strings.Replace(url, ":server", server, 1)
 
-	return &DefaultRabbitMQContext{
+	rabbitMQContext := &DefaultRabbitMQContext{
 		url:    url,
 		server: server,
 	}
+
+	for _, opt := range options {
+		opt(rabbitMQContext)
+	}
+
+	return rabbitMQContext
 }
 
 func (context *DefaultRabbitMQContext) Url() string {
@@ -45,4 +60,8 @@ func (context *DefaultRabbitMQContext) Url() string {
 
 func (context *DefaultRabbitMQContext) Server() string {
 	return context.server
+}
+
+func (context *DefaultRabbitMQContext) FailOver() bool {
+	return context.failOver
 }
