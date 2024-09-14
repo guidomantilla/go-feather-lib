@@ -36,6 +36,7 @@ type RabbitMQQueueConnection interface {
 var _ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
 
 type RabbitMQQueueMessageListener interface {
+	Queue() string
 	OnMessage(message *amqp.Delivery) error
 }
 

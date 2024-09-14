@@ -13,10 +13,17 @@ import (
 var JunkMessage = amqp.Delivery{}
 
 type DefaultRabbitMQQueueMessageListener struct {
+	queue string
 }
 
-func NewDefaultRabbitMQQueueMessageListener() *DefaultRabbitMQQueueMessageListener {
-	return &DefaultRabbitMQQueueMessageListener{}
+func NewDefaultRabbitMQQueueMessageListener(queue string) *DefaultRabbitMQQueueMessageListener {
+	return &DefaultRabbitMQQueueMessageListener{
+		queue: queue,
+	}
+}
+
+func (listener *DefaultRabbitMQQueueMessageListener) Queue() string {
+	return listener.queue
 }
 
 func (listener *DefaultRabbitMQQueueMessageListener) OnMessage(message *amqp.Delivery) error {

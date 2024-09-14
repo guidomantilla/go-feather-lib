@@ -13,12 +13,12 @@ import (
 
 type RabbitMQQueueMessageDispatcher struct {
 	ctx                  context.Context
-	connection           messaging.RabbitMQQueueConnection
+	connection           messaging.RabbitMQConnection
 	listener             messaging.RabbitMQQueueMessageListener
 	receivedMessagesChan <-chan amqp.Delivery
 }
 
-func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQQueueConnection, listener messaging.RabbitMQQueueMessageListener) Server {
+func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: connection is nil")
@@ -41,11 +41,27 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server starting up - starting rabbitmq queue dispatcher %s, v.%s", info.Name(), info.Version()))
 
-	server.connection.Start()
-
 	var err error
 
-	if _, _, _, server.receivedMessagesChan, err = server.connection.Connect(); err != nil {
+	var connection *amqp.Connection
+	if connection, err = server.connection.Connect(); err != nil {
+		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
+		return err
+	}
+
+	var channel *amqp.Channel
+	if channel, err = connection.Channel(); err != nil {
+		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
+		return err
+	}
+
+	var queue amqp.Queue
+	if queue, err = channel.QueueDeclare(server.listener.Queue(), true, false, false, false, nil); err != nil {
+		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
+		return err
+	}
+
+	if server.receivedMessagesChan, err = channel.Consume(queue.Name, "xxx", false, false, false, false, nil); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
