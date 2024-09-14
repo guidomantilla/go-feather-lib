@@ -10,12 +10,10 @@ import (
 )
 
 type DefaultDatasource struct {
-	url       string
-	server    string
-	service   string
-	database  *gorm.DB
-	dialector gorm.Dialector
-	opts      []gorm.Option
+	datasourceContext DatasourceContext
+	database          *gorm.DB
+	dialector         gorm.Dialector
+	opts              []gorm.Option
 }
 
 func NewDefaultDatasource(datasourceContext DatasourceContext, dialector gorm.Dialector, opts ...gorm.Option) *DefaultDatasource {
@@ -25,22 +23,10 @@ func NewDefaultDatasource(datasourceContext DatasourceContext, dialector gorm.Di
 	}
 
 	return &DefaultDatasource{
-		url:       datasourceContext.GetUrl(),
-		server:    datasourceContext.GetServer(),
-		service:   datasourceContext.GetService(),
-		database:  nil,
-		dialector: dialector,
-		opts:      opts,
-	}
-}
-
-func (datasource *DefaultDatasource) Close() {
-
-	if datasource.database != nil {
-		sqlDB, _ := datasource.database.DB()
-		if err := sqlDB.Close(); err != nil {
-			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.server, datasource.service, err.Error()))
-		}
+		datasourceContext: datasourceContext,
+		database:          nil,
+		dialector:         dialector,
+		opts:              opts,
 	}
 }
 
@@ -51,7 +37,7 @@ func (datasource *DefaultDatasource) Connect() (*gorm.DB, error) {
 		err := retry.Do(datasource.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
 				log.Info("datasource connection - failed to connect")
-				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.server, datasource.service))
+				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService()))
 			}),
 		)
 
@@ -70,7 +56,21 @@ func (datasource *DefaultDatasource) connect() error {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.server, datasource.service))
+	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService()))
 
 	return nil
+}
+
+func (datasource *DefaultDatasource) Close() {
+
+	if datasource.database != nil {
+		sqlDB, _ := datasource.database.DB()
+		if err := sqlDB.Close(); err != nil {
+			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.datasourceContext.GetServer(), datasource.datasourceContext.GetService(), err.Error()))
+		}
+	}
+}
+
+func (datasource *DefaultDatasource) DatasourceContext() DatasourceContext {
+	return datasource.datasourceContext
 }

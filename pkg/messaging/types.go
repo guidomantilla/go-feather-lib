@@ -21,6 +21,7 @@ type MessagingContext interface {
 type RabbitMQConnection interface {
 	Connect() (*amqp.Connection, error)
 	Close()
+	MessagingContext() MessagingContext
 }
 
 //
