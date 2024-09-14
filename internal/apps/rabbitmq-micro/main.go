@@ -23,6 +23,7 @@ func main() {
 	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	connection.Connect()
+	defer connection.Close()
 	//listener := messaging.NewDefaultRabbitMQQueueMessageListener()
 	//dispatcher := server.BuildRabbitMQQueueMessageDispatcher(connection, listener)
 	app.Attach("RabbitMQDispatcher", server.BuildDummyServer())
