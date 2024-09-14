@@ -7,11 +7,12 @@ import (
 )
 
 type DefaultRabbitMQContext struct {
-	url    string
-	server string
+	url                string
+	server             string
+	notifyOnCloseEvent chan error
 }
 
-func NewDefaultRabbitMQContext(url string, username string, password string, server string) *DefaultRabbitMQContext {
+func NewDefaultRabbitMQContext(url string, username string, password string, server string, notifyOnCloseEvent chan error) *DefaultRabbitMQContext {
 
 	if strings.TrimSpace(url) == "" {
 		log.Fatal("starting up - error setting up rabbitMQContext: url is empty")
@@ -29,13 +30,18 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 		log.Fatal("starting up - error setting up rabbitMQContext: server is empty")
 	}
 
+	if notifyOnCloseEvent == nil {
+		log.Fatal("starting up - error setting up rabbitMQContext: notifyOnCloseEvent is nil")
+	}
+
 	url = strings.Replace(url, ":username", username, 1)
 	url = strings.Replace(url, ":password", password, 1)
 	url = strings.Replace(url, ":server", server, 1)
 
 	return &DefaultRabbitMQContext{
-		url:    url,
-		server: server,
+		url:                url,
+		server:             server,
+		notifyOnCloseEvent: notifyOnCloseEvent,
 	}
 }
 
@@ -45,4 +51,8 @@ func (context *DefaultRabbitMQContext) GetUrl() string {
 
 func (context *DefaultRabbitMQContext) GetServer() string {
 	return context.server
+}
+
+func (context *DefaultRabbitMQContext) NotifyOnCloseEvent() chan error {
+	return context.notifyOnCloseEvent
 }

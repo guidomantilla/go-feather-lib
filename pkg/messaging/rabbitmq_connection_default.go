@@ -17,6 +17,7 @@ type DefaultRabbitMQConnection struct {
 	notifyOnClosedConnection chan *amqp.Error
 	channel                  *amqp.Channel
 	notifyOnClosedChannel    chan *amqp.Error
+	notifyOnClosedEvent      chan error
 }
 
 func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRabbitMQConnection {
@@ -30,28 +31,14 @@ func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRab
 		server:                   messagingContext.GetServer(),
 		notifyOnClosedConnection: make(chan *amqp.Error),
 		notifyOnClosedChannel:    make(chan *amqp.Error),
+		notifyOnClosedEvent:      messagingContext.NotifyOnCloseEvent(),
 	}
 }
 
-func (connection *DefaultRabbitMQConnection) Close() {
+func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Channel, error) {
 
-	if connection.channel != nil && !connection.channel.IsClosed() {
-		if err := connection.channel.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq connection - failed to close channel to %s: %s", connection.server, err.Error()))
-		}
-	}
-
-	if connection.connection != nil && !connection.connection.IsClosed() {
-		if err := connection.connection.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.server, err.Error()))
-		}
-	}
-}
-
-func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error) {
-
-	if connection.connection != nil {
-		return connection.connection, nil
+	if connection.connection != nil && connection.channel != nil {
+		return connection.channel, nil
 	}
 
 	err := retry.Do(connection.connect, retry.Attempts(5),
@@ -68,7 +55,7 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 
 	go connection.reconnect()
 
-	return connection.connection, nil
+	return connection.channel, nil
 }
 
 func (connection *DefaultRabbitMQConnection) connect() error {
@@ -104,21 +91,37 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 		var ok bool
 		var reason *amqp.Error
 		if reason, ok = checkClosedNotificationChannel(); !ok {
-			log.Info(fmt.Sprintf("rabbitmq connection - connection closed: %s", connection.server))
 			continue
 		}
-		log.Info(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
+		log.Warn(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
 		connection.Close()
 
 		for {
 			time.Sleep(time.Duration(1) * time.Second)
 			if err := connection.connect(); err != nil {
-				log.Error(fmt.Sprintf("connection - failed reconnection to %s: %s", connection.server, err.Error()))
+				log.Error(fmt.Sprintf("rabbitmq connection - failed reconnection to %s: %s", connection.server, err.Error()))
 				continue
 			}
 
 			log.Info(fmt.Sprintf("rabbitmq connection - reconnected to %s", connection.server))
+			connection.notifyOnClosedEvent <- fmt.Errorf("connection closed unexpectedly: %s", reason.Reason)
+
 			break
+		}
+	}
+}
+
+func (connection *DefaultRabbitMQConnection) Close() {
+
+	if connection.channel != nil && !connection.channel.IsClosed() {
+		if err := connection.channel.Close(); err != nil {
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close channel to %s: %s", connection.server, err.Error()))
+		}
+	}
+
+	if connection.connection != nil && !connection.connection.IsClosed() {
+		if err := connection.connection.Close(); err != nil {
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.server, err.Error()))
 		}
 	}
 }

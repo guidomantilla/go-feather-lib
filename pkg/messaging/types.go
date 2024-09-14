@@ -14,12 +14,13 @@ const (
 type MessagingContext interface {
 	GetUrl() string
 	GetServer() string
+	NotifyOnCloseEvent() chan error
 }
 
 //
 
 type RabbitMQConnection interface {
-	Connect() (*amqp.Connection, error)
+	Connect() (*amqp.Channel, error)
 	Close()
 }
 

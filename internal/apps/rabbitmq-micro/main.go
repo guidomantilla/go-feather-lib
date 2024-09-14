@@ -22,14 +22,16 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
+	notifyOnClosedEvent := make(chan error)
+	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672", notifyOnClosedEvent)
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
-	connection.Connect()
+	//connection.Connect()
 	defer connection.Close()
 
-	//listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")
-	//dispatcher := server.BuildRabbitMQQueueMessageDispatcher(connection, listener)
-	app.Attach("RabbitMQDispatcher", server.BuildDummyServer())
+	listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")
+	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(messagingContext, connection, listener)
+	app.Attach("DummyServer", server.BuildDummyServer())
+	app.Attach("RabbitMQDispatcher", dispatcher)
 
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())

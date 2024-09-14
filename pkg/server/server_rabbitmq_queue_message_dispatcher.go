@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
 	"github.com/qmdx00/lifecycle"
 	amqp "github.com/rabbitmq/amqp091-go"
 
@@ -19,9 +19,14 @@ type RabbitMQQueueMessageDispatcher struct {
 	notifyOnClosedConnection chan *amqp.Error
 	notifyOnClosedChannel    chan *amqp.Error
 	notifyOnClosedQueue      chan string
+	notifyOnClosedEvent      chan error
 }
 
-func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
+func BuildRabbitMQQueueMessageDispatcher(messagingContext messaging.MessagingContext, connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
+
+	if messagingContext == nil {
+		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: messagingContext is nil")
+	}
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: connection is nil")
@@ -35,6 +40,7 @@ func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQConnection
 		connection:           connection,
 		listener:             listener,
 		receivedMessagesChan: make(<-chan amqp.Delivery),
+		notifyOnClosedEvent:  messagingContext.NotifyOnCloseEvent(),
 	}
 }
 
@@ -44,36 +50,50 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server starting up - starting rabbitmq queue dispatcher %s, v.%s", info.Name(), info.Version()))
 
+	if err := server.listen(); err != nil {
+		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
+		return err
+	}
+
+	for {
+		select {
+		case <-server.ctx.Done():
+			return nil
+		case <-server.notifyOnClosedEvent:
+			//log.Warn(fmt.Sprintf("rabbitmq queue dispatcher - connection closed unexpectedly: %s", reason))
+			if err := server.listen(); err != nil {
+				log.Error(fmt.Sprintf("rabbitmq queue dispatcher - failure reestablishing connection: %s", err.Error()))
+				continue
+			}
+			log.Info(fmt.Sprintf("rabbitmq queue dispatcher - connection reestablish to queue %s", server.listener.Queue()))
+		case reason, _ := <-server.notifyOnClosedQueue:
+			return errors.New(fmt.Sprintf("rabbitmq queue dispatcher - queue %s closed unexpectedly: %s", server.listener.Queue(), reason))
+		case message, ok := <-server.receivedMessagesChan:
+			if ok {
+				go server.Dispatch(&message)
+			}
+		}
+	}
+}
+
+func (server *RabbitMQQueueMessageDispatcher) listen() error {
+
 	var err error
-
-	var connection *amqp.Connection
-	if connection, err = server.connection.Connect(); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
-		return err
-	}
-	server.notifyOnClosedConnection = connection.NotifyClose(make(chan *amqp.Error))
-
 	var channel *amqp.Channel
-	if channel, err = connection.Channel(); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
+	if channel, err = server.connection.Connect(); err != nil {
 		return err
 	}
-	server.notifyOnClosedChannel = channel.NotifyClose(make(chan *amqp.Error))
 
 	var queue amqp.Queue
 	if queue, err = channel.QueueDeclare(server.listener.Queue(), true, false, false, false, nil); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
-	server.notifyOnClosedQueue = channel.NotifyCancel(make(chan string))
+	if server.notifyOnClosedQueue == nil {
+		server.notifyOnClosedQueue = make(chan string)
+	}
+	channel.NotifyCancel(server.notifyOnClosedQueue)
 
 	if server.receivedMessagesChan, err = channel.Consume(queue.Name, "xxx", false, false, false, false, nil); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
-		return err
-	}
-
-	if err = server.ListenAndDispatch(); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
 
@@ -86,8 +106,13 @@ func (server *RabbitMQQueueMessageDispatcher) ListenAndDispatch() error {
 		select {
 		case <-server.ctx.Done():
 			return nil
-		case message := <-server.receivedMessagesChan:
-			go server.Dispatch(&message)
+		case <-server.notifyOnClosedQueue:
+			log.Warn("server starting up - rabbitmq queue dispatcher - queue closed")
+			return nil
+		case message, ok := <-server.receivedMessagesChan:
+			if ok {
+				go server.Dispatch(&message)
+			}
 		}
 	}
 }
