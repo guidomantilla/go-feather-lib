@@ -21,10 +21,10 @@ type RabbitMQQueueMessageDispatcher struct {
 	notifyOnClosedQueue      chan string
 }
 
-func BuildRabbitMQQueueMessageDispatcher(messagingContext messaging.MessagingContext, connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
+func BuildRabbitMQQueueMessageDispatcher(rabbitMQContext messaging.RabbitMQContext, connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
 
-	if messagingContext == nil {
-		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: messagingContext is nil")
+	if rabbitMQContext == nil {
+		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: rabbitMQContext is nil")
 	}
 
 	if connection == nil {

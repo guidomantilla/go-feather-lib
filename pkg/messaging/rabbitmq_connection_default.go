@@ -11,19 +11,19 @@ import (
 )
 
 type DefaultRabbitMQConnection struct {
-	messagingContext         MessagingContext
+	rabbitmqContext          RabbitMQContext
 	connection               *amqp.Connection
 	notifyOnClosedConnection chan *amqp.Error
 }
 
-func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRabbitMQConnection {
+func NewDefaultRabbitMQConnection(rabbitmqContext RabbitMQContext) *DefaultRabbitMQConnection {
 
-	if messagingContext == nil {
-		log.Fatal("starting up - error setting up rabbitMQConnection: messagingContext is nil")
+	if rabbitmqContext == nil {
+		log.Fatal("starting up - error setting up rabbitMQConnection: rabbitmqContext is nil")
 	}
 
 	return &DefaultRabbitMQConnection{
-		messagingContext:         messagingContext,
+		rabbitmqContext:          rabbitmqContext,
 		notifyOnClosedConnection: make(chan *amqp.Error),
 	}
 }
@@ -37,12 +37,12 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 	err := retry.Do(connection.connect, retry.Attempts(5),
 		retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
-			log.Debug(fmt.Sprintf("rabbitmq connection - trying reconnection to %s", connection.messagingContext.GetServer()))
+			log.Debug(fmt.Sprintf("rabbitmq connection - trying reconnection to %s", connection.rabbitmqContext.GetServer()))
 		}),
 	)
 
 	if err != nil {
-		log.Error(fmt.Sprintf("rabbitmq connection - failed connection to %s", connection.messagingContext.GetServer()))
+		log.Error(fmt.Sprintf("rabbitmq connection - failed connection to %s", connection.rabbitmqContext.GetServer()))
 		return nil, err
 	}
 
@@ -54,12 +54,12 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 func (connection *DefaultRabbitMQConnection) connect() error {
 
 	var err error
-	if connection.connection, err = amqp.Dial(connection.messagingContext.GetUrl()); err != nil {
+	if connection.connection, err = amqp.Dial(connection.rabbitmqContext.GetUrl()); err != nil {
 		return err
 	}
 
 	connection.notifyOnClosedConnection = connection.connection.NotifyClose(make(chan *amqp.Error))
-	log.Debug(fmt.Sprintf("rabbitmq connection - connected to %s", connection.messagingContext.GetServer()))
+	log.Debug(fmt.Sprintf("rabbitmq connection - connected to %s", connection.rabbitmqContext.GetServer()))
 
 	return nil
 }
@@ -78,11 +78,11 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 		for {
 			time.Sleep(time.Duration(1) * time.Second)
 			if err := connection.connect(); err != nil {
-				log.Error(fmt.Sprintf("rabbitmq connection - failed reconnection to %s: %s", connection.messagingContext.GetServer(), err.Error()))
+				log.Error(fmt.Sprintf("rabbitmq connection - failed reconnection to %s: %s", connection.rabbitmqContext.GetServer(), err.Error()))
 				continue
 			}
 
-			log.Info(fmt.Sprintf("rabbitmq connection - reconnected to %s", connection.messagingContext.GetServer()))
+			log.Info(fmt.Sprintf("rabbitmq connection - reconnected to %s", connection.rabbitmqContext.GetServer()))
 			break
 		}
 	}
@@ -92,11 +92,11 @@ func (connection *DefaultRabbitMQConnection) Close() {
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		if err := connection.connection.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.messagingContext.GetServer(), err.Error()))
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.rabbitmqContext.GetServer(), err.Error()))
 		}
 	}
 }
 
-func (connection *DefaultRabbitMQConnection) MessagingContext() MessagingContext {
-	return connection.messagingContext
+func (connection *DefaultRabbitMQConnection) RabbitMQContext() RabbitMQContext {
+	return connection.rabbitmqContext
 }
