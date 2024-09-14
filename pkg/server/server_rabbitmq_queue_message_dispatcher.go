@@ -134,9 +134,7 @@ func (server *RabbitMQQueueMessageDispatcher) Stop(ctx context.Context) error {
 
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server shutting down - stopping rabbitmq queue dispatcher %s, v.%s", info.Name(), info.Version()))
-
 	server.connection.Close()
-
-	log.Info("server shutting down - rabbitmq queue dispatcher stopped")
+	log.Debug("server shutting down - rabbitmq queue dispatcher stopped")
 	return nil
 }

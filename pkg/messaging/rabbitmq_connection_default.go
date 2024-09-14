@@ -34,10 +34,9 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 		return connection.connection, nil
 	}
 
-	err := retry.Do(connection.connect, retry.Attempts(5),
+	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(makeConnectionDelay),
 		retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
-			log.Debug(fmt.Sprintf("rabbitmq connection - trying reconnection to %s", connection.rabbitmqContext.Server()))
 		}),
 	)
 
@@ -76,16 +75,18 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 		if reason, ok = <-connection.notifyOnClosedConnection; !ok {
 			break
 		}
-		log.Debug(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
+		log.Warn(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
 		connection.Close()
 
 		for {
-			time.Sleep(time.Duration(1) * time.Second)
+			time.Sleep(makeConnectionDelay)
 			if err := connection.connect(); err != nil {
 				log.Error(fmt.Sprintf("rabbitmq connection - failed reconnection to %s: %s", connection.rabbitmqContext.Server(), err.Error()))
 				continue
 			}
 
+			log.Info(fmt.Sprintf("rabbitmq connection - reconnected to %s", connection.rabbitmqContext.Server()))
+			connection.rabbitmqContext.NotifyOnFaiOverConnection() <- fmt.Sprintf("reconnected to %s", connection.rabbitmqContext.Server())
 			break
 		}
 	}

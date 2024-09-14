@@ -71,9 +71,7 @@ func (server *NatsMessageDispatcher) Stop(ctx context.Context) error {
 
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server shutting down - stopping nats dispatcher %s, v.%s", info.Name(), info.Version()))
-
 	server.connection.Close()
-
-	log.Info("server shutting down - nats dispatcher stopped")
+	log.Debug("server shutting down - nats dispatcher stopped")
 	return nil
 }

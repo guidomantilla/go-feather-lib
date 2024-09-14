@@ -15,7 +15,7 @@ func main() {
 
 	var err error
 	appName, version := "rabbitmq-micro", "1.0.0"
-	os.Setenv("LOG_LEVEL", "DEBUG")
+	os.Setenv("LOG_LEVEL", "INFO")
 	log.Custom()
 	app := lifecycle.NewApp(
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
@@ -27,7 +27,10 @@ func main() {
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	defer connection.Close()
 
-	connection.Connect()
+	channel := messaging.NewDefaultRabbitMQChannel(connection)
+	defer channel.Close()
+
+	channel.Connect()
 	app.Attach("DummyServer", server.BuildDummyServer())
 
 	//listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")

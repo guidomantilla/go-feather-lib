@@ -15,9 +15,10 @@ func WithFailOver(failOver bool) RabbitMQContextOption {
 }
 
 type DefaultRabbitMQContext struct {
-	url      string
-	server   string
-	failOver bool
+	url                       string
+	server                    string
+	failOver                  bool
+	notifyOnFaiOverConnection chan string
 }
 
 func NewDefaultRabbitMQContext(url string, username string, password string, server string, options ...RabbitMQContextOption) *DefaultRabbitMQContext {
@@ -43,8 +44,9 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 	url = strings.Replace(url, ":server", server, 1)
 
 	rabbitMQContext := &DefaultRabbitMQContext{
-		url:    url,
-		server: server,
+		url:                       url,
+		server:                    server,
+		notifyOnFaiOverConnection: make(chan string, 100),
 	}
 
 	for _, opt := range options {
@@ -64,4 +66,8 @@ func (context *DefaultRabbitMQContext) Server() string {
 
 func (context *DefaultRabbitMQContext) FailOver() bool {
 	return context.failOver
+}
+
+func (context *DefaultRabbitMQContext) NotifyOnFaiOverConnection() chan string {
+	return context.notifyOnFaiOverConnection
 }

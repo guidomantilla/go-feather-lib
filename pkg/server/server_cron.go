@@ -37,9 +37,7 @@ func (server *CronServer) Run(ctx context.Context) error {
 func (server *CronServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping cron server")
-
 	server.internal.Stop()
-
-	log.Info("shutting down - cron server stopped")
+	log.Debug("shutting down - cron server stopped")
 	return nil
 }

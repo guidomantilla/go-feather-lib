@@ -41,12 +41,10 @@ func (server *HttpServer) Run(ctx context.Context) error {
 func (server *HttpServer) Stop(ctx context.Context) error {
 
 	log.Info("shutting down - stopping http server")
-
 	if err := server.internal.Shutdown(ctx); err != nil {
 		log.Error(fmt.Sprintf("shutting down - forced shutdown: %s", err.Error()))
 		return err
 	}
-
-	log.Info("shutting down - http server stopped")
+	log.Debug("shutting down - http server stopped")
 	return nil
 }

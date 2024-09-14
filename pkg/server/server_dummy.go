@@ -26,6 +26,6 @@ func (server *DummyServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping dummy server")
 	server.channel <- "stop"
-	log.Info("shutting down - dummy server stopped")
+	log.Debug("shutting down - dummy server stopped")
 	return nil
 }

@@ -59,7 +59,6 @@ func (server *GrpcServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping grpc server")
 	server.internal.GracefulStop()
-	log.Info("shutting down - grpc server stopped")
-
+	log.Debug("shutting down - grpc server stopped")
 	return nil
 }
