@@ -19,7 +19,6 @@ type RabbitMQQueueMessageDispatcher struct {
 	notifyOnClosedConnection chan *amqp.Error
 	notifyOnClosedChannel    chan *amqp.Error
 	notifyOnClosedQueue      chan string
-	notifyOnClosedEvent      chan error
 }
 
 func BuildRabbitMQQueueMessageDispatcher(messagingContext messaging.MessagingContext, connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
@@ -40,7 +39,6 @@ func BuildRabbitMQQueueMessageDispatcher(messagingContext messaging.MessagingCon
 		connection:           connection,
 		listener:             listener,
 		receivedMessagesChan: make(<-chan amqp.Delivery),
-		notifyOnClosedEvent:  messagingContext.NotifyOnCloseEvent(),
 	}
 }
 
@@ -59,7 +57,7 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 		select {
 		case <-server.ctx.Done():
 			return nil
-		case <-server.notifyOnClosedEvent:
+		case <-server.ctx.Done():
 			//log.Warn(fmt.Sprintf("rabbitmq queue dispatcher - connection closed unexpectedly: %s", reason))
 			if err := server.listen(); err != nil {
 				log.Error(fmt.Sprintf("rabbitmq queue dispatcher - failure reestablishing connection: %s", err.Error()))
@@ -79,8 +77,13 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 func (server *RabbitMQQueueMessageDispatcher) listen() error {
 
 	var err error
+	var connection *amqp.Connection
+	if connection, err = server.connection.Connect(); err != nil {
+		return err
+	}
+
 	var channel *amqp.Channel
-	if channel, err = server.connection.Connect(); err != nil {
+	if channel, err = connection.Channel(); err != nil {
 		return err
 	}
 
