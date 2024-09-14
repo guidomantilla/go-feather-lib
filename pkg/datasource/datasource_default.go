@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"fmt"
+	"github.com/avast/retry-go/v4"
 
 	"gorm.io/gorm"
 
@@ -35,15 +36,31 @@ func NewDefaultDatasource(datasourceContext DatasourceContext, dialector gorm.Di
 
 func (datasource *DefaultDatasource) GetDatabase() (*gorm.DB, error) {
 
-	var err error
-
 	if datasource.database == nil {
-		if datasource.database, err = gorm.Open(datasource.dialector, datasource.opts...); err != nil {
-			log.Error(err.Error())
-			return nil, ErrDBConnectionFailed(err)
+
+		err := retry.Do(datasource.Connect, retry.Attempts(5),
+			retry.OnRetry(func(n uint, err error) {
+				log.Info("connection - failed to connect")
+				log.Info(fmt.Sprintf("connection - retrying connection to %s/%s", datasource.server, datasource.service))
+			}),
+		)
+
+		if err != nil {
+			return nil, err
 		}
-		log.Debug(fmt.Sprintf("connection - connected to %s/%s", datasource.server, datasource.service))
 	}
 
 	return datasource.database, nil
+}
+
+func (datasource *DefaultDatasource) Connect() error {
+
+	var err error
+	if datasource.database, err = gorm.Open(datasource.dialector, datasource.opts...); err != nil {
+		log.Error(err.Error())
+		return ErrDBConnectionFailed(err)
+	}
+	log.Debug(fmt.Sprintf("connection - connected to %s/%s", datasource.server, datasource.service))
+
+	return nil
 }
