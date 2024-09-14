@@ -15,6 +15,8 @@ type DefaultRabbitMQConnection struct {
 	server                   string
 	connection               *amqp.Connection
 	notifyOnClosedConnection chan *amqp.Error
+	channel                  *amqp.Channel
+	notifyOnClosedChannel    chan *amqp.Error
 }
 
 func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRabbitMQConnection {
@@ -27,12 +29,19 @@ func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRab
 		url:                      messagingContext.GetUrl(),
 		server:                   messagingContext.GetServer(),
 		notifyOnClosedConnection: make(chan *amqp.Error),
+		notifyOnClosedChannel:    make(chan *amqp.Error),
 	}
 }
 
 func (connection *DefaultRabbitMQConnection) Close() {
 
-	if connection.connection != nil {
+	if connection.channel != nil && !connection.channel.IsClosed() {
+		if err := connection.channel.Close(); err != nil {
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close channel to %s: %s", connection.server, err.Error()))
+		}
+	}
+
+	if connection.connection != nil && !connection.connection.IsClosed() {
 		if err := connection.connection.Close(); err != nil {
 			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.server, err.Error()))
 		}
@@ -69,7 +78,12 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 		return err
 	}
 
+	if connection.channel, err = connection.connection.Channel(); err != nil {
+		return err
+	}
+
 	connection.notifyOnClosedConnection = connection.connection.NotifyClose(make(chan *amqp.Error))
+	connection.notifyOnClosedChannel = connection.channel.NotifyClose(make(chan *amqp.Error))
 	log.Debug(fmt.Sprintf("rabbitmq connection - connected to %s", connection.server))
 
 	return nil
@@ -77,14 +91,24 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 
 func (connection *DefaultRabbitMQConnection) reconnect() {
 
+	checkClosedNotificationChannel := func() (*amqp.Error, bool) {
+		select {
+		case reason, ok := <-connection.notifyOnClosedConnection:
+			return reason, ok
+		case reason, ok := <-connection.notifyOnClosedChannel:
+			return reason, ok
+		}
+	}
+
 	for {
 		var ok bool
 		var reason *amqp.Error
-		if reason, ok = <-connection.notifyOnClosedConnection; !ok {
+		if reason, ok = checkClosedNotificationChannel(); !ok {
 			log.Info(fmt.Sprintf("rabbitmq connection - connection closed: %s", connection.server))
 			continue
 		}
 		log.Info(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
+		connection.Close()
 
 		for {
 			time.Sleep(time.Duration(1) * time.Second)

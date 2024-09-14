@@ -12,10 +12,13 @@ import (
 )
 
 type RabbitMQQueueMessageDispatcher struct {
-	ctx                  context.Context
-	connection           messaging.RabbitMQConnection
-	listener             messaging.RabbitMQQueueMessageListener
-	receivedMessagesChan <-chan amqp.Delivery
+	ctx                      context.Context
+	connection               messaging.RabbitMQConnection
+	listener                 messaging.RabbitMQQueueMessageListener
+	receivedMessagesChan     <-chan amqp.Delivery
+	notifyOnClosedConnection chan *amqp.Error
+	notifyOnClosedChannel    chan *amqp.Error
+	notifyOnClosedQueue      chan string
 }
 
 func BuildRabbitMQQueueMessageDispatcher(connection messaging.RabbitMQConnection, listener messaging.RabbitMQQueueMessageListener) Server {
@@ -48,18 +51,21 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
+	server.notifyOnClosedConnection = connection.NotifyClose(make(chan *amqp.Error))
 
 	var channel *amqp.Channel
 	if channel, err = connection.Channel(); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
+	server.notifyOnClosedChannel = channel.NotifyClose(make(chan *amqp.Error))
 
 	var queue amqp.Queue
 	if queue, err = channel.QueueDeclare(server.listener.Queue(), true, false, false, false, nil); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}
+	server.notifyOnClosedQueue = channel.NotifyCancel(make(chan string))
 
 	if server.receivedMessagesChan, err = channel.Consume(queue.Name, "xxx", false, false, false, false, nil); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
