@@ -18,7 +18,7 @@ var _ RabbitMQQueueConnection = (*DefaultRabbitMQQueueConnection)(nil)
 type RabbitMQQueueConnection interface {
 	Start()
 	Close()
-	Connect() (*amqp.Connection, *amqp.Channel, *amqp.Queue, error)
+	Connect() (*amqp.Connection, *amqp.Channel, *amqp.Queue, <-chan amqp.Delivery, error)
 }
 
 var _ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)

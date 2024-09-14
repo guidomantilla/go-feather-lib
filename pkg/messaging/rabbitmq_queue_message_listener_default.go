@@ -17,6 +17,11 @@ func NewDefaultRabbitMQQueueMessageListener() *DefaultRabbitMQQueueMessageListen
 }
 
 func (listener *DefaultRabbitMQQueueMessageListener) OnMessage(message *amqp.Delivery) error {
+
+	if message.Body == nil || len(message.Body) == 0 || string(message.Body) == "" {
+		return nil
+	}
+
 	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
 	<-time.After(5 * time.Second)
 	return nil

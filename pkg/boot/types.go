@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
-	log2 "github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	log "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
@@ -61,7 +61,6 @@ type ApplicationContext struct {
 	GrpcConfig             *GrpcConfig
 	SecurityConfig         *SecurityConfig
 	DatabaseConfig         *DatabaseConfig
-	Logger                 log2.Logger
 	Environment            environment.Environment
 	DatasourceContext      datasource.DatasourceContext
 	Datasource             datasource.Datasource
@@ -81,38 +80,33 @@ type ApplicationContext struct {
 	GrpcServiceServer      any
 }
 
-func NewApplicationContext(appName string, version string, args []string, logger log2.Logger, enablers *Enablers, builder *BeanBuilder) *ApplicationContext {
+func NewApplicationContext(appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder) *ApplicationContext {
 
 	if appName == "" {
-		log2.Fatal("starting up - error setting up the ApplicationContext: appName is empty")
+		log.Fatal("starting up - error setting up the ApplicationContext: appName is empty")
 	}
 
 	if version == "" {
-		log2.Fatal("starting up - error setting up the ApplicationContext: version is empty")
+		log.Fatal("starting up - error setting up the ApplicationContext: version is empty")
 	}
 
 	if args == nil {
-		log2.Fatal("starting up - error setting up the ApplicationContext: args is nil")
-	}
-
-	if logger == nil {
-		log2.Fatal("starting up - error setting up the application: logger is nil")
+		log.Fatal("starting up - error setting up the ApplicationContext: args is nil")
 	}
 
 	if enablers == nil {
-		log2.Warn("starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
+		log.Warn("starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
 		enablers = &Enablers{}
 	}
 
 	if builder == nil { //nolint:staticcheck
-		log2.Fatal("starting up - error setting up the ApplicationContext: builder is nil")
+		log.Fatal("starting up - error setting up the ApplicationContext: builder is nil")
 	}
 
 	ctx := &ApplicationContext{
 		AppName:    appName,
 		AppVersion: version,
 		CmdArgs:    args,
-		Logger:     logger,
 		Enablers:   enablers,
 		SecurityConfig: &SecurityConfig{
 			TokenSignatureKey:    pointer.Of("SecretYouShouldHide"),
@@ -128,22 +122,22 @@ func NewApplicationContext(appName string, version string, args []string, logger
 		},
 	}
 
-	log2.Debug("starting up - setting up environment variables")
+	log.Debug("starting up - setting up environment variables")
 	ctx.Environment = builder.Environment(ctx) //nolint:staticcheck
 
-	log2.Debug("starting up - setting up configuration")
+	log.Debug("starting up - setting up configuration")
 	builder.Config(ctx) //nolint:staticcheck
 
 	if ctx.Enablers.DatabaseEnabled {
-		log2.Debug("starting up - setting up db connectivity")
+		log.Debug("starting up - setting up db connectivity")
 		ctx.DatasourceContext = builder.DatasourceContext(ctx)   //nolint:staticcheck
 		ctx.Datasource = builder.Datasource(ctx)                 //nolint:staticcheck
 		ctx.TransactionHandler = builder.TransactionHandler(ctx) //nolint:staticcheck
 	} else {
-		log2.Warn("starting up - warning setting up database configuration. database connectivity is disabled")
+		log.Warn("starting up - warning setting up database configuration. database connectivity is disabled")
 	}
 
-	log2.Debug("starting up - setting up security")
+	log.Debug("starting up - setting up security")
 	ctx.PasswordEncoder = builder.PasswordEncoder(ctx)                                                                          //nolint:staticcheck
 	ctx.PasswordGenerator = builder.PasswordGenerator(ctx)                                                                      //nolint:staticcheck
 	ctx.PasswordManager = builder.PasswordManager(ctx)                                                                          //nolint:staticcheck
@@ -152,17 +146,17 @@ func NewApplicationContext(appName string, version string, args []string, logger
 	ctx.AuthenticationEndpoint, ctx.AuthorizationFilter = builder.AuthenticationEndpoint(ctx), builder.AuthorizationFilter(ctx) //nolint:staticcheck
 
 	if ctx.Enablers.HttpServerEnabled {
-		log2.Debug("starting up - setting up http server")
+		log.Debug("starting up - setting up http server")
 		ctx.PublicRouter, ctx.PrivateRouter = builder.HttpServer(ctx) //nolint:staticcheck
 	} else {
-		log2.Warn("starting up - warning setting up http configuration. http server is disabled")
+		log.Warn("starting up - warning setting up http configuration. http server is disabled")
 	}
 
 	if ctx.Enablers.GrpcServerEnabled {
-		log2.Debug("starting up - setting up grpc server")
+		log.Debug("starting up - setting up grpc server")
 		ctx.GrpcServiceDesc, ctx.GrpcServiceServer = builder.GrpcServer(ctx) //nolint:staticcheck
 	} else {
-		log2.Warn("starting up - warning setting up grpc configuration. grpc server is disabled")
+		log.Warn("starting up - warning setting up grpc configuration. grpc server is disabled")
 	}
 
 	return ctx
@@ -175,26 +169,26 @@ func (ctx *ApplicationContext) Stop() {
 	if ctx.Datasource != nil && ctx.DatasourceContext != nil {
 
 		var database *gorm.DB
-		log2.Debug("shutting down - closing up db connection")
+		log.Debug("shutting down - closing up db connection")
 
 		if database, err = ctx.Datasource.GetDatabase(); err != nil {
-			log2.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
+			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}
 
 		var db *sql.DB
 		if db, err = database.DB(); err != nil {
-			log2.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
+			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}
 
 		if err = db.Close(); err != nil {
-			log2.Error(fmt.Sprintf("shutting down - error closing db connection: %s", err.Error()))
+			log.Error(fmt.Sprintf("shutting down - error closing db connection: %s", err.Error()))
 			return
 		}
 
-		log2.Debug("shutting down - db connection closed")
+		log.Debug("shutting down - db connection closed")
 	}
 
-	log2.Info(fmt.Sprintf("Application %s stopped", strings.Join([]string{ctx.AppName, ctx.AppVersion}, " - ")))
+	log.Info(fmt.Sprintf("Application %s stopped", strings.Join([]string{ctx.AppName, ctx.AppVersion}, " - ")))
 }

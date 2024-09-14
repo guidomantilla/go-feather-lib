@@ -55,7 +55,7 @@ func (logger *SlogLogger) Fatal(ctx context.Context, msg string, args ...any) {
 	os.Exit(1)
 }
 
-func (logger *SlogLogger) RetrieveLogger() any {
+func (logger *SlogLogger) GetLogger() any {
 	return logger.internal
 }
 

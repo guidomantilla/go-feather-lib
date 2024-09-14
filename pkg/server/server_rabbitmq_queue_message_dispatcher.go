@@ -44,15 +44,8 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 	server.connection.Start()
 
 	var err error
-	var channel *amqp.Channel
-	var queue *amqp.Queue
 
-	if _, channel, queue, err = server.connection.Connect(); err != nil {
-		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
-		return err
-	}
-
-	if server.receivedMessagesChan, err = channel.Consume(queue.Name, "", true, false, false, false, nil); err != nil {
+	if _, _, _, server.receivedMessagesChan, err = server.connection.Connect(); err != nil {
 		log.Error(fmt.Sprintf("server starting up - rabbitmq queue dispatcher - error: %s", err.Error()))
 		return err
 	}

@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 	"sync/atomic"
@@ -56,4 +57,11 @@ func Fatal(msg string, args ...any) {
 	slogLogger := retrieveSingleton()
 	slogLogger.Fatal(context.Background(), msg, args...)
 	os.Exit(1)
+}
+
+//
+
+func GetSlogLogger() *slog.Logger {
+	slogLogger := retrieveSingleton()
+	return slogLogger.GetLogger().(*slog.Logger)
 }
