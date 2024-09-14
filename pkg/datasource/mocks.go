@@ -105,19 +105,19 @@ func (m *MockDatasource) EXPECT() *MockDatasourceMockRecorder {
 	return m.recorder
 }
 
-// GetDatabase mocks base method.
-func (m *MockDatasource) GetDatabase() (*gorm.DB, error) {
+// Connect mocks base method.
+func (m *MockDatasource) Connect() (*gorm.DB, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDatabase")
+	ret := m.ctrl.Call(m, "Connect")
 	ret0, _ := ret[0].(*gorm.DB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDatabase indicates an expected call of GetDatabase.
-func (mr *MockDatasourceMockRecorder) GetDatabase() *gomock.Call {
+// Connect indicates an expected call of Connect.
+func (mr *MockDatasourceMockRecorder) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabase", reflect.TypeOf((*MockDatasource)(nil).GetDatabase))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockDatasource)(nil).Connect))
 }
 
 // MockTransactionHandler is a mock of TransactionHandler interface.

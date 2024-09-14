@@ -21,7 +21,7 @@ type DatasourceContext interface {
 //
 
 type Datasource interface {
-	GetDatabase() (*gorm.DB, error)
+	Connect() (*gorm.DB, error)
 }
 
 //

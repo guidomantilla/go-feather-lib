@@ -11,6 +11,17 @@ const (
 	makeConnectionDelay = 2 * time.Second
 )
 
+type MessagingContext interface {
+	GetUrl() string
+	GetServer() string
+}
+
+//
+
+type RabbitMQConnection interface {
+	Connect() (*amqp.Connection, error)
+}
+
 //
 
 var _ RabbitMQQueueConnection = (*DefaultRabbitMQQueueConnection)(nil)

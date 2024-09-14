@@ -17,6 +17,109 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
+// MockMessagingContext is a mock of MessagingContext interface.
+type MockMessagingContext struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessagingContextMockRecorder
+}
+
+// MockMessagingContextMockRecorder is the mock recorder for MockMessagingContext.
+type MockMessagingContextMockRecorder struct {
+	mock *MockMessagingContext
+}
+
+// NewMockMessagingContext creates a new mock instance.
+func NewMockMessagingContext(ctrl *gomock.Controller) *MockMessagingContext {
+	mock := &MockMessagingContext{ctrl: ctrl}
+	mock.recorder = &MockMessagingContextMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessagingContext) EXPECT() *MockMessagingContextMockRecorder {
+	return m.recorder
+}
+
+// GetServer mocks base method.
+func (m *MockMessagingContext) GetServer() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServer")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetServer indicates an expected call of GetServer.
+func (mr *MockMessagingContextMockRecorder) GetServer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockMessagingContext)(nil).GetServer))
+}
+
+// GetUrl mocks base method.
+func (m *MockMessagingContext) GetUrl() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUrl")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetUrl indicates an expected call of GetUrl.
+func (mr *MockMessagingContextMockRecorder) GetUrl() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUrl", reflect.TypeOf((*MockMessagingContext)(nil).GetUrl))
+}
+
+// MockRabbitMQConnection is a mock of RabbitMQConnection interface.
+type MockRabbitMQConnection struct {
+	ctrl     *gomock.Controller
+	recorder *MockRabbitMQConnectionMockRecorder
+}
+
+// MockRabbitMQConnectionMockRecorder is the mock recorder for MockRabbitMQConnection.
+type MockRabbitMQConnectionMockRecorder struct {
+	mock *MockRabbitMQConnection
+}
+
+// NewMockRabbitMQConnection creates a new mock instance.
+func NewMockRabbitMQConnection(ctrl *gomock.Controller) *MockRabbitMQConnection {
+	mock := &MockRabbitMQConnection{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQConnectionMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRabbitMQConnection) EXPECT() *MockRabbitMQConnectionMockRecorder {
+	return m.recorder
+}
+
+// Connect mocks base method.
+func (m *MockRabbitMQConnection) Connect() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Connect")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockRabbitMQConnectionMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQConnection)(nil).Connect))
+}
+
+// GetConnection mocks base method.
+func (m *MockRabbitMQConnection) GetConnection() (*amqp091.Connection, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetConnection")
+	ret0, _ := ret[0].(*amqp091.Connection)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetConnection indicates an expected call of GetConnection.
+func (mr *MockRabbitMQConnectionMockRecorder) GetConnection() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConnection", reflect.TypeOf((*MockRabbitMQConnection)(nil).GetConnection))
+}
+
 // MockRabbitMQQueueConnection is a mock of RabbitMQQueueConnection interface.
 type MockRabbitMQQueueConnection struct {
 	ctrl     *gomock.Controller
@@ -53,14 +156,15 @@ func (mr *MockRabbitMQQueueConnectionMockRecorder) Close() *gomock.Call {
 }
 
 // Connect mocks base method.
-func (m *MockRabbitMQQueueConnection) Connect() (*amqp091.Connection, *amqp091.Channel, *amqp091.Queue, error) {
+func (m *MockRabbitMQQueueConnection) Connect() (*amqp091.Connection, *amqp091.Channel, *amqp091.Queue, <-chan amqp091.Delivery, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
 	ret0, _ := ret[0].(*amqp091.Connection)
 	ret1, _ := ret[1].(*amqp091.Channel)
 	ret2, _ := ret[2].(*amqp091.Queue)
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret3, _ := ret[3].(<-chan amqp091.Delivery)
+	ret4, _ := ret[4].(error)
+	return ret0, ret1, ret2, ret3, ret4
 }
 
 // Connect indicates an expected call of Connect.

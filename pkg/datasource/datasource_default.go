@@ -34,14 +34,14 @@ func NewDefaultDatasource(datasourceContext DatasourceContext, dialector gorm.Di
 	}
 }
 
-func (datasource *DefaultDatasource) GetDatabase() (*gorm.DB, error) {
+func (datasource *DefaultDatasource) Connect() (*gorm.DB, error) {
 
 	if datasource.database == nil {
 
-		err := retry.Do(datasource.Connect, retry.Attempts(5),
+		err := retry.Do(datasource.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
-				log.Info("connection - failed to connect")
-				log.Info(fmt.Sprintf("connection - retrying connection to %s/%s", datasource.server, datasource.service))
+				log.Info("datasource connection - failed to connect")
+				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.server, datasource.service))
 			}),
 		)
 
@@ -53,14 +53,14 @@ func (datasource *DefaultDatasource) GetDatabase() (*gorm.DB, error) {
 	return datasource.database, nil
 }
 
-func (datasource *DefaultDatasource) Connect() error {
+func (datasource *DefaultDatasource) connect() error {
 
 	var err error
 	if datasource.database, err = gorm.Open(datasource.dialector, datasource.opts...); err != nil {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Debug(fmt.Sprintf("connection - connected to %s/%s", datasource.server, datasource.service))
+	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.server, datasource.service))
 
 	return nil
 }
