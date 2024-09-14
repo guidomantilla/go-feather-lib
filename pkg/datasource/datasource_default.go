@@ -2,8 +2,8 @@ package datasource
 
 import (
 	"fmt"
-	"github.com/avast/retry-go/v4"
 
+	retry "github.com/avast/retry-go/v4"
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -31,6 +31,16 @@ func NewDefaultDatasource(datasourceContext DatasourceContext, dialector gorm.Di
 		database:  nil,
 		dialector: dialector,
 		opts:      opts,
+	}
+}
+
+func (datasource *DefaultDatasource) Close() {
+
+	if datasource.database != nil {
+		sqlDB, _ := datasource.database.DB()
+		if err := sqlDB.Close(); err != nil {
+			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.server, datasource.service, err.Error()))
+		}
 	}
 }
 

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	retry "github.com/avast/retry-go/v4"
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"github.com/avast/retry-go/v4"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
@@ -158,7 +158,6 @@ func (client *DefaultRabbitMQQueueConnection) watchConnection() {
 
 		case <-client.notifyOnClosedQueue:
 			client.isReady = false
-			client.channel.Cancel("xxx", true)
 			log.Info("rabbitmq - queue closed. recreating...")
 			continue
 

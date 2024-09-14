@@ -105,6 +105,18 @@ func (m *MockDatasource) EXPECT() *MockDatasourceMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *MockDatasource) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockDatasourceMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockDatasource)(nil).Close))
+}
+
 // Connect mocks base method.
 func (m *MockDatasource) Connect() (*gorm.DB, error) {
 	m.ctrl.T.Helper()

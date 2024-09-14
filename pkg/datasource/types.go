@@ -22,6 +22,7 @@ type DatasourceContext interface {
 
 type Datasource interface {
 	Connect() (*gorm.DB, error)
+	Close()
 }
 
 //

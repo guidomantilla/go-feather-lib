@@ -91,33 +91,31 @@ func (m *MockRabbitMQConnection) EXPECT() *MockRabbitMQConnectionMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *MockRabbitMQConnection) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRabbitMQConnectionMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQConnection)(nil).Close))
+}
+
 // Connect mocks base method.
-func (m *MockRabbitMQConnection) Connect() error {
+func (m *MockRabbitMQConnection) Connect() (*amqp091.Connection, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*amqp091.Connection)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Connect indicates an expected call of Connect.
 func (mr *MockRabbitMQConnectionMockRecorder) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQConnection)(nil).Connect))
-}
-
-// GetConnection mocks base method.
-func (m *MockRabbitMQConnection) GetConnection() (*amqp091.Connection, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConnection")
-	ret0, _ := ret[0].(*amqp091.Connection)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetConnection indicates an expected call of GetConnection.
-func (mr *MockRabbitMQConnectionMockRecorder) GetConnection() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConnection", reflect.TypeOf((*MockRabbitMQConnection)(nil).GetConnection))
 }
 
 // MockRabbitMQQueueConnection is a mock of RabbitMQQueueConnection interface.

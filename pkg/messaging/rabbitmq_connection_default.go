@@ -2,10 +2,12 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/avast/retry-go/v4"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"time"
+
+	retry "github.com/avast/retry-go/v4"
+	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type DefaultRabbitMQConnection struct {
@@ -55,7 +57,7 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 		return nil, err
 	}
 
-	//go connection.reconnect()
+	go connection.reconnect()
 
 	return connection.connection, nil
 }
@@ -67,7 +69,7 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 		return err
 	}
 
-	connection.connection.NotifyClose(connection.notifyOnClosedConnection)
+	connection.notifyOnClosedConnection = connection.connection.NotifyClose(make(chan *amqp.Error))
 	log.Debug(fmt.Sprintf("rabbitmq connection - connected to %s", connection.server))
 
 	return nil
@@ -79,8 +81,8 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 		var ok bool
 		var reason *amqp.Error
 		if reason, ok = <-connection.notifyOnClosedConnection; !ok {
-			log.Info("connection - connection closed")
-			break
+			log.Info(fmt.Sprintf("rabbitmq connection - connection closed: %s", connection.server))
+			continue
 		}
 		log.Info(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
 

@@ -1,12 +1,14 @@
 package main
 
 import (
+	"os"
+	"syscall"
+
+	"github.com/qmdx00/lifecycle"
+
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
-	"github.com/qmdx00/lifecycle"
-	"os"
-	"syscall"
 )
 
 func main() {

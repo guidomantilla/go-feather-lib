@@ -171,7 +171,7 @@ func (ctx *ApplicationContext) Stop() {
 		var database *gorm.DB
 		log.Debug("shutting down - closing up db connection")
 
-		if database, err = ctx.Datasource.GetDatabase(); err != nil {
+		if database, err = ctx.Datasource.Connect(); err != nil {
 			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}

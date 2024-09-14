@@ -17,7 +17,7 @@ func NewTransactionHandler(datasource Datasource) *DefaultTransactionHandler {
 }
 
 func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
-	dbx, err := handler.datasource.GetDatabase()
+	dbx, err := handler.datasource.Connect()
 	if err != nil {
 		log.Error(err.Error())
 		return err
