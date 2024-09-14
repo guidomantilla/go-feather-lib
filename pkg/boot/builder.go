@@ -13,14 +13,14 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	environment2 "github.com/guidomantilla/go-feather-lib/pkg/common/environment"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 
-type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment2.Environment
+type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environment
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
@@ -79,9 +79,9 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 
 	return &BeanBuilder{
 
-		Environment: func(appCtx *ApplicationContext) environment2.Environment {
+		Environment: func(appCtx *ApplicationContext) environment.Environment {
 			osArgs := os.Environ()
-			return environment2.NewDefaultEnvironment(environment2.WithArrays(osArgs, appCtx.CmdArgs))
+			return environment.NewDefaultEnvironment(environment.WithArrays(osArgs, appCtx.CmdArgs))
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
