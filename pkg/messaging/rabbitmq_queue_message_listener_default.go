@@ -2,12 +2,15 @@ package messaging
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
+
+var JunkMessage = amqp.Delivery{}
 
 type DefaultRabbitMQQueueMessageListener struct {
 }
@@ -18,7 +21,7 @@ func NewDefaultRabbitMQQueueMessageListener() *DefaultRabbitMQQueueMessageListen
 
 func (listener *DefaultRabbitMQQueueMessageListener) OnMessage(message *amqp.Delivery) error {
 
-	if message.Body == nil || len(message.Body) == 0 || string(message.Body) == "" {
+	if reflect.DeepEqual(*message, JunkMessage) {
 		return nil
 	}
 
