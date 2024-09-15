@@ -20,7 +20,6 @@ var (
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
 	_ MessagingListener[*samqp.Message]        = (*StreamsRabbitMQListener)(nil)
 	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)
-	_ RabbitMQChannel                          = (*DefaultRabbitMQChannel)(nil)
 	_ RabbitMQQueue                            = (*DefaultRabbitMQQueue)(nil)
 	_ MessagingContext                         = (*MockMessagingContext)(nil)
 	_ MessagingConnection[*amqp.Connection]    = (*MockMessagingConnection[*amqp.Connection])(nil)
@@ -28,7 +27,6 @@ var (
 	_ MessagingListener[*amqp.Delivery]        = (*MockMessagingListener[*amqp.Delivery])(nil)
 	_ MessagingListener[*samqp.Message]        = (*MockMessagingListener[*samqp.Message])(nil)
 	_ MessagingListener[*nats.Msg]             = (*MockMessagingListener[*nats.Msg])(nil)
-	_ RabbitMQChannel                          = (*MockRabbitMQChannel)(nil)
 	_ RabbitMQQueue                            = (*MockRabbitMQQueue)(nil)
 )
 
@@ -60,12 +58,6 @@ type MessagingListener[T MessagingListenerTypes] interface {
 }
 
 // RabbitMQ Classic
-
-type RabbitMQChannel interface {
-	MessagingContext() MessagingContext
-	Connect() (*amqp.Channel, error)
-	Close()
-}
 
 type RabbitMQQueue interface {
 	MessagingContext() MessagingContext

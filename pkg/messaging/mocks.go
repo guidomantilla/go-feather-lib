@@ -13,6 +13,7 @@ import (
 	reflect "reflect"
 
 	amqp091 "github.com/rabbitmq/amqp091-go"
+	stream "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -168,70 +169,6 @@ func (mr *MockMessagingListenerMockRecorder[T]) OnMessage(message any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockMessagingListener[T])(nil).OnMessage), message)
 }
 
-// MockRabbitMQChannel is a mock of RabbitMQChannel interface.
-type MockRabbitMQChannel struct {
-	ctrl     *gomock.Controller
-	recorder *MockRabbitMQChannelMockRecorder
-}
-
-// MockRabbitMQChannelMockRecorder is the mock recorder for MockRabbitMQChannel.
-type MockRabbitMQChannelMockRecorder struct {
-	mock *MockRabbitMQChannel
-}
-
-// NewMockRabbitMQChannel creates a new mock instance.
-func NewMockRabbitMQChannel(ctrl *gomock.Controller) *MockRabbitMQChannel {
-	mock := &MockRabbitMQChannel{ctrl: ctrl}
-	mock.recorder = &MockRabbitMQChannelMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRabbitMQChannel) EXPECT() *MockRabbitMQChannelMockRecorder {
-	return m.recorder
-}
-
-// Close mocks base method.
-func (m *MockRabbitMQChannel) Close() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Close")
-}
-
-// Close indicates an expected call of Close.
-func (mr *MockRabbitMQChannelMockRecorder) Close() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQChannel)(nil).Close))
-}
-
-// Connect mocks base method.
-func (m *MockRabbitMQChannel) Connect() (*amqp091.Channel, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Connect")
-	ret0, _ := ret[0].(*amqp091.Channel)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Connect indicates an expected call of Connect.
-func (mr *MockRabbitMQChannelMockRecorder) Connect() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQChannel)(nil).Connect))
-}
-
-// MessagingContext mocks base method.
-func (m *MockRabbitMQChannel) MessagingContext() MessagingContext {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MessagingContext")
-	ret0, _ := ret[0].(MessagingContext)
-	return ret0
-}
-
-// MessagingContext indicates an expected call of MessagingContext.
-func (mr *MockRabbitMQChannelMockRecorder) MessagingContext() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockRabbitMQChannel)(nil).MessagingContext))
-}
-
 // MockRabbitMQQueue is a mock of RabbitMQQueue interface.
 type MockRabbitMQQueue struct {
 	ctrl     *gomock.Controller
@@ -322,4 +259,96 @@ func (m *MockRabbitMQQueue) Name() string {
 func (mr *MockRabbitMQQueueMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockRabbitMQQueue)(nil).Name))
+}
+
+// MockRabbitMQStreams is a mock of RabbitMQStreams interface.
+type MockRabbitMQStreams struct {
+	ctrl     *gomock.Controller
+	recorder *MockRabbitMQStreamsMockRecorder
+}
+
+// MockRabbitMQStreamsMockRecorder is the mock recorder for MockRabbitMQStreams.
+type MockRabbitMQStreamsMockRecorder struct {
+	mock *MockRabbitMQStreams
+}
+
+// NewMockRabbitMQStreams creates a new mock instance.
+func NewMockRabbitMQStreams(ctrl *gomock.Controller) *MockRabbitMQStreams {
+	mock := &MockRabbitMQStreams{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQStreamsMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRabbitMQStreams) EXPECT() *MockRabbitMQStreamsMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockRabbitMQStreams) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRabbitMQStreamsMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQStreams)(nil).Close))
+}
+
+// Connect mocks base method.
+func (m *MockRabbitMQStreams) Connect() (*stream.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Connect")
+	ret0, _ := ret[0].(*stream.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockRabbitMQStreamsMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQStreams)(nil).Connect))
+}
+
+// Consumer mocks base method.
+func (m *MockRabbitMQStreams) Consumer() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Consumer")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Consumer indicates an expected call of Consumer.
+func (mr *MockRabbitMQStreamsMockRecorder) Consumer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consumer", reflect.TypeOf((*MockRabbitMQStreams)(nil).Consumer))
+}
+
+// MessagingContext mocks base method.
+func (m *MockRabbitMQStreams) MessagingContext() MessagingContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MessagingContext")
+	ret0, _ := ret[0].(MessagingContext)
+	return ret0
+}
+
+// MessagingContext indicates an expected call of MessagingContext.
+func (mr *MockRabbitMQStreamsMockRecorder) MessagingContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockRabbitMQStreams)(nil).MessagingContext))
+}
+
+// Name mocks base method.
+func (m *MockRabbitMQStreams) Name() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Name indicates an expected call of Name.
+func (mr *MockRabbitMQStreamsMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockRabbitMQStreams)(nil).Name))
 }
