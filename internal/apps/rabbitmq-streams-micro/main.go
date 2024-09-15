@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"syscall"
@@ -31,27 +30,46 @@ func main() {
 
 	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream://:username::password@:server:vhost",
 		"raven-dev", "raven-dev*+", "170.187.157.212:5552", messaging.WithVhost("/"))
-	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
-	env, err := connection.Connect()
 
-	CheckErrReceive(err)
+	stopCh := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-stopCh:
+				return
+			default:
 
-	streamName := "rabbitmq-stream-micro-stream"
-	err = env.DeclareStream(streamName, &stream.StreamOptions{MaxLengthBytes: stream.ByteCapacity{}.GB(2)})
-	CheckErrReceive(err)
+				connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
+				env, err := connection.Connect()
+				if err != nil {
+					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
+					continue
+				}
 
-	messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-		fmt.Printf("Stream: %s - Received message: %s\n", consumerContext.Consumer.GetStreamName(), message.Data)
-	}
+				streamName := "rabbitmq-stream-micro-stream"
+				err = env.DeclareStream(streamName, &stream.StreamOptions{MaxLengthBytes: stream.ByteCapacity{}.GB(2)})
+				if err != nil {
+					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
+					continue
+				}
 
-	consumer, err := env.NewConsumer(streamName, messagesHandler, stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()))
-	CheckErrReceive(err)
+				messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+					fmt.Printf("Stream: %s - Received message: %s\n", consumerContext.Consumer.GetStreamName(), message.Data)
+				}
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println(" [x] Waiting for messages. enter to close the consumer")
-	_, _ = reader.ReadString('\n')
-	err = consumer.Close()
-	CheckErrReceive(err)
+				consumer, err := env.NewConsumer(streamName, messagesHandler, stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()))
+				if err != nil {
+					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
+					continue
+				}
+
+				onClose := consumer.NotifyClose()
+				for _ = range onClose {
+					log.Info("Stream: %s - Consumer closed", streamName)
+				}
+			}
+		}
+	}()
 
 	app := lifecycle.NewApp(
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
