@@ -34,7 +34,7 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 	defer connection.mu.Unlock()
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
-		log.Debug(fmt.Sprintf("rabbitmq queue - already connected to %s", connection.rabbitmqContext.Server()))
+		log.Debug(fmt.Sprintf("rabbitmq connection - already connected to %s", connection.rabbitmqContext.Server()))
 		return connection.connection, nil
 	}
 

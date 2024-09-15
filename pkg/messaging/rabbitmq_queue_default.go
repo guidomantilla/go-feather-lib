@@ -45,48 +45,28 @@ func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string
 
 func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
 
-	if queue.channel != nil && !queue.channel.IsClosed() {
-		log.Debug(fmt.Sprintf("rabbitmq queue - already connected to queue %s", queue.name))
-		return queue.channel, nil
-	}
-
-	/*
-		err := retry.Do(channel.connect, retry.Attempts(5),
-			retry.OnRetry(func(n uint, err error) {
-				log.Warn(fmt.Sprintf("rabbitmq channel - failed to connect: %s", err.Error()))
-				log.Debug(fmt.Sprintf("rabbitmq channel - trying reconnection to channel"))
-			}),
-		)
-	*/
-	if err := queue.connect(); err != nil {
-		log.Error(fmt.Sprintf("rabbitmq queue - failed connection to queue"))
-		return nil, err
-	}
-
-	return queue.channel, nil
-}
-
-func (queue *DefaultRabbitMQQueue) connect() error {
-
 	var err error
 	var connection *amqp.Connection
 	if connection, err = queue.rabbitMQConnection.Connect(); err != nil {
-		return err
+		log.Debug(fmt.Sprintf("rabbitmq queue - failed connection to queue %s: %s", queue.name, err.Error()))
+		return nil, err
 	}
 
-	if queue.channel, err = connection.Channel(); err != nil {
-		return err
+	if !(queue.channel != nil && !queue.channel.IsClosed()) {
+		if queue.channel, err = connection.Channel(); err != nil {
+			log.Debug(fmt.Sprintf("rabbitmq queue - failed connection to queue %s: %s", queue.name, err.Error()))
+			return nil, err
+		}
 	}
 
 	if queue.queue, err = queue.channel.QueueDeclare(queue.name, true, false, false, false, nil); err != nil {
-		return err
+		log.Debug(fmt.Sprintf("rabbitmq queue - failed connection to queue %s: %s", queue.name, err.Error()))
+		return nil, err
 	}
 
-	//queue.notifyOnClosedChannel = queue.channel.NotifyClose(make(chan *amqp.Error))
-	//queue.notifyOnClosedQueue = queue.channel.NotifyCancel(make(chan string))
 	log.Debug(fmt.Sprintf("rabbitmq queue - connected to queue %s", queue.name))
 
-	return nil
+	return queue.channel, nil
 }
 
 func (queue *DefaultRabbitMQQueue) Close() {

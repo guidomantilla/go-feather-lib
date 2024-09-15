@@ -27,15 +27,17 @@ func main() {
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	defer connection.Close()
 
+	queue := messaging.NewDefaultRabbitMQQueue(connection, "queue", "consumer-queue")
+	defer queue.Close()
+
+	myqueue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue", "consumer-my-queue")
+	defer myqueue.Close()
+
 	go func() {
 		log.Info("entering goroutine - queue")
 
 		for {
 			log.Info("opening deliveries - queue")
-
-			queue := messaging.NewDefaultRabbitMQQueue(connection, "queue", "consumer-queue")
-			//defer queue.Close()
-
 			rabbitChannel, _ := queue.Connect()
 			deliveries, _ := rabbitChannel.Consume("queue", "consumer-queue", true, false, false, false, nil)
 			for d := range deliveries {
@@ -51,11 +53,7 @@ func main() {
 
 		for {
 			log.Info("opening deliveries - my-queue")
-
-			queue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue", "consumer-my-queue")
-			//defer queue.Close()
-
-			rabbitChannel, _ := queue.Connect()
+			rabbitChannel, _ := myqueue.Connect()
 			deliveries, _ := rabbitChannel.Consume("my-queue", "consumer-my-queue", true, false, false, false, nil)
 			for d := range deliveries {
 				log.Info(string(d.Body))
