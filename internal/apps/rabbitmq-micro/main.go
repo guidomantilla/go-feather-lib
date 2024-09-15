@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
@@ -15,8 +14,7 @@ func main() {
 
 	var err error
 	appName, version := "rabbitmq-micro", "1.0.0"
-	os.Setenv("LOG_LEVEL", "DEBUG")
-	log.Custom()
+	log.Default()
 	app := lifecycle.NewApp(
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
