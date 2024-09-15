@@ -288,31 +288,31 @@ func (mr *MockRabbitMQQueueMockRecorder) RabbitMQContext() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQQueue)(nil).RabbitMQContext))
 }
 
-// MockRabbitMQQueueMessageListener is a mock of RabbitMQQueueMessageListener interface.
-type MockRabbitMQQueueMessageListener struct {
+// MockRabbitMQMessageListener is a mock of RabbitMQMessageListener interface.
+type MockRabbitMQMessageListener struct {
 	ctrl     *gomock.Controller
-	recorder *MockRabbitMQQueueMessageListenerMockRecorder
+	recorder *MockRabbitMQMessageListenerMockRecorder
 }
 
-// MockRabbitMQQueueMessageListenerMockRecorder is the mock recorder for MockRabbitMQQueueMessageListener.
-type MockRabbitMQQueueMessageListenerMockRecorder struct {
-	mock *MockRabbitMQQueueMessageListener
+// MockRabbitMQMessageListenerMockRecorder is the mock recorder for MockRabbitMQMessageListener.
+type MockRabbitMQMessageListenerMockRecorder struct {
+	mock *MockRabbitMQMessageListener
 }
 
-// NewMockRabbitMQQueueMessageListener creates a new mock instance.
-func NewMockRabbitMQQueueMessageListener(ctrl *gomock.Controller) *MockRabbitMQQueueMessageListener {
-	mock := &MockRabbitMQQueueMessageListener{ctrl: ctrl}
-	mock.recorder = &MockRabbitMQQueueMessageListenerMockRecorder{mock}
+// NewMockRabbitMQMessageListener creates a new mock instance.
+func NewMockRabbitMQMessageListener(ctrl *gomock.Controller) *MockRabbitMQMessageListener {
+	mock := &MockRabbitMQMessageListener{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQMessageListenerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRabbitMQQueueMessageListener) EXPECT() *MockRabbitMQQueueMessageListenerMockRecorder {
+func (m *MockRabbitMQMessageListener) EXPECT() *MockRabbitMQMessageListenerMockRecorder {
 	return m.recorder
 }
 
 // OnMessage mocks base method.
-func (m *MockRabbitMQQueueMessageListener) OnMessage(message *amqp091.Delivery) error {
+func (m *MockRabbitMQMessageListener) OnMessage(message *amqp091.Delivery) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnMessage", message)
 	ret0, _ := ret[0].(error)
@@ -320,9 +320,9 @@ func (m *MockRabbitMQQueueMessageListener) OnMessage(message *amqp091.Delivery) 
 }
 
 // OnMessage indicates an expected call of OnMessage.
-func (mr *MockRabbitMQQueueMessageListenerMockRecorder) OnMessage(message any) *gomock.Call {
+func (mr *MockRabbitMQMessageListenerMockRecorder) OnMessage(message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockRabbitMQQueueMessageListener)(nil).OnMessage), message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockRabbitMQMessageListener)(nil).OnMessage), message)
 }
 
 // MockNatsSubjectConnection is a mock of NatsSubjectConnection interface.
