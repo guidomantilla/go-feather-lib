@@ -40,6 +40,34 @@ func (m *MockRabbitMQContext) EXPECT() *MockRabbitMQContextMockRecorder {
 	return m.recorder
 }
 
+// FailOver mocks base method.
+func (m *MockRabbitMQContext) FailOver() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FailOver")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// FailOver indicates an expected call of FailOver.
+func (mr *MockRabbitMQContextMockRecorder) FailOver() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FailOver", reflect.TypeOf((*MockRabbitMQContext)(nil).FailOver))
+}
+
+// NotifyOnFaiOverConnection mocks base method.
+func (m *MockRabbitMQContext) NotifyOnFaiOverConnection() chan string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotifyOnFaiOverConnection")
+	ret0, _ := ret[0].(chan string)
+	return ret0
+}
+
+// NotifyOnFaiOverConnection indicates an expected call of NotifyOnFaiOverConnection.
+func (mr *MockRabbitMQContextMockRecorder) NotifyOnFaiOverConnection() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotifyOnFaiOverConnection", reflect.TypeOf((*MockRabbitMQContext)(nil).NotifyOnFaiOverConnection))
+}
+
 // Server mocks base method.
 func (m *MockRabbitMQContext) Server() string {
 	m.ctrl.T.Helper()
@@ -232,10 +260,10 @@ func (mr *MockRabbitMQQueueMockRecorder) Close() *gomock.Call {
 }
 
 // Connect mocks base method.
-func (m *MockRabbitMQQueue) Connect() (*amqp091.Queue, error) {
+func (m *MockRabbitMQQueue) Connect() (*amqp091.Channel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
-	ret0, _ := ret[0].(*amqp091.Queue)
+	ret0, _ := ret[0].(*amqp091.Channel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

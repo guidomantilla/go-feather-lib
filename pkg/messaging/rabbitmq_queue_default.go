@@ -20,7 +20,6 @@ type DefaultRabbitMQQueue struct {
 	name                  string
 	consumer              string
 	notifyOnClosedQueue   chan string
-	deliveries            chan DeliveryChan
 }
 
 func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string, consumer string) *DefaultRabbitMQQueue {
@@ -43,11 +42,14 @@ func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string
 		name:                  queue,
 		consumer:              consumer,
 		notifyOnClosedQueue:   make(chan string),
-		deliveries:            make(chan DeliveryChan, 1),
 	}
 }
 
-func (queue *DefaultRabbitMQQueue) Consume() (chan DeliveryChan, error) {
+func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
+
+	if queue.channel != nil && !queue.channel.IsClosed() {
+		return queue.channel, nil
+	}
 
 	/*
 		err := retry.Do(channel.connect, retry.Attempts(5),
@@ -64,7 +66,7 @@ func (queue *DefaultRabbitMQQueue) Consume() (chan DeliveryChan, error) {
 
 	go queue.reconnect()
 
-	return queue.deliveries, nil
+	return queue.channel, nil
 }
 
 func (queue *DefaultRabbitMQQueue) connect() error {
@@ -78,20 +80,13 @@ func (queue *DefaultRabbitMQQueue) connect() error {
 	if queue.channel, err = connection.Channel(); err != nil {
 		return err
 	}
-	queue.notifyOnClosedChannel = queue.channel.NotifyClose(make(chan *amqp.Error))
 
 	if queue.queue, err = queue.channel.QueueDeclare(queue.name, true, false, false, false, nil); err != nil {
 		return err
 	}
-	queue.channel.NotifyCancel(queue.notifyOnClosedQueue)
 
-	internal := make(DeliveryChan)
-	if internal, err = queue.channel.Consume(queue.name, queue.consumer, true, false, false, false, nil); err != nil {
-		return err
-	}
-
-	queue.deliveries <- internal
-
+	queue.notifyOnClosedChannel = queue.channel.NotifyClose(make(chan *amqp.Error))
+	queue.notifyOnClosedQueue = queue.channel.NotifyCancel(make(chan string))
 	log.Debug(fmt.Sprintf("rabbitmq queue - connected to queue %s", queue.name))
 
 	return nil

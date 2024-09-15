@@ -34,7 +34,7 @@ type RabbitMQChannel interface {
 
 type RabbitMQQueue interface {
 	RabbitMQContext() RabbitMQContext
-	Consume() (DeliveryChan, error)
+	Connect() (*amqp.Channel, error)
 	Close()
 }
 

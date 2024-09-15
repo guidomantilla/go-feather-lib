@@ -103,6 +103,7 @@ func (channel *DefaultRabbitMQChannel) reconnect() {
 func (channel *DefaultRabbitMQChannel) Close() {
 
 	if channel.channel != nil && !channel.channel.IsClosed() {
+		log.Debug("rabbitmq channel - closing connection")
 		if err := channel.channel.Close(); err != nil {
 			log.Error(fmt.Sprintf("rabbitmq channel - failed to close connection to channel: %s", err.Error()))
 		}
