@@ -40,7 +40,7 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 	}
 
 	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(makeConnectionDelay),
-		retry.OnRetry(func(n uint, err error) {
+		retry.LastErrorOnly(true), retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
 		}),
 	)
@@ -61,7 +61,7 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 	}
 
 	//connection.notifyOnClosedConnection = connection.connection.NotifyClose(make(chan *amqp.Error))
-	log.Debug(fmt.Sprintf("rabbitmq connection - connected to %s", connection.rabbitmqContext.Server()))
+	log.Info(fmt.Sprintf("rabbitmq connection - connected to %s", connection.rabbitmqContext.Server()))
 
 	return nil
 }

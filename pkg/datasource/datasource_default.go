@@ -56,7 +56,7 @@ func (datasource *DefaultDatasource) connect() error {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Debug(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service()))
+	log.Info(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service()))
 
 	return nil
 }
@@ -64,11 +64,14 @@ func (datasource *DefaultDatasource) connect() error {
 func (datasource *DefaultDatasource) Close() {
 
 	if datasource.database != nil {
+		log.Debug("datasource connection - closing connection")
 		sqlDB, _ := datasource.database.DB()
 		if err := sqlDB.Close(); err != nil {
 			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service(), err.Error()))
 		}
 	}
+	datasource.database = nil
+	log.Debug(fmt.Sprintf("datasource connection - closed connection to to %s/%s", datasource.datasourceContext.Server(), datasource.datasourceContext.Service()))
 }
 
 func (datasource *DefaultDatasource) DatasourceContext() DatasourceContext {
