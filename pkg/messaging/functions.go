@@ -6,7 +6,8 @@ import (
 )
 
 var RabbitMQDialer MessagingConnectionDialer[*amqp.Connection] = amqp.Dial
+var RabbitMQStreamsDialer MessagingConnectionDialer[*stream.Environment] = delegateRabbitMQStreamsDialer
 
-func RabbitMQStreamsDialer(url string) (*stream.Environment, error) {
+func delegateRabbitMQStreamsDialer(url string) (*stream.Environment, error) {
 	return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
 }

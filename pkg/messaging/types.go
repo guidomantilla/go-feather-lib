@@ -17,7 +17,7 @@ var (
 	_ MessagingContext                         = (*RabbitMQContext)(nil)
 	_ MessagingContext                         = (*NatsContext)(nil)
 	_ MessagingConnection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
-	_ MessagingConnection[*stream.Environment] = (*StreamsRabbitMQConnection)(nil)
+	_ MessagingConnection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
 	_ MessagingListener[*samqp.Message]        = (*StreamsRabbitMQListener)(nil)
 	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)

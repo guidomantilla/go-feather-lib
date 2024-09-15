@@ -30,7 +30,7 @@ func main() {
 	log.Custom()
 
 	messagingContext := messaging.NewRabbitMQContext("rabbitmq-stream://:username::password@:server:vhost", "raven-dev", "raven-dev*+", "170.187.157.212:5552", "/")
-	connection := messaging.NewRabbitMQConnection[*stream.Environment](messagingContext, messaging.RabbitMQStreamsDialer)
+	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.RabbitMQStreamsDialer)
 	env, err := connection.Connect()
 
 	CheckErrReceive(err)
