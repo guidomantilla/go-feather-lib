@@ -60,13 +60,8 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 		}(queue)
 	}
 
-	for { //nolint:gosimple
-		select {
-		case <-server.ctx.Done():
-			return nil
-		}
-	}
-
+	<-server.ctx.Done()
+	return nil
 }
 
 func (server *RabbitMQQueueMessageDispatcher) Dispatch(message any) {
