@@ -21,7 +21,8 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	messagingContext := messaging.NewRabbitMQContext("amqp://:username::password@:server:vhost", "raven-dev", "raven-dev*+", "170.187.157.212:5672", "/")
+	messagingContext := messaging.NewDefaultMessagingContext("amqp://:username::password@:server:vhost",
+		"raven-dev", "raven-dev*+", "170.187.157.212:5672", messaging.WithVhost("/"))
 	connection := messaging.NewRabbitMQConnection[*amqp.Connection](messagingContext, messaging.RabbitMQDialer)
 
 	queues := []messaging.RabbitMQQueue{

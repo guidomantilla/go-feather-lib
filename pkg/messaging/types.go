@@ -14,8 +14,7 @@ const (
 )
 
 var (
-	_ MessagingContext                         = (*RabbitMQContext)(nil)
-	_ MessagingContext                         = (*NatsContext)(nil)
+	_ MessagingContext                         = (*DefaultMessagingContext)(nil)
 	_ MessagingConnection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
 	_ MessagingConnection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
