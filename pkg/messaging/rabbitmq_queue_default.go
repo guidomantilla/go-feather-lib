@@ -10,8 +10,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DeliveryChan <-chan amqp.Delivery
-
 type DefaultRabbitMQQueue struct {
 	messagingConnection   MessagingConnection[*amqp.Connection]
 	channel               *amqp.Channel

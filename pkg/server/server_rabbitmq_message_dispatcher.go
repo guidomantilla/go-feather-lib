@@ -11,38 +11,38 @@ import (
 )
 
 type RabbitMQMessageDispatcher struct {
-	ctx           context.Context
-	listener      messaging.MessagingListener[*amqp.Delivery]
-	rabbitMQQueue []messaging.RabbitMQQueue
-	deliveries    <-chan amqp.Delivery
-	stopCh        chan struct{}
+	ctx        context.Context
+	listener   messaging.MessagingListener[*amqp.Delivery]
+	consumers  []messaging.MessagingConsumer[*amqp.Channel]
+	deliveries <-chan amqp.Delivery
+	stopCh     chan struct{}
 }
 
-func BuildRabbitMQMessageDispatcher(listener messaging.MessagingListener[*amqp.Delivery], rabbitMQQueue ...messaging.RabbitMQQueue) Server {
+func BuildRabbitMQMessageDispatcher(listener messaging.MessagingListener[*amqp.Delivery], consumers ...messaging.MessagingConsumer[*amqp.Channel]) Server {
 
 	if listener == nil {
 		log.Fatal("starting up - error setting up rabbitmq dispatcher: listener is nil")
 	}
 
-	if len(rabbitMQQueue) == 0 {
-		log.Fatal("starting up - error setting up rabbitmq dispatcher: rabbitMQQueue is empty")
+	if len(consumers) == 0 {
+		log.Fatal("starting up - error setting up rabbitmq dispatcher: consumers is empty")
 	}
 
 	return &RabbitMQMessageDispatcher{
-		listener:      listener,
-		rabbitMQQueue: rabbitMQQueue,
-		deliveries:    make(<-chan amqp.Delivery),
-		stopCh:        make(chan struct{}),
+		listener:   listener,
+		consumers:  consumers,
+		deliveries: make(<-chan amqp.Delivery),
+		stopCh:     make(chan struct{}),
 	}
 }
 
 func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting rabbitmq dispatcher: %s", server.rabbitMQQueue[0].MessagingContext().Server()))
+	log.Info(fmt.Sprintf("starting up - starting rabbitmq dispatcher: %s", server.consumers[0].MessagingContext().Server()))
 
-	for _, queue := range server.rabbitMQQueue {
-		go func(queue messaging.RabbitMQQueue) {
+	for _, consumer := range server.consumers {
+		go func(consumer messaging.MessagingConsumer[*amqp.Channel]) {
 			for {
 				select {
 				case <-server.stopCh:
@@ -51,14 +51,14 @@ func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 				default:
 					var err error
 
-					var rabbitChannel *amqp.Channel
-					if rabbitChannel, err = queue.Connect(); err != nil {
+					var channel *amqp.Channel
+					if channel, err = consumer.Connect(); err != nil {
 						log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
 						continue
 					}
 
 					var deliveries <-chan amqp.Delivery
-					if deliveries, err = rabbitChannel.Consume(queue.Name(), queue.Consumer(), true, false, false, false, nil); err != nil {
+					if deliveries, err = channel.Consume(consumer.Name(), consumer.Consumer(), true, false, false, false, nil); err != nil {
 						log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
 						continue
 					}
@@ -68,7 +68,7 @@ func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 					}
 				}
 			}
-		}(queue)
+		}(consumer)
 	}
 
 	<-server.ctx.Done()
@@ -88,7 +88,7 @@ func (server *RabbitMQMessageDispatcher) Stop(ctx context.Context) error {
 
 	log.Debug("server shutting down - stopping rabbitmq dispatcher")
 	close(server.stopCh)
-	for _, queue := range server.rabbitMQQueue {
+	for _, queue := range server.consumers {
 		queue.Close()
 	}
 	log.Debug("server shutting down - rabbitmq dispatcher stopped")

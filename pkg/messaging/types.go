@@ -20,14 +20,14 @@ var (
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
 	_ MessagingListener[*samqp.Message]        = (*StreamsRabbitMQListener)(nil)
 	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)
-	_ RabbitMQQueue                            = (*DefaultRabbitMQQueue)(nil)
+	_ MessagingConsumer[*amqp.Channel]         = (*DefaultRabbitMQQueue)(nil)
+	_ MessagingConsumer[*stream.Environment]   = (*DefaultRabbitMQStreams)(nil)
 	_ MessagingContext                         = (*MockMessagingContext)(nil)
 	_ MessagingConnection[*amqp.Connection]    = (*MockMessagingConnection[*amqp.Connection])(nil)
 	_ MessagingConnection[*stream.Environment] = (*MockMessagingConnection[*stream.Environment])(nil)
 	_ MessagingListener[*amqp.Delivery]        = (*MockMessagingListener[*amqp.Delivery])(nil)
 	_ MessagingListener[*samqp.Message]        = (*MockMessagingListener[*samqp.Message])(nil)
 	_ MessagingListener[*nats.Msg]             = (*MockMessagingListener[*nats.Msg])(nil)
-	_ RabbitMQQueue                            = (*MockRabbitMQQueue)(nil)
 )
 
 type MessagingContext interface {
@@ -57,20 +57,13 @@ type MessagingListener[T MessagingListenerTypes] interface {
 	OnMessage(message T) error
 }
 
-// RabbitMQ Classic
-
-type RabbitMQQueue interface {
-	MessagingContext() MessagingContext
-	Connect() (*amqp.Channel, error)
-	Close()
-	Name() string
-	Consumer() string
+type MessagingConsumerTypes interface {
+	*amqp.Channel | *stream.Environment
 }
 
-// RabbitMQ Streams
-type RabbitMQStreams interface {
+type MessagingConsumer[T MessagingConsumerTypes] interface {
 	MessagingContext() MessagingContext
-	Connect() (*stream.Environment, error)
+	Connect() (T, error)
 	Close()
 	Name() string
 	Consumer() string
