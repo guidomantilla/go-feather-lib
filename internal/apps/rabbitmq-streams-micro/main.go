@@ -31,41 +31,34 @@ func main() {
 	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream://:username::password@:server:vhost",
 		"raven-dev", "raven-dev*+", "170.187.157.212:5552", messaging.WithVhost("/"))
 
-	stopCh := make(chan struct{})
+	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
+	streams := messaging.NewDefaultRabbitMQStreams(connection, "rabbitmq-stream-micro-stream")
+	options := stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()).SetConsumerName("rabbitmq-stream-micro-stream")
+
+	messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+		fmt.Printf("Stream: %s - Received message: %s\n", consumerContext.Consumer.GetStreamName(), message.Data)
+	}
+
 	go func() {
 		for {
 			select {
-			case <-stopCh:
-				return
 			default:
+				var err error
 
-				connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
-				env, err := connection.Connect()
-				if err != nil {
+				var env *stream.Environment
+				if env, err = streams.Connect(); err != nil {
 					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
 					continue
 				}
 
-				streamName := "rabbitmq-stream-micro-stream"
-				err = env.DeclareStream(streamName, &stream.StreamOptions{MaxLengthBytes: stream.ByteCapacity{}.GB(2)})
-				if err != nil {
+				var consumer *stream.Consumer
+				if consumer, err = env.NewConsumer("rabbitmq-stream-micro-stream", messagesHandler, options); err != nil {
 					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
 					continue
 				}
 
-				messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-					fmt.Printf("Stream: %s - Received message: %s\n", consumerContext.Consumer.GetStreamName(), message.Data)
-				}
-
-				consumer, err := env.NewConsumer(streamName, messagesHandler, stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()))
-				if err != nil {
-					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
-					continue
-				}
-
-				onClose := consumer.NotifyClose()
-				for _ = range onClose {
-					log.Info("Stream: %s - Consumer closed", streamName)
+				for event := range consumer.NotifyClose() {
+					log.Info("Stream: %s - Consumer closed", "rabbitmq-stream-micro-stream", event.Reason)
 				}
 			}
 		}

@@ -2,11 +2,11 @@ package messaging
 
 import (
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 	"sync"
 
 	retry "github.com/avast/retry-go/v4"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )

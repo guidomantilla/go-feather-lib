@@ -74,3 +74,12 @@ type RabbitMQQueue interface {
 	Name() string
 	Consumer() string
 }
+
+// RabbitMQ Streams
+type RabbitMQStreams interface {
+	MessagingContext() MessagingContext
+	Connect() (*stream.Environment, error)
+	Close()
+	Name() string
+	Consumer() string
+}

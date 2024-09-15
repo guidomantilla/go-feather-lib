@@ -26,11 +26,11 @@ type DefaultRabbitMQQueue struct {
 func NewDefaultRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection], queue string) *DefaultRabbitMQQueue {
 
 	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitMQueue: messagingConnection is nil")
+		log.Fatal("starting up - error setting up rabbitMQQueue: messagingConnection is nil")
 	}
 
 	if strings.TrimSpace(queue) == "" {
-		log.Fatal("starting up - error setting up rabbitMQueue: queue is empty")
+		log.Fatal("starting up - error setting up rabbitMQQueue: queue is empty")
 	}
 
 	return &DefaultRabbitMQQueue{
