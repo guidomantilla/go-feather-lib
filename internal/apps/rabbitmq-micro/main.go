@@ -23,7 +23,7 @@ func main() {
 
 	messagingContext := messaging.NewDefaultMessagingContext("amqp://:username::password@:server:vhost",
 		"raven-dev", "raven-dev*+", "170.187.157.212:5672", messaging.WithVhost("/"))
-	connection := messaging.NewRabbitMQConnection[*amqp.Connection](messagingContext, messaging.RabbitMQDialer)
+	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialer())
 
 	queues := []messaging.RabbitMQQueue{
 		messaging.NewDefaultRabbitMQQueue(connection, appName+"-queue"),

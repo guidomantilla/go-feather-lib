@@ -2,12 +2,36 @@ package messaging
 
 import (
 	"fmt"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 	"sync"
 
 	retry "github.com/avast/retry-go/v4"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
+
+type RabbitMQConnectionOption[T MessagingConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
+
+func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
+	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
+		rabbitMQConnection.messagingConnectionDialer = amqp.Dial
+	}
+}
+
+func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
+	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
+		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
+			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
+		}
+	}
+}
+
+func WithMessagingConnectionDialer[T MessagingConnectionTypes](dialer MessagingConnectionDialer[T]) RabbitMQConnectionOption[T] {
+	return func(rabbitMQConnection *RabbitMQConnection[T]) {
+		rabbitMQConnection.messagingConnectionDialer = dialer
+	}
+}
 
 type RabbitMQConnection[T MessagingConnectionTypes] struct {
 	messagingContext          MessagingContext
@@ -16,20 +40,25 @@ type RabbitMQConnection[T MessagingConnectionTypes] struct {
 	mu                        sync.Mutex
 }
 
-func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, messagingConnectionDialer MessagingConnectionDialer[T]) *RabbitMQConnection[T] {
+func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
 
 	if messagingContext == nil {
 		log.Fatal("starting up - error setting up rabbitMQConnection: messagingContext is nil")
 	}
 
-	if messagingConnectionDialer == nil {
-		log.Fatal("starting up - error setting up rabbitMQConnection: messagingConnectionDialer is nil")
+	if len(options) == 0 {
+		log.Fatal("starting up - error setting up rabbitMQConnection: options is empty")
 	}
 
-	return &RabbitMQConnection[T]{
-		messagingContext:          messagingContext,
-		messagingConnectionDialer: messagingConnectionDialer,
+	connection := &RabbitMQConnection[T]{
+		messagingContext: messagingContext,
 	}
+
+	for _, option := range options {
+		option(connection)
+	}
+
+	return connection
 }
 
 func (connection *RabbitMQConnection[T]) Connect() (T, error) {
