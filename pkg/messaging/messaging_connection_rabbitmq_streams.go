@@ -10,24 +10,24 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultRabbitMQStreamsConnection struct {
+type StreamsRabbitMQConnection struct {
 	messagingContext MessagingContext
 	environment      *stream.Environment
 	mu               sync.Mutex
 }
 
-func NewDefaultRabbitMQStreamsConnection(rabbitmqContext MessagingContext) *DefaultRabbitMQStreamsConnection {
+func NewStreamsRabbitMQConnection(rabbitmqContext MessagingContext) *StreamsRabbitMQConnection {
 
 	if rabbitmqContext == nil {
-		log.Fatal("starting up - error setting up rabbitMQStreamsConnection: messagingContext is nil")
+		log.Fatal("starting up - error setting up rabbitMQConnection: messagingContext is nil")
 	}
 
-	return &DefaultRabbitMQStreamsConnection{
+	return &StreamsRabbitMQConnection{
 		messagingContext: rabbitmqContext,
 	}
 }
 
-func (connection *DefaultRabbitMQStreamsConnection) Connect() (*stream.Environment, error) {
+func (connection *StreamsRabbitMQConnection) Connect() (*stream.Environment, error) {
 
 	connection.mu.Lock()
 	defer connection.mu.Unlock()
@@ -51,7 +51,7 @@ func (connection *DefaultRabbitMQStreamsConnection) Connect() (*stream.Environme
 	return connection.environment, nil
 }
 
-func (connection *DefaultRabbitMQStreamsConnection) connect() error {
+func (connection *StreamsRabbitMQConnection) connect() error {
 
 	var err error
 	if connection.environment, err = stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(connection.messagingContext.Url())); err != nil {
@@ -63,7 +63,7 @@ func (connection *DefaultRabbitMQStreamsConnection) connect() error {
 	return nil
 }
 
-func (connection *DefaultRabbitMQStreamsConnection) Close() {
+func (connection *StreamsRabbitMQConnection) Close() {
 
 	if connection.environment != nil && !connection.environment.IsClosed() {
 		log.Debug("rabbitmq streams connection - closing connection")
@@ -75,6 +75,6 @@ func (connection *DefaultRabbitMQStreamsConnection) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams connection - closed connection to %s", connection.messagingContext.Server()))
 }
 
-func (connection *DefaultRabbitMQStreamsConnection) MessagingContext() MessagingContext {
+func (connection *StreamsRabbitMQConnection) MessagingContext() MessagingContext {
 	return connection.messagingContext
 }

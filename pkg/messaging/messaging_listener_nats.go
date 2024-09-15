@@ -9,14 +9,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultNatsMessageListener struct {
+type NatsListener struct {
 }
 
-func NewDefaultNatsMessageListener() *DefaultNatsMessageListener {
-	return &DefaultNatsMessageListener{}
+func NewNatsListener() *NatsListener {
+	return &NatsListener{}
 }
 
-func (listener *DefaultNatsMessageListener) OnMessage(message *nats.Msg) error {
+func (listener *NatsListener) OnMessage(message *nats.Msg) error {
 	log.Info(fmt.Sprintf("Received a message: %s", message.Data))
 	<-time.After(5 * time.Second)
 	return nil

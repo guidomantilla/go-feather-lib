@@ -3,12 +3,12 @@ module go-feather-lib/internal/apps/rabbitmq-streams-micro
 go 1.22.2
 
 require (
-	github.com/guidomantilla/go-feather-lib v0.0.0-20240915032845-15d8ba362c9d
+	github.com/guidomantilla/go-feather-lib v0.0.0-20240915182351-e20a807e64cb
 	github.com/qmdx00/lifecycle v1.1.1
 	github.com/rabbitmq/rabbitmq-stream-go-client v1.4.9
 )
 
-replace github.com/guidomantilla/go-feather-lib v0.0.0-20240915032845-15d8ba362c9d => ../../../
+replace github.com/guidomantilla/go-feather-lib v0.0.0-20240915182351-e20a807e64cb => ../../../
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
@@ -33,5 +33,3 @@ require (
 	google.golang.org/grpc v1.66.2 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
-
-replace github.com/guidomantilla/go-feather-lib v0.0.0-20240912034130-f3b9783c9708 => ../../../

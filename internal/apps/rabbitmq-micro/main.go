@@ -4,6 +4,7 @@ import (
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
@@ -20,13 +21,13 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server:vhost", "raven-dev", "raven-dev*+", "170.187.157.212:5672", "/")
-	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
+	messagingContext := messaging.NewRabbitMQContext("amqp://:username::password@:server:vhost", "raven-dev", "raven-dev*+", "170.187.157.212:5672", "/")
+	connection := messaging.NewRabbitMQConnection[*amqp.Connection](messagingContext, messaging.RabbitMQDialer)
 
 	queues := []messaging.RabbitMQQueue{
 		messaging.NewDefaultRabbitMQQueue(connection, appName+"-queue"),
 	}
-	listener := messaging.NewDefaultRabbitMQListener()
+	listener := messaging.NewDefaultMessagingListener[*amqp.Delivery]()
 	dispatcher := server.BuildRabbitMQMessageDispatcher(listener, queues...)
 
 	app.Attach("RabbitMQDispatcher", dispatcher)

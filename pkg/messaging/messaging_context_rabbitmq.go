@@ -6,15 +6,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQContextOption func(rabbitMQContext *DefaultRabbitMQContext)
+type RabbitMQContextOption func(rabbitMQContext *RabbitMQContext)
 
-type DefaultRabbitMQContext struct {
+type RabbitMQContext struct {
 	url    string
 	server string
-	vhost  string
 }
 
-func NewDefaultRabbitMQContext(url string, username string, password string, server string, vhost string) *DefaultRabbitMQContext {
+func NewRabbitMQContext(url string, username string, password string, server string, vhost string) *RabbitMQContext {
 
 	if strings.TrimSpace(url) == "" {
 		log.Fatal("starting up - error setting up rabbitMQContext: url is empty")
@@ -41,16 +40,16 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 	url = strings.Replace(url, ":server", server, 1)
 	url = strings.Replace(url, ":vhost", vhost, 1)
 
-	return &DefaultRabbitMQContext{
+	return &RabbitMQContext{
 		url:    url,
 		server: server + vhost,
 	}
 }
 
-func (context *DefaultRabbitMQContext) Url() string {
+func (context *RabbitMQContext) Url() string {
 	return context.url
 }
 
-func (context *DefaultRabbitMQContext) Server() string {
+func (context *RabbitMQContext) Server() string {
 	return context.server
 }

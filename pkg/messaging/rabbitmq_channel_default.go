@@ -9,19 +9,19 @@ import (
 )
 
 type DefaultRabbitMQChannel struct {
-	rabbitMQConnection    RabbitMQConnection[*amqp.Connection]
+	messagingConnection   MessagingConnection[*amqp.Connection]
 	channel               *amqp.Channel
 	notifyOnClosedChannel chan *amqp.Error
 }
 
-func NewDefaultRabbitMQChannel(rabbitMQConnection RabbitMQConnection[*amqp.Connection]) *DefaultRabbitMQChannel {
+func NewDefaultRabbitMQChannel(messagingConnection MessagingConnection[*amqp.Connection]) *DefaultRabbitMQChannel {
 
-	if rabbitMQConnection == nil {
-		log.Fatal("starting up - error setting up rabbitMQChannel: rabbitMQConnection is nil")
+	if messagingConnection == nil {
+		log.Fatal("starting up - error setting up rabbitMQChannel: messagingConnection is nil")
 	}
 
 	return &DefaultRabbitMQChannel{
-		rabbitMQConnection:    rabbitMQConnection,
+		messagingConnection:   messagingConnection,
 		notifyOnClosedChannel: make(chan *amqp.Error),
 	}
 }
@@ -30,7 +30,7 @@ func (channel *DefaultRabbitMQChannel) Connect() (*amqp.Channel, error) {
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = channel.rabbitMQConnection.Connect(); err != nil {
+	if connection, err = channel.messagingConnection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq channel - failed connection to channel: %s", err.Error()))
 		return nil, err
 	}
@@ -60,5 +60,5 @@ func (channel *DefaultRabbitMQChannel) Close() {
 }
 
 func (channel *DefaultRabbitMQChannel) MessagingContext() MessagingContext {
-	return channel.rabbitMQConnection.MessagingContext()
+	return channel.messagingConnection.MessagingContext()
 }

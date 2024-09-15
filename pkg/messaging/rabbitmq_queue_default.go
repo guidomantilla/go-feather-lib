@@ -13,7 +13,7 @@ import (
 type DeliveryChan <-chan amqp.Delivery
 
 type DefaultRabbitMQQueue struct {
-	rabbitMQConnection    RabbitMQConnection[*amqp.Connection]
+	messagingConnection   MessagingConnection[*amqp.Connection]
 	channel               *amqp.Channel
 	notifyOnClosedChannel chan *amqp.Error
 	queue                 amqp.Queue
@@ -23,10 +23,10 @@ type DefaultRabbitMQQueue struct {
 	mu                    sync.Mutex
 }
 
-func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection[*amqp.Connection], queue string) *DefaultRabbitMQQueue {
+func NewDefaultRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection], queue string) *DefaultRabbitMQQueue {
 
-	if rabbitMQConnection == nil {
-		log.Fatal("starting up - error setting up rabbitMQueue: rabbitMQConnection is nil")
+	if messagingConnection == nil {
+		log.Fatal("starting up - error setting up rabbitMQueue: messagingConnection is nil")
 	}
 
 	if strings.TrimSpace(queue) == "" {
@@ -34,7 +34,7 @@ func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection[*amqp.Connect
 	}
 
 	return &DefaultRabbitMQQueue{
-		rabbitMQConnection:    rabbitMQConnection,
+		messagingConnection:   messagingConnection,
 		notifyOnClosedChannel: make(chan *amqp.Error),
 		name:                  queue,
 		consumer:              "consumer-" + queue,
@@ -49,7 +49,7 @@ func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = queue.rabbitMQConnection.Connect(); err != nil {
+	if connection, err = queue.messagingConnection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq queue - failed connection to queue %s: %s", queue.name, err.Error()))
 		return nil, err
 	}
@@ -79,12 +79,12 @@ func (queue *DefaultRabbitMQQueue) Close() {
 		}
 	}
 	queue.channel = nil
-	queue.rabbitMQConnection.Close()
+	queue.messagingConnection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq queue - closed connection to queue %s", queue.name))
 }
 
 func (queue *DefaultRabbitMQQueue) MessagingContext() MessagingContext {
-	return queue.rabbitMQConnection.MessagingContext()
+	return queue.messagingConnection.MessagingContext()
 }
 
 func (queue *DefaultRabbitMQQueue) Name() string {

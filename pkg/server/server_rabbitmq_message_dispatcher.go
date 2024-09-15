@@ -12,13 +12,13 @@ import (
 
 type RabbitMQMessageDispatcher struct {
 	ctx           context.Context
-	listener      messaging.RabbitMQMessageListener[*amqp.Delivery]
+	listener      messaging.MessagingListener[*amqp.Delivery]
 	rabbitMQQueue []messaging.RabbitMQQueue
 	deliveries    <-chan amqp.Delivery
 	stopCh        chan struct{}
 }
 
-func BuildRabbitMQMessageDispatcher(listener messaging.RabbitMQMessageListener[*amqp.Delivery], rabbitMQQueue ...messaging.RabbitMQQueue) Server {
+func BuildRabbitMQMessageDispatcher(listener messaging.MessagingListener[*amqp.Delivery], rabbitMQQueue ...messaging.RabbitMQQueue) Server {
 
 	if listener == nil {
 		log.Fatal("starting up - error setting up rabbitmq dispatcher: listener is nil")
@@ -39,7 +39,7 @@ func BuildRabbitMQMessageDispatcher(listener messaging.RabbitMQMessageListener[*
 func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting rabbitmq dispatcher: %s", server.rabbitMQQueue[0].RabbitMQContext().Server()))
+	log.Info(fmt.Sprintf("starting up - starting rabbitmq dispatcher: %s", server.rabbitMQQueue[0].MessagingContext().Server()))
 
 	for _, queue := range server.rabbitMQQueue {
 		go func(queue messaging.RabbitMQQueue) {

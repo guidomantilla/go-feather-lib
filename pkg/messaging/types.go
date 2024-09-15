@@ -14,24 +14,23 @@ const (
 )
 
 var (
-	_ MessagingContext                        = (*DefaultRabbitMQContext)(nil)
-	_ RabbitMQConnection[*amqp.Connection]    = (*DefaultRabbitMQConnection)(nil)
-	_ RabbitMQConnection[*stream.Environment] = (*DefaultRabbitMQStreamsConnection)(nil)
-	_ RabbitMQChannel                         = (*DefaultRabbitMQChannel)(nil)
-	_ RabbitMQQueue                           = (*DefaultRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener[*amqp.Delivery] = (*DefaultRabbitMQListener)(nil)
-	_ RabbitMQMessageListener[*samqp.Message] = (*DefaultRabbitMQStreamsListener)(nil)
-	_ NatsSubjectConnection                   = (*DefaultNatsSubjectConnection)(nil)
-	_ NatsMessageListener                     = (*DefaultNatsMessageListener)(nil)
-	_ MessagingContext                        = (*MockMessagingContext)(nil)
-	_ RabbitMQConnection[*amqp.Connection]    = (*MockRabbitMQConnection[*amqp.Connection])(nil)
-	_ RabbitMQConnection[*stream.Environment] = (*MockRabbitMQConnection[*stream.Environment])(nil)
-	_ RabbitMQChannel                         = (*MockRabbitMQChannel)(nil)
-	_ RabbitMQQueue                           = (*MockRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener[*amqp.Delivery] = (*MockRabbitMQMessageListener[*amqp.Delivery])(nil)
-	_ RabbitMQMessageListener[*samqp.Message] = (*MockRabbitMQMessageListener[*samqp.Message])(nil)
-	_ NatsSubjectConnection                   = (*MockNatsSubjectConnection)(nil)
-	_ NatsMessageListener                     = (*MockNatsMessageListener)(nil)
+	_ MessagingContext                         = (*RabbitMQContext)(nil)
+	_ MessagingContext                         = (*NatsContext)(nil)
+	_ MessagingConnection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
+	_ MessagingConnection[*stream.Environment] = (*StreamsRabbitMQConnection)(nil)
+	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
+	_ MessagingListener[*samqp.Message]        = (*StreamsRabbitMQListener)(nil)
+	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)
+	_ RabbitMQChannel                          = (*DefaultRabbitMQChannel)(nil)
+	_ RabbitMQQueue                            = (*DefaultRabbitMQQueue)(nil)
+	_ MessagingContext                         = (*MockMessagingContext)(nil)
+	_ MessagingConnection[*amqp.Connection]    = (*MockMessagingConnection[*amqp.Connection])(nil)
+	_ MessagingConnection[*stream.Environment] = (*MockMessagingConnection[*stream.Environment])(nil)
+	_ MessagingListener[*amqp.Delivery]        = (*MockMessagingListener[*amqp.Delivery])(nil)
+	_ MessagingListener[*samqp.Message]        = (*MockMessagingListener[*samqp.Message])(nil)
+	_ MessagingListener[*nats.Msg]             = (*MockMessagingListener[*nats.Msg])(nil)
+	_ RabbitMQChannel                          = (*MockRabbitMQChannel)(nil)
+	_ RabbitMQQueue                            = (*MockRabbitMQQueue)(nil)
 )
 
 type MessagingContext interface {
@@ -39,23 +38,25 @@ type MessagingContext interface {
 	Server() string
 }
 
-// RabbitGeneric
-
-type RabbitMQConnectionTypes interface {
-	*amqp.Connection | *stream.Environment
+type MessagingConnectionTypes interface {
+	*amqp.Connection | *stream.Environment | *nats.Conn
+	IsClosed() bool
+	Close() error
 }
 
-type RabbitMQConnection[T RabbitMQConnectionTypes] interface {
+type MessagingConnectionDialer[T MessagingConnectionTypes] func(url string) (T, error)
+
+type MessagingConnection[T MessagingConnectionTypes] interface {
 	MessagingContext() MessagingContext
 	Connect() (T, error)
 	Close()
 }
 
-type RabbitMQMessageListenerTypes interface {
-	*amqp.Delivery | *samqp.Message
+type MessagingListenerTypes interface {
+	*amqp.Delivery | *samqp.Message | *nats.Msg
 }
 
-type RabbitMQMessageListener[T RabbitMQMessageListenerTypes] interface {
+type MessagingListener[T MessagingListenerTypes] interface {
 	OnMessage(message T) error
 }
 
@@ -73,16 +74,4 @@ type RabbitMQQueue interface {
 	Close()
 	Name() string
 	Consumer() string
-}
-
-//
-
-type NatsSubjectConnection interface {
-	Start()
-	Close()
-	Connect() (*nats.Conn, *nats.Subscription, chan *nats.Msg, error)
-}
-
-type NatsMessageListener interface {
-	OnMessage(message *nats.Msg) error
 }

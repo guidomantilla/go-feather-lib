@@ -5,29 +5,34 @@ import (
 	"sync"
 
 	retry "github.com/avast/retry-go/v4"
-	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultRabbitMQConnection struct {
-	messagingContext MessagingContext
-	connection       *amqp.Connection
-	mu               sync.Mutex
+type RabbitMQConnection[T MessagingConnectionTypes] struct {
+	messagingContext          MessagingContext
+	messagingConnectionDialer MessagingConnectionDialer[T]
+	connection                T
+	mu                        sync.Mutex
 }
 
-func NewDefaultRabbitMQConnection(messagingContext MessagingContext) *DefaultRabbitMQConnection {
+func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, messagingConnectionDialer MessagingConnectionDialer[T]) *RabbitMQConnection[T] {
 
 	if messagingContext == nil {
 		log.Fatal("starting up - error setting up rabbitMQConnection: messagingContext is nil")
 	}
 
-	return &DefaultRabbitMQConnection{
-		messagingContext: messagingContext,
+	if messagingConnectionDialer == nil {
+		log.Fatal("starting up - error setting up rabbitMQConnection: messagingConnectionDialer is nil")
+	}
+
+	return &RabbitMQConnection[T]{
+		messagingContext:          messagingContext,
+		messagingConnectionDialer: messagingConnectionDialer,
 	}
 }
 
-func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error) {
+func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 
 	connection.mu.Lock()
 	defer connection.mu.Unlock()
@@ -51,10 +56,10 @@ func (connection *DefaultRabbitMQConnection) Connect() (*amqp.Connection, error)
 	return connection.connection, nil
 }
 
-func (connection *DefaultRabbitMQConnection) connect() error {
+func (connection *RabbitMQConnection[T]) connect() error {
 
 	var err error
-	if connection.connection, err = amqp.Dial(connection.messagingContext.Url()); err != nil {
+	if connection.connection, err = connection.messagingConnectionDialer(connection.messagingContext.Url()); err != nil {
 		return err
 	}
 
@@ -63,7 +68,7 @@ func (connection *DefaultRabbitMQConnection) connect() error {
 	return nil
 }
 
-func (connection *DefaultRabbitMQConnection) Close() {
+func (connection *RabbitMQConnection[T]) Close() {
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		log.Debug("rabbitmq connection - closing connection")
@@ -75,6 +80,6 @@ func (connection *DefaultRabbitMQConnection) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.messagingContext.Server()))
 }
 
-func (connection *DefaultRabbitMQConnection) MessagingContext() MessagingContext {
+func (connection *RabbitMQConnection[T]) MessagingContext() MessagingContext {
 	return connection.messagingContext
 }
