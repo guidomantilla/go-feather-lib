@@ -11,19 +11,19 @@ import (
 )
 
 type DefaultRabbitMQStreamsConnection struct {
-	rabbitmqContext RabbitMQContext
-	environment     *stream.Environment
-	mu              sync.Mutex
+	messagingContext MessagingContext
+	environment      *stream.Environment
+	mu               sync.Mutex
 }
 
-func NewDefaultRabbitMQStreamsConnection(rabbitmqContext RabbitMQContext) *DefaultRabbitMQStreamsConnection {
+func NewDefaultRabbitMQStreamsConnection(rabbitmqContext MessagingContext) *DefaultRabbitMQStreamsConnection {
 
 	if rabbitmqContext == nil {
-		log.Fatal("starting up - error setting up rabbitMQStreamsConnection: rabbitmqContext is nil")
+		log.Fatal("starting up - error setting up rabbitMQStreamsConnection: messagingContext is nil")
 	}
 
 	return &DefaultRabbitMQStreamsConnection{
-		rabbitmqContext: rabbitmqContext,
+		messagingContext: rabbitmqContext,
 	}
 }
 
@@ -33,7 +33,7 @@ func (connection *DefaultRabbitMQStreamsConnection) Connect() (*stream.Environme
 	defer connection.mu.Unlock()
 
 	if connection.environment != nil && !connection.environment.IsClosed() {
-		log.Debug(fmt.Sprintf("rabbitmq streams connection - already connected to %s", connection.rabbitmqContext.Server()))
+		log.Debug(fmt.Sprintf("rabbitmq streams connection - already connected to %s", connection.messagingContext.Server()))
 		return connection.environment, nil
 	}
 
@@ -44,7 +44,7 @@ func (connection *DefaultRabbitMQStreamsConnection) Connect() (*stream.Environme
 	)
 
 	if err != nil {
-		log.Error(fmt.Sprintf("rabbitmq streams connection - failed connection to %s", connection.rabbitmqContext.Server()))
+		log.Error(fmt.Sprintf("rabbitmq streams connection - failed connection to %s", connection.messagingContext.Server()))
 		return nil, err
 	}
 
@@ -54,11 +54,11 @@ func (connection *DefaultRabbitMQStreamsConnection) Connect() (*stream.Environme
 func (connection *DefaultRabbitMQStreamsConnection) connect() error {
 
 	var err error
-	if connection.environment, err = stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(connection.rabbitmqContext.Url())); err != nil {
+	if connection.environment, err = stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(connection.messagingContext.Url())); err != nil {
 		return err
 	}
 
-	log.Info(fmt.Sprintf("rabbitmq streams connection - connected to %s", connection.rabbitmqContext.Server()))
+	log.Info(fmt.Sprintf("rabbitmq streams connection - connected to %s", connection.messagingContext.Server()))
 
 	return nil
 }
@@ -68,13 +68,13 @@ func (connection *DefaultRabbitMQStreamsConnection) Close() {
 	if connection.environment != nil && !connection.environment.IsClosed() {
 		log.Debug("rabbitmq streams connection - closing connection")
 		if err := connection.environment.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq streams connection - failed to close connection to %s: %s", connection.rabbitmqContext.Server(), err.Error()))
+			log.Error(fmt.Sprintf("rabbitmq streams connection - failed to close connection to %s: %s", connection.messagingContext.Server(), err.Error()))
 		}
 	}
 	connection.environment = nil
-	log.Debug(fmt.Sprintf("rabbitmq streams connection - closed connection to %s", connection.rabbitmqContext.Server()))
+	log.Debug(fmt.Sprintf("rabbitmq streams connection - closed connection to %s", connection.messagingContext.Server()))
 }
 
-func (connection *DefaultRabbitMQStreamsConnection) RabbitMQContext() RabbitMQContext {
-	return connection.rabbitmqContext
+func (connection *DefaultRabbitMQStreamsConnection) MessagingContext() MessagingContext {
+	return connection.messagingContext
 }

@@ -59,6 +59,6 @@ func (channel *DefaultRabbitMQChannel) Close() {
 	log.Debug("rabbitmq channel - closed connection to channel")
 }
 
-func (channel *DefaultRabbitMQChannel) RabbitMQContext() RabbitMQContext {
-	return channel.rabbitMQConnection.RabbitMQContext()
+func (channel *DefaultRabbitMQChannel) MessagingContext() MessagingContext {
+	return channel.rabbitMQConnection.MessagingContext()
 }

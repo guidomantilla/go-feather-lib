@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	_ RabbitMQContext                         = (*DefaultRabbitMQContext)(nil)
+	_ MessagingContext                        = (*DefaultRabbitMQContext)(nil)
 	_ RabbitMQConnection[*amqp.Connection]    = (*DefaultRabbitMQConnection)(nil)
 	_ RabbitMQConnection[*stream.Environment] = (*DefaultRabbitMQStreamsConnection)(nil)
 	_ RabbitMQChannel                         = (*DefaultRabbitMQChannel)(nil)
@@ -23,7 +23,7 @@ var (
 	_ RabbitMQMessageListener[*samqp.Message] = (*DefaultRabbitMQStreamsListener)(nil)
 	_ NatsSubjectConnection                   = (*DefaultNatsSubjectConnection)(nil)
 	_ NatsMessageListener                     = (*DefaultNatsMessageListener)(nil)
-	_ RabbitMQContext                         = (*MockRabbitMQContext)(nil)
+	_ MessagingContext                        = (*MockMessagingContext)(nil)
 	_ RabbitMQConnection[*amqp.Connection]    = (*MockRabbitMQConnection[*amqp.Connection])(nil)
 	_ RabbitMQConnection[*stream.Environment] = (*MockRabbitMQConnection[*stream.Environment])(nil)
 	_ RabbitMQChannel                         = (*MockRabbitMQChannel)(nil)
@@ -34,20 +34,19 @@ var (
 	_ NatsMessageListener                     = (*MockNatsMessageListener)(nil)
 )
 
-// Generic
-
-type RabbitMQContext interface {
+type MessagingContext interface {
 	Url() string
 	Server() string
-	VHost() string
 }
+
+// RabbitGeneric
 
 type RabbitMQConnectionTypes interface {
 	*amqp.Connection | *stream.Environment
 }
 
 type RabbitMQConnection[T RabbitMQConnectionTypes] interface {
-	RabbitMQContext() RabbitMQContext
+	MessagingContext() MessagingContext
 	Connect() (T, error)
 	Close()
 }
@@ -63,13 +62,13 @@ type RabbitMQMessageListener[T RabbitMQMessageListenerTypes] interface {
 // RabbitMQ Classic
 
 type RabbitMQChannel interface {
-	RabbitMQContext() RabbitMQContext
+	MessagingContext() MessagingContext
 	Connect() (*amqp.Channel, error)
 	Close()
 }
 
 type RabbitMQQueue interface {
-	RabbitMQContext() RabbitMQContext
+	MessagingContext() MessagingContext
 	Connect() (*amqp.Channel, error)
 	Close()
 	Name() string

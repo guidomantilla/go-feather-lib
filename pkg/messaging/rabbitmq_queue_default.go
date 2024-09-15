@@ -83,8 +83,8 @@ func (queue *DefaultRabbitMQQueue) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq queue - closed connection to queue %s", queue.name))
 }
 
-func (queue *DefaultRabbitMQQueue) RabbitMQContext() RabbitMQContext {
-	return queue.rabbitMQConnection.RabbitMQContext()
+func (queue *DefaultRabbitMQQueue) MessagingContext() MessagingContext {
+	return queue.rabbitMQConnection.MessagingContext()
 }
 
 func (queue *DefaultRabbitMQQueue) Name() string {

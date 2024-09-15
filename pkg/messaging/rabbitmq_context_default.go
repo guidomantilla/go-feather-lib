@@ -43,8 +43,7 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 
 	return &DefaultRabbitMQContext{
 		url:    url,
-		server: server,
-		vhost:  vhost,
+		server: server + vhost,
 	}
 }
 
@@ -54,8 +53,4 @@ func (context *DefaultRabbitMQContext) Url() string {
 
 func (context *DefaultRabbitMQContext) Server() string {
 	return context.server
-}
-
-func (context *DefaultRabbitMQContext) VHost() string {
-	return context.vhost
 }
