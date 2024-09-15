@@ -11,12 +11,21 @@ const (
 	makeConnectionDelay = 2 * time.Second
 )
 
+var (
+	_ RabbitMQContext              = (*DefaultRabbitMQContext)(nil)
+	_ RabbitMQConnection           = (*DefaultRabbitMQConnection)(nil)
+	_ RabbitMQChannel              = (*DefaultRabbitMQChannel)(nil)
+	_ RabbitMQQueue                = (*DefaultRabbitMQQueue)(nil)
+	_ NatsSubjectConnection        = (*DefaultNatsSubjectConnection)(nil)
+	_ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
+	_ NatsSubjectConnection        = (*DefaultNatsSubjectConnection)(nil)
+	_ NatsMessageListener          = (*DefaultNatsMessageListener)(nil)
+)
+
 type RabbitMQContext interface {
 	Url() string
 	Server() string
 }
-
-//
 
 type RabbitMQConnection interface {
 	RabbitMQContext() RabbitMQContext
@@ -38,8 +47,6 @@ type RabbitMQQueue interface {
 	Consumer() string
 }
 
-var _ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
-
 type RabbitMQQueueMessageListener interface {
 	OnMessage(message *amqp.Delivery) error
 }
@@ -51,8 +58,6 @@ type NatsSubjectConnection interface {
 	Close()
 	Connect() (*nats.Conn, *nats.Subscription, chan *nats.Msg, error)
 }
-
-var _ NatsMessageListener = (*DefaultNatsMessageListener)(nil)
 
 type NatsMessageListener interface {
 	OnMessage(message *nats.Msg) error
