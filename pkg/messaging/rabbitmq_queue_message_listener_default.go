@@ -10,17 +10,10 @@ import (
 )
 
 type DefaultRabbitMQQueueMessageListener struct {
-	queue string
 }
 
-func NewDefaultRabbitMQQueueMessageListener(queue string) *DefaultRabbitMQQueueMessageListener {
-	return &DefaultRabbitMQQueueMessageListener{
-		queue: queue,
-	}
-}
-
-func (listener *DefaultRabbitMQQueueMessageListener) Queue() string {
-	return listener.queue
+func NewDefaultRabbitMQQueueMessageListener() *DefaultRabbitMQQueueMessageListener {
+	return &DefaultRabbitMQQueueMessageListener{}
 }
 
 func (listener *DefaultRabbitMQQueueMessageListener) OnMessage(message *amqp.Delivery) error {

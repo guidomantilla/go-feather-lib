@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/server"
 	"os"
 	"syscall"
 
@@ -9,6 +8,7 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
+	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 
 func main() {
@@ -21,51 +21,21 @@ func main() {
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
-	app.Attach("DummyServer", server.BuildDummyServer())
 
 	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	defer connection.Close()
 
-	queue := messaging.NewDefaultRabbitMQQueue(connection, "queue", "consumer-queue")
+	queue := messaging.NewDefaultRabbitMQQueue(connection, "queue")
 	defer queue.Close()
 
-	myqueue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue", "consumer-my-queue")
+	myqueue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue")
 	defer myqueue.Close()
 
-	go func() {
-		log.Info("entering goroutine - queue")
+	listener := messaging.NewDefaultRabbitMQQueueMessageListener()
+	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(listener, queue, myqueue)
 
-		for {
-			log.Info("opening deliveries - queue")
-			rabbitChannel, _ := queue.Connect()
-			deliveries, _ := rabbitChannel.Consume("queue", "consumer-queue", true, false, false, false, nil)
-			for d := range deliveries {
-				log.Info(string(d.Body))
-			}
-			log.Info("closing deliveries - queue")
-		}
-		log.Info("leaving goroutine - queue")
-	}()
-
-	go func() {
-		log.Info("entering goroutine - my-queue")
-
-		for {
-			log.Info("opening deliveries - my-queue")
-			rabbitChannel, _ := myqueue.Connect()
-			deliveries, _ := rabbitChannel.Consume("my-queue", "consumer-my-queue", true, false, false, false, nil)
-			for d := range deliveries {
-				log.Info(string(d.Body))
-			}
-			log.Info("closing deliveries - my-queue")
-		}
-		log.Info("leaving goroutine - my-queue")
-	}()
-
-	//listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")
-	//dispatcher := server.BuildRabbitMQQueueMessageDispatcher(messagingContext, connection, listener)
-	//app.Attach("RabbitMQDispatcher", dispatcher)
+	app.Attach("RabbitMQDispatcher", dispatcher)
 
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())

@@ -51,20 +51,6 @@ func (mr *MockDispatcherMockRecorder) Dispatch(message any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Dispatch", reflect.TypeOf((*MockDispatcher)(nil).Dispatch), message)
 }
 
-// ListenAndDispatch mocks base method.
-func (m *MockDispatcher) ListenAndDispatch() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListenAndDispatch")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// ListenAndDispatch indicates an expected call of ListenAndDispatch.
-func (mr *MockDispatcherMockRecorder) ListenAndDispatch() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListenAndDispatch", reflect.TypeOf((*MockDispatcher)(nil).ListenAndDispatch))
-}
-
 // Run mocks base method.
 func (m *MockDispatcher) Run(ctx context.Context) error {
 	m.ctrl.T.Helper()

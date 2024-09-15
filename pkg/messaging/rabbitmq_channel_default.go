@@ -2,8 +2,10 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type DefaultRabbitMQChannel struct {
@@ -26,42 +28,23 @@ func NewDefaultRabbitMQChannel(rabbitMQConnection RabbitMQConnection) *DefaultRa
 
 func (channel *DefaultRabbitMQChannel) Connect() (*amqp.Channel, error) {
 
-	if channel.channel != nil && !channel.channel.IsClosed() {
-		log.Debug(fmt.Sprintf("rabbitmq channel - already connected to channel"))
-		return channel.channel, nil
-	}
-	/*
-		err := retry.Do(channel.connect, retry.Attempts(5),
-			retry.OnRetry(func(n uint, err error) {
-				log.Warn(fmt.Sprintf("rabbitmq channel - failed to connect: %s", err.Error()))
-				log.Debug(fmt.Sprintf("rabbitmq channel - trying reconnection to channel"))
-			}),
-		)
-	*/
-	if err := channel.connect(); err != nil {
-		log.Error(fmt.Sprintf("rabbitmq channel - failed connection to channel"))
-		return nil, err
-	}
-
-	return channel.channel, nil
-}
-
-func (channel *DefaultRabbitMQChannel) connect() error {
-
 	var err error
 	var connection *amqp.Connection
 	if connection, err = channel.rabbitMQConnection.Connect(); err != nil {
-		return err
+		log.Debug(fmt.Sprintf("rabbitmq channel - failed connection to channel: %s", err.Error()))
+		return nil, err
 	}
 
-	if channel.channel, err = connection.Channel(); err != nil {
-		return err
+	if !(channel.channel != nil && !channel.channel.IsClosed()) {
+		if channel.channel, err = connection.Channel(); err != nil {
+			log.Debug(fmt.Sprintf("rabbitmq channel - failed connection channel: %s", err.Error()))
+			return nil, err
+		}
 	}
 
-	//channel.notifyOnClosedChannel = channel.channel.NotifyClose(make(chan *amqp.Error))
-	log.Debug(fmt.Sprintf("rabbitmq channel - connected to channel"))
+	log.Debug("rabbitmq channel - connected to channel")
 
-	return nil
+	return channel.channel, nil
 }
 
 func (channel *DefaultRabbitMQChannel) Close() {
@@ -73,7 +56,7 @@ func (channel *DefaultRabbitMQChannel) Close() {
 		}
 	}
 	channel.channel = nil
-	log.Debug(fmt.Sprintf("rabbitmq channel - closed connection to channel"))
+	log.Debug("rabbitmq channel - closed connection to channel")
 }
 
 func (channel *DefaultRabbitMQChannel) RabbitMQContext() RabbitMQContext {

@@ -14,7 +14,6 @@ var (
 
 type Dispatcher interface {
 	lifecycle.Server
-	ListenAndDispatch() error
 	Dispatch(message any)
 }
 

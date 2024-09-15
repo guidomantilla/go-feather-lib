@@ -2,8 +2,10 @@ package messaging
 
 import (
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"strings"
+	"sync"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
@@ -18,9 +20,10 @@ type DefaultRabbitMQQueue struct {
 	name                  string
 	consumer              string
 	notifyOnClosedQueue   chan string
+	mu                    sync.Mutex
 }
 
-func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string, consumer string) *DefaultRabbitMQQueue {
+func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string) *DefaultRabbitMQQueue {
 
 	if rabbitMQConnection == nil {
 		log.Fatal("starting up - error setting up rabbitMQueue: rabbitMQConnection is nil")
@@ -30,20 +33,19 @@ func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string
 		log.Fatal("starting up - error setting up rabbitMQueue: queue is empty")
 	}
 
-	if strings.TrimSpace(consumer) == "" {
-		log.Fatal("starting up - error setting up rabbitMQueue: consumer is empty")
-	}
-
 	return &DefaultRabbitMQQueue{
 		rabbitMQConnection:    rabbitMQConnection,
 		notifyOnClosedChannel: make(chan *amqp.Error),
 		name:                  queue,
-		consumer:              consumer,
+		consumer:              "consumer-" + queue,
 		notifyOnClosedQueue:   make(chan string),
 	}
 }
 
 func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
+
+	queue.mu.Lock()
+	defer queue.mu.Unlock()
 
 	var err error
 	var connection *amqp.Connection
@@ -82,4 +84,12 @@ func (queue *DefaultRabbitMQQueue) Close() {
 
 func (queue *DefaultRabbitMQQueue) RabbitMQContext() RabbitMQContext {
 	return queue.rabbitMQConnection.RabbitMQContext()
+}
+
+func (queue *DefaultRabbitMQQueue) Name() string {
+	return queue.name
+}
+
+func (queue *DefaultRabbitMQQueue) Consumer() string {
+	return queue.consumer
 }

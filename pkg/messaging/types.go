@@ -34,22 +34,13 @@ type RabbitMQQueue interface {
 	RabbitMQContext() RabbitMQContext
 	Connect() (*amqp.Channel, error)
 	Close()
-}
-
-//
-
-var _ RabbitMQQueueConnection = (*DefaultRabbitMQQueueConnection)(nil)
-
-type RabbitMQQueueConnection interface {
-	Start()
-	Close()
-	Connect() (*amqp.Connection, *amqp.Channel, *amqp.Queue, <-chan amqp.Delivery, error)
+	Name() string
+	Consumer() string
 }
 
 var _ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
 
 type RabbitMQQueueMessageListener interface {
-	Queue() string
 	OnMessage(message *amqp.Delivery) error
 }
 

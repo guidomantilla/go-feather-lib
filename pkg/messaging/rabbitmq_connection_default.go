@@ -2,9 +2,10 @@ package messaging
 
 import (
 	"fmt"
+	"sync"
+
 	retry "github.com/avast/retry-go/v4"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"sync"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
