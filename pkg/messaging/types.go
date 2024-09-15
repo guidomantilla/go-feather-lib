@@ -16,10 +16,16 @@ var (
 	_ RabbitMQConnection           = (*DefaultRabbitMQConnection)(nil)
 	_ RabbitMQChannel              = (*DefaultRabbitMQChannel)(nil)
 	_ RabbitMQQueue                = (*DefaultRabbitMQQueue)(nil)
-	_ NatsSubjectConnection        = (*DefaultNatsSubjectConnection)(nil)
 	_ RabbitMQQueueMessageListener = (*DefaultRabbitMQQueueMessageListener)(nil)
 	_ NatsSubjectConnection        = (*DefaultNatsSubjectConnection)(nil)
 	_ NatsMessageListener          = (*DefaultNatsMessageListener)(nil)
+	_ RabbitMQContext              = (*MockRabbitMQContext)(nil)
+	_ RabbitMQConnection           = (*MockRabbitMQConnection)(nil)
+	_ RabbitMQChannel              = (*MockRabbitMQChannel)(nil)
+	_ RabbitMQQueue                = (*MockRabbitMQQueue)(nil)
+	_ RabbitMQQueueMessageListener = (*MockRabbitMQQueueMessageListener)(nil)
+	_ NatsSubjectConnection        = (*MockNatsSubjectConnection)(nil)
+	_ NatsMessageListener          = (*MockNatsMessageListener)(nil)
 )
 
 type RabbitMQContext interface {

@@ -3,6 +3,8 @@ package properties
 var (
 	_ Properties     = (*DefaultProperties)(nil)
 	_ PropertySource = (*DefaultPropertySource)(nil)
+	_ PropertySource = (*MockPropertySource)(nil)
+	_ Properties     = (*MockProperties)(nil)
 )
 
 type Properties interface {

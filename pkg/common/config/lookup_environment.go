@@ -8,6 +8,7 @@ import (
 
 var (
 	_ envconfig.Lookuper = (*EnvironmentLookup)(nil)
+	_ envconfig.Lookuper = (*MockLookuper)(nil)
 )
 
 type EnvironmentLookup struct {

@@ -10,6 +10,9 @@ var (
 	_ DatasourceContext  = (*DefaultDatasourceContext)(nil)
 	_ Datasource         = (*DefaultDatasource)(nil)
 	_ TransactionHandler = (*DefaultTransactionHandler)(nil)
+	_ DatasourceContext  = (*MockDatasourceContext)(nil)
+	_ Datasource         = (*MockDatasource)(nil)
+	_ TransactionHandler = (*MockTransactionHandler)(nil)
 )
 
 type DatasourceContext interface {

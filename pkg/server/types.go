@@ -10,6 +10,7 @@ var (
 	_ Server     = (*CronServer)(nil)
 	_ Server     = (*GrpcServer)(nil)
 	_ Server     = (*HttpServer)(nil)
+	_ Server     = (*MockServer)(nil)
 )
 
 type Dispatcher interface {

@@ -6,7 +6,10 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/properties"
 )
 
-var _ Environment = (*DefaultEnvironment)(nil)
+var (
+	_ Environment = (*DefaultEnvironment)(nil)
+	_ Environment = (*MockEnvironment)(nil)
+)
 
 type Environment interface {
 	Value(property string) EnvVar

@@ -211,8 +211,3 @@ func (enum CustomSlogFormat) Handler(w io.Writer, opts *slog.HandlerOptions) slo
 	}
 	return slog.NewTextHandler(w, opts)
 }
-
-//
-
-type CustomSlogHandler interface {
-}

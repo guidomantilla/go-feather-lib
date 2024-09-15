@@ -6,6 +6,7 @@ import (
 
 var (
 	_ Logger = (*SlogLogger)(nil)
+	_ Logger = (*MockLogger)(nil)
 )
 
 type Logger interface {

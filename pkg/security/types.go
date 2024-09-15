@@ -30,6 +30,12 @@ var (
 	_ AuthorizationFilter    = (*DefaultAuthorizationFilter)(nil)
 	_ AuthorizationService   = (*DefaultAuthorizationService)(nil)
 	_ TokenManager           = (*JwtTokenManager)(nil)
+	_ PrincipalManager       = (*MockPrincipalManager)(nil)
+	_ AuthenticationEndpoint = (*MockAuthenticationEndpoint)(nil)
+	_ AuthenticationService  = (*MockAuthenticationService)(nil)
+	_ AuthorizationFilter    = (*MockAuthorizationFilter)(nil)
+	_ AuthorizationService   = (*MockAuthorizationService)(nil)
+	_ TokenManager           = (*MockTokenManager)(nil)
 )
 
 type PrincipalManager interface {
