@@ -3,15 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 	"os"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 

@@ -9,7 +9,7 @@ generate:
 
 sort-import:
 	goimports-reviser -rm-unused -set-alias -format -recursive pkg
-	##goimports-reviser -rm-unused -set-alias -format -recursive internal
+	goimports-reviser -rm-unused -set-alias -format -recursive internal
 
 format:
 	go fmt ./pkg/...

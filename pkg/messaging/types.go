@@ -5,6 +5,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 	amqp "github.com/rabbitmq/amqp091-go"
+	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 )
 
@@ -18,7 +19,8 @@ var (
 	_ RabbitMQConnection[*stream.Environment] = (*DefaultRabbitMQStreamsConnection)(nil)
 	_ RabbitMQChannel                         = (*DefaultRabbitMQChannel)(nil)
 	_ RabbitMQQueue                           = (*DefaultRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener                 = (*DefaultRabbitMQMessageListener)(nil)
+	_ RabbitMQMessageListener[*amqp.Delivery] = (*DefaultRabbitMQListener)(nil)
+	_ RabbitMQMessageListener[*samqp.Message] = (*DefaultRabbitMQStreamsListener)(nil)
 	_ NatsSubjectConnection                   = (*DefaultNatsSubjectConnection)(nil)
 	_ NatsMessageListener                     = (*DefaultNatsMessageListener)(nil)
 	_ RabbitMQContext                         = (*MockRabbitMQContext)(nil)
@@ -26,7 +28,8 @@ var (
 	_ RabbitMQConnection[*stream.Environment] = (*MockRabbitMQConnection[*stream.Environment])(nil)
 	_ RabbitMQChannel                         = (*MockRabbitMQChannel)(nil)
 	_ RabbitMQQueue                           = (*MockRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener                 = (*MockRabbitMQMessageListener)(nil)
+	_ RabbitMQMessageListener[*amqp.Delivery] = (*MockRabbitMQMessageListener[*amqp.Delivery])(nil)
+	_ RabbitMQMessageListener[*samqp.Message] = (*MockRabbitMQMessageListener[*samqp.Message])(nil)
 	_ NatsSubjectConnection                   = (*MockNatsSubjectConnection)(nil)
 	_ NatsMessageListener                     = (*MockNatsMessageListener)(nil)
 )
@@ -49,6 +52,16 @@ type RabbitMQConnection[T RabbitMQConnectionTypes] interface {
 	Close()
 }
 
+type RabbitMQMessageListenerTypes interface {
+	*amqp.Delivery | *samqp.Message
+}
+
+type RabbitMQMessageListener[T RabbitMQMessageListenerTypes] interface {
+	OnMessage(message T) error
+}
+
+// RabbitMQ Classic
+
 type RabbitMQChannel interface {
 	RabbitMQContext() RabbitMQContext
 	Connect() (*amqp.Channel, error)
@@ -61,10 +74,6 @@ type RabbitMQQueue interface {
 	Close()
 	Name() string
 	Consumer() string
-}
-
-type RabbitMQMessageListener interface {
-	OnMessage(message *amqp.Delivery) error
 }
 
 //
