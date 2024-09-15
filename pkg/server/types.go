@@ -6,7 +6,7 @@ import (
 
 var (
 	_ Dispatcher = (*NatsMessageDispatcher)(nil)
-	_ Dispatcher = (*RabbitMQQueueMessageDispatcher)(nil)
+	_ Dispatcher = (*RabbitMQMessageDispatcher)(nil)
 	_ Server     = (*CronServer)(nil)
 	_ Server     = (*GrpcServer)(nil)
 	_ Server     = (*HttpServer)(nil)

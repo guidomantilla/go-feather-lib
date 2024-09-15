@@ -11,7 +11,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type RabbitMQQueueMessageDispatcher struct {
+type RabbitMQMessageDispatcher struct {
 	ctx           context.Context
 	listener      messaging.RabbitMQMessageListener
 	rabbitMQQueue []messaging.RabbitMQQueue
@@ -19,7 +19,7 @@ type RabbitMQQueueMessageDispatcher struct {
 	stopCh        chan struct{}
 }
 
-func BuildRabbitMQQueueMessageDispatcher(listener messaging.RabbitMQMessageListener, rabbitMQQueue ...messaging.RabbitMQQueue) Server {
+func BuildRabbitMQMessageDispatcher(listener messaging.RabbitMQMessageListener, rabbitMQQueue ...messaging.RabbitMQQueue) Server {
 
 	if listener == nil {
 		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: listener is nil")
@@ -29,7 +29,7 @@ func BuildRabbitMQQueueMessageDispatcher(listener messaging.RabbitMQMessageListe
 		log.Fatal("starting up - error setting up rabbitmq queue dispatcher: rabbitMQQueue is empty")
 	}
 
-	return &RabbitMQQueueMessageDispatcher{
+	return &RabbitMQMessageDispatcher{
 		listener:      listener,
 		rabbitMQQueue: rabbitMQQueue,
 		deliveries:    make(<-chan amqp.Delivery),
@@ -37,7 +37,7 @@ func BuildRabbitMQQueueMessageDispatcher(listener messaging.RabbitMQMessageListe
 	}
 }
 
-func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
+func (server *RabbitMQMessageDispatcher) Run(ctx context.Context) error {
 
 	server.ctx = ctx
 	info, _ := lifecycle.FromContext(ctx)
@@ -64,7 +64,7 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *RabbitMQQueueMessageDispatcher) Dispatch(message any) {
+func (server *RabbitMQMessageDispatcher) Dispatch(message any) {
 
 	var err error
 	msg := message.(*amqp.Delivery)
@@ -73,7 +73,7 @@ func (server *RabbitMQQueueMessageDispatcher) Dispatch(message any) {
 	}
 }
 
-func (server *RabbitMQQueueMessageDispatcher) Stop(ctx context.Context) error {
+func (server *RabbitMQMessageDispatcher) Stop(ctx context.Context) error {
 
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server shutting down - stopping rabbitmq queue dispatcher %s, v.%s", info.Name(), info.Version()))
