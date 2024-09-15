@@ -2,11 +2,8 @@ package messaging
 
 import (
 	"fmt"
-	"time"
-
-	amqp "github.com/rabbitmq/amqp091-go"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type DefaultRabbitMQChannel struct {
@@ -30,6 +27,7 @@ func NewDefaultRabbitMQChannel(rabbitMQConnection RabbitMQConnection) *DefaultRa
 func (channel *DefaultRabbitMQChannel) Connect() (*amqp.Channel, error) {
 
 	if channel.channel != nil && !channel.channel.IsClosed() {
+		log.Debug(fmt.Sprintf("rabbitmq channel - already connected to channel"))
 		return channel.channel, nil
 	}
 	/*
@@ -44,8 +42,6 @@ func (channel *DefaultRabbitMQChannel) Connect() (*amqp.Channel, error) {
 		log.Error(fmt.Sprintf("rabbitmq channel - failed connection to channel"))
 		return nil, err
 	}
-
-	go channel.reconnect()
 
 	return channel.channel, nil
 }
@@ -62,42 +58,10 @@ func (channel *DefaultRabbitMQChannel) connect() error {
 		return err
 	}
 
-	channel.notifyOnClosedChannel = channel.channel.NotifyClose(make(chan *amqp.Error))
+	//channel.notifyOnClosedChannel = channel.channel.NotifyClose(make(chan *amqp.Error))
 	log.Debug(fmt.Sprintf("rabbitmq channel - connected to channel"))
 
 	return nil
-}
-
-func (channel *DefaultRabbitMQChannel) reconnect() {
-
-	if !channel.rabbitMQConnection.RabbitMQContext().FailOver() {
-		return
-	}
-
-	for {
-		var ok bool
-		var reason *amqp.Error
-		if reason, ok = <-channel.notifyOnClosedChannel; !ok {
-			break
-		}
-		log.Debug(fmt.Sprintf("rabbitmq channel - channel closed unexpectedly: %s", reason.Reason))
-
-		<-channel.RabbitMQContext().NotifyOnFaiOverConnection()
-		time.Sleep(makeConnectionDelay)
-		channel.Close()
-
-		log.Debug(fmt.Sprintf("rabbitmq channel - trying reconnection to channel"))
-
-		for {
-			time.Sleep(makeConnectionDelay)
-			if err := channel.connect(); err != nil {
-				log.Error(fmt.Sprintf("rabbitmq channel - failed reconnection to channel: %s", err.Error()))
-				continue
-			}
-			log.Info(fmt.Sprintf("rabbitmq channel - reconnected to channel"))
-			break
-		}
-	}
 }
 
 func (channel *DefaultRabbitMQChannel) Close() {

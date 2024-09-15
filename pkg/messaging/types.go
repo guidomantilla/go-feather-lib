@@ -14,8 +14,6 @@ const (
 type RabbitMQContext interface {
 	Url() string
 	Server() string
-	FailOver() bool
-	NotifyOnFaiOverConnection() chan string
 }
 
 //

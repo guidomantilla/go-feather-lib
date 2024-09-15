@@ -2,10 +2,8 @@ package messaging
 
 import (
 	"fmt"
-	"strings"
-	"time"
-
 	amqp "github.com/rabbitmq/amqp091-go"
+	"strings"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
@@ -48,6 +46,7 @@ func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string
 func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
 
 	if queue.channel != nil && !queue.channel.IsClosed() {
+		log.Debug(fmt.Sprintf("rabbitmq queue - already connected to queue %s", queue.name))
 		return queue.channel, nil
 	}
 
@@ -63,8 +62,6 @@ func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
 		log.Error(fmt.Sprintf("rabbitmq queue - failed connection to queue"))
 		return nil, err
 	}
-
-	go queue.reconnect()
 
 	return queue.channel, nil
 }
@@ -85,55 +82,11 @@ func (queue *DefaultRabbitMQQueue) connect() error {
 		return err
 	}
 
-	queue.notifyOnClosedChannel = queue.channel.NotifyClose(make(chan *amqp.Error))
-	queue.notifyOnClosedQueue = queue.channel.NotifyCancel(make(chan string))
+	//queue.notifyOnClosedChannel = queue.channel.NotifyClose(make(chan *amqp.Error))
+	//queue.notifyOnClosedQueue = queue.channel.NotifyCancel(make(chan string))
 	log.Debug(fmt.Sprintf("rabbitmq queue - connected to queue %s", queue.name))
 
 	return nil
-}
-
-func (queue *DefaultRabbitMQQueue) reconnect() {
-
-	if !queue.rabbitMQConnection.RabbitMQContext().FailOver() {
-		return
-	}
-
-	notifyOnClosedEvent := func() (*amqp.Error, bool) {
-		select {
-		case reason, ok := <-queue.notifyOnClosedChannel:
-			return reason, ok
-			/*
-				case reason, ok := <-queue.notifyOnClosedQueue:
-					return &amqp.Error{Reason: reason}, ok
-
-			*/
-		}
-	}
-
-	for {
-		var ok bool
-		var reason *amqp.Error
-		if reason, ok = notifyOnClosedEvent(); !ok {
-			break
-		}
-		log.Debug(fmt.Sprintf("rabbitmq queue - queue %s closed unexpectedly: %s", queue.name, reason.Reason))
-
-		<-queue.RabbitMQContext().NotifyOnFaiOverConnection()
-		time.Sleep(makeConnectionDelay)
-		queue.Close()
-
-		log.Debug(fmt.Sprintf("rabbitmq queue - trying reconnection to queue"))
-
-		for {
-			time.Sleep(makeConnectionDelay)
-			if err := queue.connect(); err != nil {
-				log.Error(fmt.Sprintf("rabbitmq queue - failed reconnection to queue %s: %s", queue.name, err.Error()))
-				continue
-			}
-			log.Info(fmt.Sprintf("rabbitmq queue - reconnected to queue %s", queue.name))
-			break
-		}
-	}
 }
 
 func (queue *DefaultRabbitMQQueue) Close() {
@@ -143,6 +96,7 @@ func (queue *DefaultRabbitMQQueue) Close() {
 			log.Error(fmt.Sprintf("rabbitmq queue - failed to close connection to queue %s: %s", queue.name, err.Error()))
 		}
 	}
+	queue.channel = nil
 	log.Debug(fmt.Sprintf("rabbitmq queue - closed connection to queue %s", queue.name))
 }
 

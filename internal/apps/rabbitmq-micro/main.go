@@ -23,36 +23,46 @@ func main() {
 	)
 	app.Attach("DummyServer", server.BuildDummyServer())
 
-	options := []messaging.RabbitMQContextOption{
-		messaging.WithFailOver(true),
-		//messaging.WithInternalObserver(true),
-	}
-	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672", options...)
+	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 	defer connection.Close()
 
-	//channel := messaging.NewDefaultRabbitMQChannel(connection)
-	//defer channel.Close()
-
-	queue := messaging.NewDefaultRabbitMQQueue(connection, "queue", "consumer")
-	defer queue.Close()
-
-	//connection.Connect()
-	//channel.Connect()
-
 	go func() {
-		log.Info("entering goroutine")
+		log.Info("entering goroutine - queue")
+
 		for {
-			log.Info("opening deliveries")
+			log.Info("opening deliveries - queue")
+
+			queue := messaging.NewDefaultRabbitMQQueue(connection, "queue", "consumer-queue")
+			//defer queue.Close()
+
 			rabbitChannel, _ := queue.Connect()
-			deliveries, _ := rabbitChannel.Consume("queue", "consumer", true, false, false, false, nil)
+			deliveries, _ := rabbitChannel.Consume("queue", "consumer-queue", true, false, false, false, nil)
 			for d := range deliveries {
 				log.Info(string(d.Body))
 			}
-			log.Info("closing deliveries")
+			log.Info("closing deliveries - queue")
 		}
+		log.Info("leaving goroutine - queue")
+	}()
 
-		log.Info("leaving goroutine")
+	go func() {
+		log.Info("entering goroutine - my-queue")
+
+		for {
+			log.Info("opening deliveries - my-queue")
+
+			queue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue", "consumer-my-queue")
+			//defer queue.Close()
+
+			rabbitChannel, _ := queue.Connect()
+			deliveries, _ := rabbitChannel.Consume("my-queue", "consumer-my-queue", true, false, false, false, nil)
+			for d := range deliveries {
+				log.Info(string(d.Body))
+			}
+			log.Info("closing deliveries - my-queue")
+		}
+		log.Info("leaving goroutine - my-queue")
 	}()
 
 	//listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")
