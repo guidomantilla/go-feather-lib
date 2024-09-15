@@ -24,16 +24,13 @@ func main() {
 
 	messagingContext := messaging.NewDefaultRabbitMQContext("amqp://:username::password@:server/", "raven-dev", "raven-dev*+", "170.187.157.212:5672")
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
-	defer connection.Close()
 
-	queue := messaging.NewDefaultRabbitMQQueue(connection, "queue")
-	defer queue.Close()
-
-	myqueue := messaging.NewDefaultRabbitMQQueue(connection, "my-queue")
-	defer myqueue.Close()
-
+	queues := []messaging.RabbitMQQueue{
+		messaging.NewDefaultRabbitMQQueue(connection, "queue"),
+		messaging.NewDefaultRabbitMQQueue(connection, "my-queue"),
+	}
 	listener := messaging.NewDefaultRabbitMQQueueMessageListener()
-	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(listener, queue, myqueue)
+	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(listener, queues...)
 
 	app.Attach("RabbitMQDispatcher", dispatcher)
 

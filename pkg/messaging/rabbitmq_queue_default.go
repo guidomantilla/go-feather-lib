@@ -79,6 +79,7 @@ func (queue *DefaultRabbitMQQueue) Close() {
 		}
 	}
 	queue.channel = nil
+	queue.rabbitMQConnection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq queue - closed connection to queue %s", queue.name))
 }
 

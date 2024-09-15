@@ -16,6 +16,7 @@ type RabbitMQQueueMessageDispatcher struct {
 	listener      messaging.RabbitMQQueueMessageListener
 	rabbitMQQueue []messaging.RabbitMQQueue
 	deliveries    <-chan amqp.Delivery
+	stopCh        chan struct{}
 }
 
 func BuildRabbitMQQueueMessageDispatcher(listener messaging.RabbitMQQueueMessageListener, rabbitMQQueue ...messaging.RabbitMQQueue) Server {
@@ -32,6 +33,7 @@ func BuildRabbitMQQueueMessageDispatcher(listener messaging.RabbitMQQueueMessage
 		listener:      listener,
 		rabbitMQQueue: rabbitMQQueue,
 		deliveries:    make(<-chan amqp.Delivery),
+		stopCh:        make(chan struct{}),
 	}
 }
 
@@ -44,10 +46,15 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 	for _, queue := range server.rabbitMQQueue {
 		go func(queue messaging.RabbitMQQueue) {
 			for {
-				rabbitChannel, _ := queue.Connect()
-				deliveries, _ := rabbitChannel.Consume(queue.Name(), queue.Consumer(), true, false, false, false, nil)
-				for message := range deliveries {
-					go server.Dispatch(&message)
+				select {
+				case <-server.stopCh:
+					return
+				default:
+					rabbitChannel, _ := queue.Connect()
+					deliveries, _ := rabbitChannel.Consume(queue.Name(), queue.Consumer(), true, false, false, false, nil)
+					for message := range deliveries {
+						go server.Dispatch(&message)
+					}
 				}
 			}
 		}(queue)
@@ -59,6 +66,7 @@ func (server *RabbitMQQueueMessageDispatcher) Run(ctx context.Context) error {
 			return nil
 		}
 	}
+
 }
 
 func (server *RabbitMQQueueMessageDispatcher) Dispatch(message any) {
@@ -74,6 +82,7 @@ func (server *RabbitMQQueueMessageDispatcher) Stop(ctx context.Context) error {
 
 	info, _ := lifecycle.FromContext(ctx)
 	log.Info(fmt.Sprintf("server shutting down - stopping rabbitmq queue dispatcher %s, v.%s", info.Name(), info.Version()))
+	close(server.stopCh)
 	for _, queue := range server.rabbitMQQueue {
 		queue.Close()
 	}
