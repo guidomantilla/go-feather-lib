@@ -11,9 +11,10 @@ type RabbitMQContextOption func(rabbitMQContext *DefaultRabbitMQContext)
 type DefaultRabbitMQContext struct {
 	url    string
 	server string
+	vhost  string
 }
 
-func NewDefaultRabbitMQContext(url string, username string, password string, server string) *DefaultRabbitMQContext {
+func NewDefaultRabbitMQContext(url string, username string, password string, server string, vhost string) *DefaultRabbitMQContext {
 
 	if strings.TrimSpace(url) == "" {
 		log.Fatal("starting up - error setting up rabbitMQContext: url is empty")
@@ -31,13 +32,19 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 		log.Fatal("starting up - error setting up rabbitMQContext: server is empty")
 	}
 
+	if strings.TrimSpace(vhost) == "" {
+		log.Fatal("starting up - error setting up rabbitMQContext: vhost is empty")
+	}
+
 	url = strings.Replace(url, ":username", username, 1)
 	url = strings.Replace(url, ":password", password, 1)
 	url = strings.Replace(url, ":server", server, 1)
+	url = strings.Replace(url, ":vhost", vhost, 1)
 
 	return &DefaultRabbitMQContext{
 		url:    url,
 		server: server,
+		vhost:  vhost,
 	}
 }
 
@@ -47,4 +54,8 @@ func (context *DefaultRabbitMQContext) Url() string {
 
 func (context *DefaultRabbitMQContext) Server() string {
 	return context.server
+}
+
+func (context *DefaultRabbitMQContext) VHost() string {
+	return context.vhost
 }

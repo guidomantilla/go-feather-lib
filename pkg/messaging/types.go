@@ -5,6 +5,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 )
 
 const (
@@ -12,30 +13,39 @@ const (
 )
 
 var (
-	_ RabbitMQContext         = (*DefaultRabbitMQContext)(nil)
-	_ RabbitMQConnection      = (*DefaultRabbitMQConnection)(nil)
-	_ RabbitMQChannel         = (*DefaultRabbitMQChannel)(nil)
-	_ RabbitMQQueue           = (*DefaultRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener = (*DefaultRabbitMQMessageListener)(nil)
-	_ NatsSubjectConnection   = (*DefaultNatsSubjectConnection)(nil)
-	_ NatsMessageListener     = (*DefaultNatsMessageListener)(nil)
-	_ RabbitMQContext         = (*MockRabbitMQContext)(nil)
-	_ RabbitMQConnection      = (*MockRabbitMQConnection)(nil)
-	_ RabbitMQChannel         = (*MockRabbitMQChannel)(nil)
-	_ RabbitMQQueue           = (*MockRabbitMQQueue)(nil)
-	_ RabbitMQMessageListener = (*MockRabbitMQMessageListener)(nil)
-	_ NatsSubjectConnection   = (*MockNatsSubjectConnection)(nil)
-	_ NatsMessageListener     = (*MockNatsMessageListener)(nil)
+	_ RabbitMQContext                         = (*DefaultRabbitMQContext)(nil)
+	_ RabbitMQConnection[*amqp.Connection]    = (*DefaultRabbitMQConnection)(nil)
+	_ RabbitMQConnection[*stream.Environment] = (*DefaultRabbitMQStreamsConnection)(nil)
+	_ RabbitMQChannel                         = (*DefaultRabbitMQChannel)(nil)
+	_ RabbitMQQueue                           = (*DefaultRabbitMQQueue)(nil)
+	_ RabbitMQMessageListener                 = (*DefaultRabbitMQMessageListener)(nil)
+	_ NatsSubjectConnection                   = (*DefaultNatsSubjectConnection)(nil)
+	_ NatsMessageListener                     = (*DefaultNatsMessageListener)(nil)
+	_ RabbitMQContext                         = (*MockRabbitMQContext)(nil)
+	_ RabbitMQConnection[*amqp.Connection]    = (*MockRabbitMQConnection[*amqp.Connection])(nil)
+	_ RabbitMQConnection[*stream.Environment] = (*MockRabbitMQConnection[*stream.Environment])(nil)
+	_ RabbitMQChannel                         = (*MockRabbitMQChannel)(nil)
+	_ RabbitMQQueue                           = (*MockRabbitMQQueue)(nil)
+	_ RabbitMQMessageListener                 = (*MockRabbitMQMessageListener)(nil)
+	_ NatsSubjectConnection                   = (*MockNatsSubjectConnection)(nil)
+	_ NatsMessageListener                     = (*MockNatsMessageListener)(nil)
 )
+
+// Generic
 
 type RabbitMQContext interface {
 	Url() string
 	Server() string
+	VHost() string
 }
 
-type RabbitMQConnection interface {
+type RabbitMQConnectionTypes interface {
+	*amqp.Connection | *stream.Environment
+}
+
+type RabbitMQConnection[T RabbitMQConnectionTypes] interface {
 	RabbitMQContext() RabbitMQContext
-	Connect() (*amqp.Connection, error)
+	Connect() (T, error)
 	Close()
 }
 

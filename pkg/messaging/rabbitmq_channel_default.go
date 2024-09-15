@@ -9,12 +9,12 @@ import (
 )
 
 type DefaultRabbitMQChannel struct {
-	rabbitMQConnection    RabbitMQConnection
+	rabbitMQConnection    RabbitMQConnection[*amqp.Connection]
 	channel               *amqp.Channel
 	notifyOnClosedChannel chan *amqp.Error
 }
 
-func NewDefaultRabbitMQChannel(rabbitMQConnection RabbitMQConnection) *DefaultRabbitMQChannel {
+func NewDefaultRabbitMQChannel(rabbitMQConnection RabbitMQConnection[*amqp.Connection]) *DefaultRabbitMQChannel {
 
 	if rabbitMQConnection == nil {
 		log.Fatal("starting up - error setting up rabbitMQChannel: rabbitMQConnection is nil")

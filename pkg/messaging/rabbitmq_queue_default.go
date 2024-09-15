@@ -13,7 +13,7 @@ import (
 type DeliveryChan <-chan amqp.Delivery
 
 type DefaultRabbitMQQueue struct {
-	rabbitMQConnection    RabbitMQConnection
+	rabbitMQConnection    RabbitMQConnection[*amqp.Connection]
 	channel               *amqp.Channel
 	notifyOnClosedChannel chan *amqp.Error
 	queue                 amqp.Queue
@@ -23,7 +23,7 @@ type DefaultRabbitMQQueue struct {
 	mu                    sync.Mutex
 }
 
-func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection, queue string) *DefaultRabbitMQQueue {
+func NewDefaultRabbitMQQueue(rabbitMQConnection RabbitMQConnection[*amqp.Connection], queue string) *DefaultRabbitMQQueue {
 
 	if rabbitMQConnection == nil {
 		log.Fatal("starting up - error setting up rabbitMQueue: rabbitMQConnection is nil")

@@ -68,58 +68,72 @@ func (mr *MockRabbitMQContextMockRecorder) Url() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockRabbitMQContext)(nil).Url))
 }
 
+// VHost mocks base method.
+func (m *MockRabbitMQContext) VHost() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VHost")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// VHost indicates an expected call of VHost.
+func (mr *MockRabbitMQContextMockRecorder) VHost() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VHost", reflect.TypeOf((*MockRabbitMQContext)(nil).VHost))
+}
+
 // MockRabbitMQConnection is a mock of RabbitMQConnection interface.
-type MockRabbitMQConnection struct {
+type MockRabbitMQConnection[T RabbitMQConnectionTypes] struct {
 	ctrl     *gomock.Controller
-	recorder *MockRabbitMQConnectionMockRecorder
+	recorder *MockRabbitMQConnectionMockRecorder[T]
 }
 
 // MockRabbitMQConnectionMockRecorder is the mock recorder for MockRabbitMQConnection.
-type MockRabbitMQConnectionMockRecorder struct {
-	mock *MockRabbitMQConnection
+type MockRabbitMQConnectionMockRecorder[T RabbitMQConnectionTypes] struct {
+	mock *MockRabbitMQConnection[T]
 }
 
 // NewMockRabbitMQConnection creates a new mock instance.
-func NewMockRabbitMQConnection(ctrl *gomock.Controller) *MockRabbitMQConnection {
-	mock := &MockRabbitMQConnection{ctrl: ctrl}
-	mock.recorder = &MockRabbitMQConnectionMockRecorder{mock}
+func NewMockRabbitMQConnection[T RabbitMQConnectionTypes](ctrl *gomock.Controller) *MockRabbitMQConnection[T] {
+	mock := &MockRabbitMQConnection[T]{ctrl: ctrl}
+	mock.recorder = &MockRabbitMQConnectionMockRecorder[T]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRabbitMQConnection) EXPECT() *MockRabbitMQConnectionMockRecorder {
+func (m *MockRabbitMQConnection[T]) EXPECT() *MockRabbitMQConnectionMockRecorder[T] {
 	return m.recorder
 }
 
 // Close mocks base method.
-func (m *MockRabbitMQConnection) Close() {
+func (m *MockRabbitMQConnection[T]) Close() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Close")
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockRabbitMQConnectionMockRecorder) Close() *gomock.Call {
+func (mr *MockRabbitMQConnectionMockRecorder[T]) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQConnection)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRabbitMQConnection[T])(nil).Close))
 }
 
 // Connect mocks base method.
-func (m *MockRabbitMQConnection) Connect() (*amqp091.Connection, error) {
+func (m *MockRabbitMQConnection[T]) Connect() (T, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
-	ret0, _ := ret[0].(*amqp091.Connection)
+	ret0, _ := ret[0].(T)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Connect indicates an expected call of Connect.
-func (mr *MockRabbitMQConnectionMockRecorder) Connect() *gomock.Call {
+func (mr *MockRabbitMQConnectionMockRecorder[T]) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQConnection)(nil).Connect))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockRabbitMQConnection[T])(nil).Connect))
 }
 
 // RabbitMQContext mocks base method.
-func (m *MockRabbitMQConnection) RabbitMQContext() RabbitMQContext {
+func (m *MockRabbitMQConnection[T]) RabbitMQContext() RabbitMQContext {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RabbitMQContext")
 	ret0, _ := ret[0].(RabbitMQContext)
@@ -127,9 +141,9 @@ func (m *MockRabbitMQConnection) RabbitMQContext() RabbitMQContext {
 }
 
 // RabbitMQContext indicates an expected call of RabbitMQContext.
-func (mr *MockRabbitMQConnectionMockRecorder) RabbitMQContext() *gomock.Call {
+func (mr *MockRabbitMQConnectionMockRecorder[T]) RabbitMQContext() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQConnection)(nil).RabbitMQContext))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RabbitMQContext", reflect.TypeOf((*MockRabbitMQConnection[T])(nil).RabbitMQContext))
 }
 
 // MockRabbitMQChannel is a mock of RabbitMQChannel interface.
