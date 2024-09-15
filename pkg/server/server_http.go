@@ -34,7 +34,6 @@ func (server *HttpServer) Run(ctx context.Context) error {
 		log.Error(fmt.Sprintf("starting up - starting http server error: %s", err.Error()))
 		return err
 	}
-
 	return nil
 }
 

@@ -28,9 +28,7 @@ func (server *CronServer) Run(ctx context.Context) error {
 
 	server.ctx = ctx
 	log.Info("starting up - starting cron server")
-
 	server.internal.Start()
-
 	return nil
 }
 

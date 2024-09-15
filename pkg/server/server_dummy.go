@@ -7,6 +7,7 @@ import (
 )
 
 type DummyServer struct {
+	ctx     context.Context
 	channel chan string
 }
 
@@ -17,6 +18,8 @@ func BuildDummyServer() Server {
 }
 
 func (server *DummyServer) Run(ctx context.Context) error {
+
+	server.ctx = ctx
 	log.Info("starting up - starting dummy server")
 	<-server.channel
 	return nil

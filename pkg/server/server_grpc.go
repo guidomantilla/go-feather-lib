@@ -51,7 +51,6 @@ func (server *GrpcServer) Run(ctx context.Context) error {
 		log.Error(fmt.Sprintf("starting up - starting grpc server error: %s", err.Error()))
 		return err
 	}
-
 	return nil
 }
 
