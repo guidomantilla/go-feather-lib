@@ -76,6 +76,8 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 			break
 		}
 		log.Warn(fmt.Sprintf("rabbitmq connection - connection closed unexpectedly: %s", reason.Reason))
+
+		time.Sleep(makeConnectionDelay)
 		connection.Close()
 
 		for {
@@ -95,6 +97,7 @@ func (connection *DefaultRabbitMQConnection) reconnect() {
 func (connection *DefaultRabbitMQConnection) Close() {
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
+		log.Debug("rabbitmq connection - closing connection")
 		if err := connection.connection.Close(); err != nil {
 			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.rabbitmqContext.Server(), err.Error()))
 		}

@@ -54,7 +54,7 @@ func NewDefaultRabbitMQContext(url string, username string, password string, ser
 	rabbitMQContext := &DefaultRabbitMQContext{
 		url:                       url,
 		server:                    server,
-		notifyOnFaiOverConnection: make(chan string, 100),
+		notifyOnFaiOverConnection: make(chan string),
 	}
 
 	for _, opt := range options {

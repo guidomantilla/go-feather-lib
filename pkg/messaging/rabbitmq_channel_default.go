@@ -81,13 +81,15 @@ func (channel *DefaultRabbitMQChannel) reconnect() {
 			break
 		}
 		log.Debug(fmt.Sprintf("rabbitmq channel - channel closed unexpectedly: %s", reason.Reason))
-		channel.Close()
 
 		<-channel.RabbitMQContext().NotifyOnFaiOverConnection()
+		time.Sleep(makeConnectionDelay)
+		channel.Close()
+
 		log.Debug(fmt.Sprintf("rabbitmq channel - trying reconnection to channel"))
 
 		for {
-			time.Sleep(time.Duration(1) * time.Second)
+			time.Sleep(makeConnectionDelay)
 			if err := channel.connect(); err != nil {
 				log.Error(fmt.Sprintf("rabbitmq channel - failed reconnection to channel: %s", err.Error()))
 				continue
