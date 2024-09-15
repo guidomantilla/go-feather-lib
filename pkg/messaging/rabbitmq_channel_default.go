@@ -108,6 +108,7 @@ func (channel *DefaultRabbitMQChannel) Close() {
 			log.Error(fmt.Sprintf("rabbitmq channel - failed to close connection to channel: %s", err.Error()))
 		}
 	}
+	channel.channel = nil
 	log.Debug(fmt.Sprintf("rabbitmq channel - closed connection to channel"))
 }
 

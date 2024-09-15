@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/server"
 	"os"
 	"syscall"
 
@@ -9,7 +9,6 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
-	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 
 func main() {
@@ -22,6 +21,7 @@ func main() {
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
+	app.Attach("DummyServer", server.BuildDummyServer())
 
 	options := []messaging.RabbitMQContextOption{
 		messaging.WithFailOver(true),
@@ -39,27 +39,20 @@ func main() {
 
 	//connection.Connect()
 	//channel.Connect()
-	app.Attach("DummyServer", server.BuildDummyServer())
-
-	deliveries, err := queue.Consume()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
 
 	go func() {
+		log.Info("entering goroutine")
 		for {
-
-			select {
-			case deliveryChan := <-deliveries:
-				for {
-					message, ok := <-deliveryChan
-					if !ok {
-						break
-					}
-					log.Info(string(message.Body))
-				}
+			log.Info("opening deliveries")
+			rabbitChannel, _ := queue.Connect()
+			deliveries, _ := rabbitChannel.Consume("queue", "consumer", true, false, false, false, nil)
+			for d := range deliveries {
+				log.Info(string(d.Body))
 			}
+			log.Info("closing deliveries")
 		}
+
+		log.Info("leaving goroutine")
 	}()
 
 	//listener := messaging.NewDefaultRabbitMQQueueMessageListener("my-queue")
@@ -68,9 +61,5 @@ func main() {
 
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())
-	}
-
-	if err2 := recover(); err2 != nil {
-		log.Fatal(fmt.Sprintf("panic: %v", err2))
 	}
 }

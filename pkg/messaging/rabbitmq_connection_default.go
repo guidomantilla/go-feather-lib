@@ -102,6 +102,7 @@ func (connection *DefaultRabbitMQConnection) Close() {
 			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.rabbitmqContext.Server(), err.Error()))
 		}
 	}
+	connection.connection = nil
 	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.rabbitmqContext.Server()))
 }
 
