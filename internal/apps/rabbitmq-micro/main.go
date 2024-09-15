@@ -26,8 +26,7 @@ func main() {
 	connection := messaging.NewDefaultRabbitMQConnection(messagingContext)
 
 	queues := []messaging.RabbitMQQueue{
-		messaging.NewDefaultRabbitMQQueue(connection, "queue"),
-		messaging.NewDefaultRabbitMQQueue(connection, "my-queue"),
+		messaging.NewDefaultRabbitMQQueue(connection, appName+"-queue"),
 	}
 	listener := messaging.NewDefaultRabbitMQMessageListener()
 	dispatcher := server.BuildRabbitMQQueueMessageDispatcher(listener, queues...)
