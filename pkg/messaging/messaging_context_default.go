@@ -27,23 +27,22 @@ type DefaultMessagingContext struct {
 	vhost   string
 }
 
-// NewDefaultMessagingContext creates a new NatsContext: nats://usuario:contraseña@localhost:4222
 func NewDefaultMessagingContext(url string, username string, password string, server string, options ...DefaultMessagingContextOption) *DefaultMessagingContext {
 
 	if strings.TrimSpace(url) == "" {
-		log.Fatal("starting up - error setting up natsContext: url is empty")
+		log.Fatal("starting up - error setting up messaging context: url is empty")
 	}
 
 	if strings.TrimSpace(username) == "" {
-		log.Fatal("starting up - error setting up natsContext: username is empty")
+		log.Fatal("starting up - error setting up messaging context: username is empty")
 	}
 
 	if strings.TrimSpace(password) == "" {
-		log.Fatal("starting up - error setting up natsContext: password is empty")
+		log.Fatal("starting up - error setting up messaging context: password is empty")
 	}
 
 	if strings.TrimSpace(server) == "" {
-		log.Fatal("starting up - error setting up natsContext: server is empty")
+		log.Fatal("starting up - error setting up messaging context: server is empty")
 	}
 
 	url = strings.Replace(url, ":username", username, 1)

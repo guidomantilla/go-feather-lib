@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	nats "github.com/nats-io/nats.go"
 	amqp "github.com/rabbitmq/amqp091-go"
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
@@ -20,7 +19,6 @@ var (
 	_ MessagingConnection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
 	_ MessagingListener[*samqp.Message]        = (*RabbitMQStreamsListener)(nil)
-	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)
 	_ MessagingConsumer                        = (*RabbitMQConsumer)(nil)
 	_ MessagingConsumer                        = (*RabbitMQStreamsConsumer)(nil)
 	_ MessagingContext                         = (*MockMessagingContext)(nil)
@@ -28,7 +26,6 @@ var (
 	_ MessagingConnection[*stream.Environment] = (*MockMessagingConnection[*stream.Environment])(nil)
 	_ MessagingListener[*amqp.Delivery]        = (*MockMessagingListener[*amqp.Delivery])(nil)
 	_ MessagingListener[*samqp.Message]        = (*MockMessagingListener[*samqp.Message])(nil)
-	_ MessagingListener[*nats.Msg]             = (*MockMessagingListener[*nats.Msg])(nil)
 )
 
 type MessagingContext interface {
@@ -37,7 +34,7 @@ type MessagingContext interface {
 }
 
 type MessagingConnectionTypes interface {
-	*amqp.Connection | *stream.Environment | *nats.Conn
+	*amqp.Connection | *stream.Environment
 	IsClosed() bool
 	Close() error
 }
@@ -51,7 +48,7 @@ type MessagingConnection[T MessagingConnectionTypes] interface {
 }
 
 type MessagingListenerTypes interface {
-	*amqp.Delivery | *samqp.Message | *nats.Msg
+	*amqp.Delivery | *samqp.Message
 }
 
 type MessagingListener[T MessagingListenerTypes] interface {
