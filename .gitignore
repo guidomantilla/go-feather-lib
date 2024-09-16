@@ -36,3 +36,7 @@ Thumbs.db
 .scannerwork/
 
 .envrc
+*.crt
+*.key
+*.pem
+*.csr
