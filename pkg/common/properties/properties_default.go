@@ -2,8 +2,9 @@ package properties
 
 import (
 	"fmt"
-	"log/slog"
 	"strings"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type DefaultPropertiesOption func(properties *DefaultProperties)
@@ -13,7 +14,7 @@ func FromArray(array []string) DefaultPropertiesOption {
 		for _, env := range array {
 			pair := strings.SplitN(env, "=", 2)
 			if len(pair) != 2 {
-				slog.Error(fmt.Sprintf("[%s=??] not a key value parameter. expected [key=value]", pair[0]))
+				log.Error(fmt.Sprintf("[%s=??] not a key value parameter. expected [key=value]", pair[0]))
 				continue
 			}
 			properties.Add(pair[0], pair[1])

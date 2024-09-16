@@ -31,17 +31,17 @@ func Custom(cmdArgsArray []string) Environment {
 	return env
 }
 
-func GetValue(property string) EnvVar {
+func Value(property string) EnvVar {
 	env := retrieveSingleton()
 	return env.Value(property)
 }
 
-func GetValueOrDefault(property string, defaultValue string) EnvVar {
+func ValueOrDefault(property string, defaultValue string) EnvVar {
 	env := retrieveSingleton()
 	return env.ValueOrDefault(property, defaultValue)
 }
 
-func GetPropertySources() []properties.PropertySource {
+func PsropertySources() []properties.PropertySource {
 	env := retrieveSingleton()
 	return env.PropertySources()
 }

@@ -37,6 +37,7 @@ func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
 		}
 	}
 }
+
 func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOption[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
 		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
