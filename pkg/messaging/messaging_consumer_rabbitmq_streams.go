@@ -26,14 +26,9 @@ func WithConsumerOptions(options *stream.ConsumerOptions) RabbitMQStreamsConsume
 	}
 }
 
-func WithMessagesHandler(handler stream.MessagesHandler) RabbitMQStreamsConsumerOption {
+func WithRabbitMQStreamsListener(listener MessagingListener[*amqp.Message]) RabbitMQStreamsConsumerOption {
 	return func(consumer *RabbitMQStreamsConsumer) {
-		consumer.messagesHandler = handler
-	}
-}
-
-func WithMessageListener(listener MessagingListener[*amqp.Message]) RabbitMQStreamsConsumerOption {
-	return func(consumer *RabbitMQStreamsConsumer) {
+		consumer.listener = listener
 		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
 			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
 			if err := listener.OnMessage(context.Background(), message); err != nil {
@@ -45,6 +40,7 @@ func WithMessageListener(listener MessagingListener[*amqp.Message]) RabbitMQStre
 
 type RabbitMQStreamsConsumer struct {
 	messagingConnection MessagingConnection[*stream.Environment]
+	listener            MessagingListener[*amqp.Message]
 	environment         *stream.Environment
 	name                string
 	consumer            string
@@ -63,16 +59,18 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	if strings.TrimSpace(name) == "" {
 		log.Fatal("starting up - error setting up rabbitmq streams consumer: name is empty")
 	}
-
+	listener := NewRabbitMQStreamsListener()
 	consumer := &RabbitMQStreamsConsumer{
 		messagingConnection: messagingConnection,
 		name:                name,
 		consumer:            "consumer-" + name,
 		streamOptions:       stream.NewStreamOptions(),
 		consumerOptions:     stream.NewConsumerOptions(),
+		listener:            listener,
 		messagesHandler: func(consumerContext stream.ConsumerContext, message *amqp.Message) {
 			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
-			if err := NewRabbitMQStreamsListener().OnMessage(context.Background(), message); err != nil {
+			ctx := context.WithValue(context.Background(), stream.ConsumerContext{}, consumerContext)
+			if err := listener.OnMessage(ctx, message); err != nil {
 				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
 			}
 		},
