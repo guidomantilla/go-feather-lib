@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"crypto/tls"
 	"fmt"
 	"sync"
 
@@ -15,7 +16,17 @@ type RabbitMQConnectionOption[T MessagingConnectionTypes] func(rabbitMQConnectio
 
 func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
 	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
-		rabbitMQConnection.messagingConnectionDialer = amqp.Dial
+		rabbitMQConnection.messagingConnectionDialer = func(url string) (*amqp.Connection, error) {
+			return amqp.Dial(url)
+		}
+	}
+}
+
+func WithRabbitMQDialerTLS(amqps *tls.Config) RabbitMQConnectionOption[*amqp.Connection] {
+	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
+		rabbitMQConnection.messagingConnectionDialer = func(url string) (*amqp.Connection, error) {
+			return amqp.DialTLS(url, amqps)
+		}
 	}
 }
 
@@ -23,6 +34,13 @@ func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
 		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
 			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
+		}
+	}
+}
+func WithRabbitMQStreamsDialerTLS(xxx *tls.Config) RabbitMQConnectionOption[*stream.Environment] {
+	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
+		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
+			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url).SetTLSConfig(xxx).IsTLS(true))
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/ssl"
 	"os"
 	"syscall"
 
@@ -22,10 +23,10 @@ func main() {
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
-
-	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream://:username::password@:server:vhost",
-		"raven-dev", "raven-dev*+", "170.187.157.212:5552", messaging.WithVhost("/"))
-	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
+	tlsConfig, _ := ssl.BuildTLS()
+	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
+		"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.WithVhost("/"))
+	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
 
 	consumer := messaging.NewRabbitMQStreamsConsumer(connection, "rabbitmq-stream-micro-stream")
 	app.Attach("RabbitMQServer", server.BuildRabbitMQServer(consumer))
