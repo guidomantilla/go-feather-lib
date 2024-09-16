@@ -20,8 +20,8 @@ var (
 	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
 	_ MessagingListener[*samqp.Message]        = (*RabbitMQStreamsListener)(nil)
 	_ MessagingListener[*nats.Msg]             = (*NatsListener)(nil)
-	_ MessagingTarget[*amqp.Channel]           = (*RabbitMQQueue)(nil)
-	_ MessagingTarget[*stream.Environment]     = (*RabbitMQStreams)(nil)
+	//_ MessagingTarget[*amqp.Channel]           = (*RabbitMQQueue)(nil)
+	//_ MessagingTarget[*stream.Environment]     = (*RabbitMQStreams)(nil)
 	_ MessagingContext                         = (*MockMessagingContext)(nil)
 	_ MessagingConnection[*amqp.Connection]    = (*MockMessagingConnection[*amqp.Connection])(nil)
 	_ MessagingConnection[*stream.Environment] = (*MockMessagingConnection[*stream.Environment])(nil)
@@ -57,14 +57,18 @@ type MessagingListener[T MessagingListenerTypes] interface {
 	OnMessage(message T) error
 }
 
-type MessagingConsumerTypes interface {
+type MessagingTargetTypes interface {
 	*amqp.Channel | *stream.Environment
 }
 
-type MessagingTarget[T MessagingConsumerTypes] interface {
+type MessagingEvent = chan string
+
+type MessagingTarget interface {
 	MessagingContext() MessagingContext
-	Connect() (T, error)
+	Consume() (MessagingEvent, error)
 	Close()
-	Name() string
+}
+
+type MessagingConsumer interface {
 	Consumer() string
 }

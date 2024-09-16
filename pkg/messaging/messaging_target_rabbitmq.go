@@ -40,7 +40,7 @@ func NewRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection],
 	}
 }
 
-func (queue *RabbitMQQueue) Connect() (*amqp.Channel, error) {
+func (queue *RabbitMQQueue) Consume() (MessagingEvent, error) {
 
 	queue.mu.Lock()
 	defer queue.mu.Unlock()
@@ -66,7 +66,23 @@ func (queue *RabbitMQQueue) Connect() (*amqp.Channel, error) {
 
 	log.Debug(fmt.Sprintf("rabbitmq queue - connected to queue %s", queue.name))
 
-	return queue.channel, nil
+	var deliveries <-chan amqp.Delivery
+	if deliveries, err = queue.channel.Consume(queue.name, queue.consumer, true, false, false, false, nil); err != nil {
+		log.Debug(fmt.Sprintf("rabbitmq queue - error: %s", err.Error()))
+		return nil, err
+	}
+
+	closeChannel := make(chan string)
+	go func(closeChannel chan string) {
+		for message := range deliveries {
+			go log.Info(fmt.Sprintf("rabbitmq queue - message received: %s", message.Body))
+		}
+		closeChannel <- "closed"
+		close(closeChannel)
+		log.Debug(fmt.Sprintf("rabbitmq queue - disconected to queue %s", queue.name))
+	}(closeChannel)
+
+	return closeChannel, nil
 }
 
 func (queue *RabbitMQQueue) Close() {
@@ -83,12 +99,4 @@ func (queue *RabbitMQQueue) Close() {
 
 func (queue *RabbitMQQueue) MessagingContext() MessagingContext {
 	return queue.messagingConnection.MessagingContext()
-}
-
-func (queue *RabbitMQQueue) Name() string {
-	return queue.name
-}
-
-func (queue *RabbitMQQueue) Consumer() string {
-	return queue.consumer
 }

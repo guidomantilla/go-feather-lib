@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
@@ -15,7 +16,9 @@ func main() {
 
 	var err error
 	appName, version := "rabbitmq-micro", "1.0.0"
-	log.Default()
+	os.Setenv("LOG_LEVEL", "DEBUG")
+	log.Custom()
+
 	app := lifecycle.NewApp(
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
@@ -25,7 +28,7 @@ func main() {
 		"raven-dev", "raven-dev*+", "170.187.157.212:5672", messaging.WithVhost("/"))
 	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialer())
 
-	queues := []messaging.MessagingTarget[*amqp.Channel]{
+	queues := []messaging.MessagingTarget{
 		messaging.NewRabbitMQQueue(connection, appName+"-queue"),
 	}
 	listener := messaging.NewDefaultMessagingListener[*amqp.Delivery]()
