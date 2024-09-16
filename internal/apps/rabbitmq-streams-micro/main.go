@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
@@ -23,7 +24,13 @@ func main() {
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
-	tlsConfig, _ := ssl.BuildTLS()
+
+	serverName := os.Getenv("SSL_SERVER_NAME")
+	caCertificate := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CA_CERTIFICATE")}, "/")
+	clientCertificate := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CLIENT_CERTIFICATE")}, "/")
+	clientKey := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CLIENT_KEY")}, "/")
+	tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
+
 	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
 		"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.WithVhost("/"))
 	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
