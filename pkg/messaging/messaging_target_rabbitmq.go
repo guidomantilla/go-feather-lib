@@ -73,7 +73,6 @@ func (queue *RabbitMQQueue) Consume() (MessagingEvent, error) {
 		for message := range deliveries {
 			go log.Info(fmt.Sprintf("rabbitmq queue - message received: %s", message.Body))
 		}
-		closeChannel <- "closed"
 		close(closeChannel)
 		log.Debug(fmt.Sprintf("rabbitmq queue - disconected to queue %s", queue.name))
 	}(closeChannel)

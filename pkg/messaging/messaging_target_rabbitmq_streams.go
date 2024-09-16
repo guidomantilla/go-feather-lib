@@ -69,7 +69,6 @@ func (streams *RabbitMQStreams) Consume() (MessagingEvent, error) {
 	closeChannel := make(chan string)
 	go func(closeChannel chan string) {
 		for range consumer.NotifyClose() {
-			closeChannel <- "closed"
 			close(closeChannel)
 			break
 		}

@@ -8,12 +8,12 @@ import (
 
 type DummyServer struct {
 	ctx     context.Context
-	channel chan string
+	channel chan struct{}
 }
 
 func BuildDummyServer() Server {
 	return &DummyServer{
-		channel: make(chan string),
+		channel: make(chan struct{}),
 	}
 }
 
@@ -28,7 +28,7 @@ func (server *DummyServer) Run(ctx context.Context) error {
 func (server *DummyServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping dummy server")
-	server.channel <- "stop"
+	close(server.channel)
 	log.Debug("shutting down - dummy server stopped")
 	return nil
 }
