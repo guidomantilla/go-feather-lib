@@ -167,43 +167,43 @@ func (mr *MockMessagingListenerMockRecorder[T]) OnMessage(message any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockMessagingListener[T])(nil).OnMessage), message)
 }
 
-// MockMessagingConsumer is a mock of MessagingConsumer interface.
-type MockMessagingConsumer[T MessagingConsumerTypes] struct {
+// MockMessagingTarget is a mock of MessagingTarget interface.
+type MockMessagingTarget[T MessagingConsumerTypes] struct {
 	ctrl     *gomock.Controller
-	recorder *MockMessagingConsumerMockRecorder[T]
+	recorder *MockMessagingTargetMockRecorder[T]
 }
 
-// MockMessagingConsumerMockRecorder is the mock recorder for MockMessagingConsumer.
-type MockMessagingConsumerMockRecorder[T MessagingConsumerTypes] struct {
-	mock *MockMessagingConsumer[T]
+// MockMessagingTargetMockRecorder is the mock recorder for MockMessagingTarget.
+type MockMessagingTargetMockRecorder[T MessagingConsumerTypes] struct {
+	mock *MockMessagingTarget[T]
 }
 
-// NewMockMessagingConsumer creates a new mock instance.
-func NewMockMessagingConsumer[T MessagingConsumerTypes](ctrl *gomock.Controller) *MockMessagingConsumer[T] {
-	mock := &MockMessagingConsumer[T]{ctrl: ctrl}
-	mock.recorder = &MockMessagingConsumerMockRecorder[T]{mock}
+// NewMockMessagingTarget creates a new mock instance.
+func NewMockMessagingTarget[T MessagingConsumerTypes](ctrl *gomock.Controller) *MockMessagingTarget[T] {
+	mock := &MockMessagingTarget[T]{ctrl: ctrl}
+	mock.recorder = &MockMessagingTargetMockRecorder[T]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockMessagingConsumer[T]) EXPECT() *MockMessagingConsumerMockRecorder[T] {
+func (m *MockMessagingTarget[T]) EXPECT() *MockMessagingTargetMockRecorder[T] {
 	return m.recorder
 }
 
 // Close mocks base method.
-func (m *MockMessagingConsumer[T]) Close() {
+func (m *MockMessagingTarget[T]) Close() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Close")
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockMessagingConsumerMockRecorder[T]) Close() *gomock.Call {
+func (mr *MockMessagingTargetMockRecorder[T]) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockMessagingConsumer[T])(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockMessagingTarget[T])(nil).Close))
 }
 
 // Connect mocks base method.
-func (m *MockMessagingConsumer[T]) Connect() (T, error) {
+func (m *MockMessagingTarget[T]) Connect() (T, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
 	ret0, _ := ret[0].(T)
@@ -212,13 +212,13 @@ func (m *MockMessagingConsumer[T]) Connect() (T, error) {
 }
 
 // Connect indicates an expected call of Connect.
-func (mr *MockMessagingConsumerMockRecorder[T]) Connect() *gomock.Call {
+func (mr *MockMessagingTargetMockRecorder[T]) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockMessagingConsumer[T])(nil).Connect))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockMessagingTarget[T])(nil).Connect))
 }
 
 // Consumer mocks base method.
-func (m *MockMessagingConsumer[T]) Consumer() string {
+func (m *MockMessagingTarget[T]) Consumer() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Consumer")
 	ret0, _ := ret[0].(string)
@@ -226,13 +226,13 @@ func (m *MockMessagingConsumer[T]) Consumer() string {
 }
 
 // Consumer indicates an expected call of Consumer.
-func (mr *MockMessagingConsumerMockRecorder[T]) Consumer() *gomock.Call {
+func (mr *MockMessagingTargetMockRecorder[T]) Consumer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consumer", reflect.TypeOf((*MockMessagingConsumer[T])(nil).Consumer))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consumer", reflect.TypeOf((*MockMessagingTarget[T])(nil).Consumer))
 }
 
 // MessagingContext mocks base method.
-func (m *MockMessagingConsumer[T]) MessagingContext() MessagingContext {
+func (m *MockMessagingTarget[T]) MessagingContext() MessagingContext {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MessagingContext")
 	ret0, _ := ret[0].(MessagingContext)
@@ -240,13 +240,13 @@ func (m *MockMessagingConsumer[T]) MessagingContext() MessagingContext {
 }
 
 // MessagingContext indicates an expected call of MessagingContext.
-func (mr *MockMessagingConsumerMockRecorder[T]) MessagingContext() *gomock.Call {
+func (mr *MockMessagingTargetMockRecorder[T]) MessagingContext() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingConsumer[T])(nil).MessagingContext))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingTarget[T])(nil).MessagingContext))
 }
 
 // Name mocks base method.
-func (m *MockMessagingConsumer[T]) Name() string {
+func (m *MockMessagingTarget[T]) Name() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Name")
 	ret0, _ := ret[0].(string)
@@ -254,7 +254,7 @@ func (m *MockMessagingConsumer[T]) Name() string {
 }
 
 // Name indicates an expected call of Name.
-func (mr *MockMessagingConsumerMockRecorder[T]) Name() *gomock.Call {
+func (mr *MockMessagingTargetMockRecorder[T]) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockMessagingConsumer[T])(nil).Name))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockMessagingTarget[T])(nil).Name))
 }

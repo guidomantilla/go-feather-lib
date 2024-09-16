@@ -10,7 +10,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultRabbitMQQueue struct {
+type RabbitMQQueue struct {
 	messagingConnection   MessagingConnection[*amqp.Connection]
 	channel               *amqp.Channel
 	notifyOnClosedChannel chan *amqp.Error
@@ -21,7 +21,7 @@ type DefaultRabbitMQQueue struct {
 	mu                    sync.Mutex
 }
 
-func NewDefaultRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection], queue string) *DefaultRabbitMQQueue {
+func NewRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection], queue string) *RabbitMQQueue {
 
 	if messagingConnection == nil {
 		log.Fatal("starting up - error setting up rabbitMQQueue: messagingConnection is nil")
@@ -31,7 +31,7 @@ func NewDefaultRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Conne
 		log.Fatal("starting up - error setting up rabbitMQQueue: queue is empty")
 	}
 
-	return &DefaultRabbitMQQueue{
+	return &RabbitMQQueue{
 		messagingConnection:   messagingConnection,
 		notifyOnClosedChannel: make(chan *amqp.Error),
 		name:                  queue,
@@ -40,7 +40,7 @@ func NewDefaultRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Conne
 	}
 }
 
-func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
+func (queue *RabbitMQQueue) Connect() (*amqp.Channel, error) {
 
 	queue.mu.Lock()
 	defer queue.mu.Unlock()
@@ -69,7 +69,7 @@ func (queue *DefaultRabbitMQQueue) Connect() (*amqp.Channel, error) {
 	return queue.channel, nil
 }
 
-func (queue *DefaultRabbitMQQueue) Close() {
+func (queue *RabbitMQQueue) Close() {
 	if queue.channel != nil && !queue.channel.IsClosed() {
 		log.Debug("rabbitmq queue - closing connection")
 		if err := queue.channel.Close(); err != nil {
@@ -81,14 +81,14 @@ func (queue *DefaultRabbitMQQueue) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq queue - closed connection to queue %s", queue.name))
 }
 
-func (queue *DefaultRabbitMQQueue) MessagingContext() MessagingContext {
+func (queue *RabbitMQQueue) MessagingContext() MessagingContext {
 	return queue.messagingConnection.MessagingContext()
 }
 
-func (queue *DefaultRabbitMQQueue) Name() string {
+func (queue *RabbitMQQueue) Name() string {
 	return queue.name
 }
 
-func (queue *DefaultRabbitMQQueue) Consumer() string {
+func (queue *RabbitMQQueue) Consumer() string {
 	return queue.consumer
 }

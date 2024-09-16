@@ -9,14 +9,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type StreamsRabbitMQListener struct {
+type RabbitMQStreamsListener struct {
 }
 
-func NewStreamsRabbitMQListener() *StreamsRabbitMQListener {
-	return &StreamsRabbitMQListener{}
+func NewRabbitMQStreamsListener() *RabbitMQStreamsListener {
+	return &RabbitMQStreamsListener{}
 }
 
-func (listener *StreamsRabbitMQListener) OnMessage(message *amqp.Message) error {
+func (listener *RabbitMQStreamsListener) OnMessage(message *amqp.Message) error {
 
 	log.Info(fmt.Sprintf("Received a message: %s", message.Data))
 	<-time.After(5 * time.Second)

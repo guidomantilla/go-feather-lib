@@ -10,7 +10,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultRabbitMQStreams struct {
+type RabbitMQStreams struct {
 	messagingConnection MessagingConnection[*stream.Environment]
 	environment         *stream.Environment
 	name                string
@@ -18,7 +18,7 @@ type DefaultRabbitMQStreams struct {
 	mu                  sync.Mutex
 }
 
-func NewDefaultRabbitMQStreams(messagingConnection MessagingConnection[*stream.Environment], stream string) *DefaultRabbitMQStreams {
+func NewRabbitMQStreams(messagingConnection MessagingConnection[*stream.Environment], stream string) *RabbitMQStreams {
 
 	if messagingConnection == nil {
 		log.Fatal("starting up - error setting up rabbitMQStreams: messagingConnection is nil")
@@ -28,14 +28,14 @@ func NewDefaultRabbitMQStreams(messagingConnection MessagingConnection[*stream.E
 		log.Fatal("starting up - error setting up rabbitMQStreams: stream is empty")
 	}
 
-	return &DefaultRabbitMQStreams{
+	return &RabbitMQStreams{
 		messagingConnection: messagingConnection,
 		name:                stream,
 		consumer:            "consumer-" + stream,
 	}
 }
 
-func (streams *DefaultRabbitMQStreams) Connect() (*stream.Environment, error) {
+func (streams *RabbitMQStreams) Connect() (*stream.Environment, error) {
 
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
@@ -57,7 +57,7 @@ func (streams *DefaultRabbitMQStreams) Connect() (*stream.Environment, error) {
 	return streams.environment, nil
 }
 
-func (streams *DefaultRabbitMQStreams) Close() {
+func (streams *RabbitMQStreams) Close() {
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams - closing connection")
 		if err := streams.environment.Close(); err != nil {
@@ -69,14 +69,14 @@ func (streams *DefaultRabbitMQStreams) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams - closed connection to stream %s", streams.name))
 }
 
-func (streams *DefaultRabbitMQStreams) MessagingContext() MessagingContext {
+func (streams *RabbitMQStreams) MessagingContext() MessagingContext {
 	return streams.messagingConnection.MessagingContext()
 }
 
-func (streams *DefaultRabbitMQStreams) Name() string {
+func (streams *RabbitMQStreams) Name() string {
 	return streams.name
 }
 
-func (streams *DefaultRabbitMQStreams) Consumer() string {
+func (streams *RabbitMQStreams) Consumer() string {
 	return streams.consumer
 }
