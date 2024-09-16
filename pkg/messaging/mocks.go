@@ -131,29 +131,6 @@ func (mr *MockMessagingConnectionMockRecorder[T]) MessagingContext() *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingConnection[T])(nil).MessagingContext))
 }
 
-// MockMessagingPublishingTypes is a mock of MessagingPublishingTypes interface.
-type MockMessagingPublishingTypes struct {
-	ctrl     *gomock.Controller
-	recorder *MockMessagingPublishingTypesMockRecorder
-}
-
-// MockMessagingPublishingTypesMockRecorder is the mock recorder for MockMessagingPublishingTypes.
-type MockMessagingPublishingTypesMockRecorder struct {
-	mock *MockMessagingPublishingTypes
-}
-
-// NewMockMessagingPublishingTypes creates a new mock instance.
-func NewMockMessagingPublishingTypes(ctrl *gomock.Controller) *MockMessagingPublishingTypes {
-	mock := &MockMessagingPublishingTypes{ctrl: ctrl}
-	mock.recorder = &MockMessagingPublishingTypesMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockMessagingPublishingTypes) EXPECT() *MockMessagingPublishingTypesMockRecorder {
-	return m.recorder
-}
-
 // MockMessagingListener is a mock of MessagingListener interface.
 type MockMessagingListener[T MessagingListenerTypes] struct {
 	ctrl     *gomock.Controller
@@ -253,6 +230,29 @@ func (m *MockMessagingConsumer) MessagingContext() MessagingContext {
 func (mr *MockMessagingConsumerMockRecorder) MessagingContext() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingConsumer)(nil).MessagingContext))
+}
+
+// MockMessagingPublishingTypes is a mock of MessagingPublishingTypes interface.
+type MockMessagingPublishingTypes struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessagingPublishingTypesMockRecorder
+}
+
+// MockMessagingPublishingTypesMockRecorder is the mock recorder for MockMessagingPublishingTypes.
+type MockMessagingPublishingTypesMockRecorder struct {
+	mock *MockMessagingPublishingTypes
+}
+
+// NewMockMessagingPublishingTypes creates a new mock instance.
+func NewMockMessagingPublishingTypes(ctrl *gomock.Controller) *MockMessagingPublishingTypes {
+	mock := &MockMessagingPublishingTypes{ctrl: ctrl}
+	mock.recorder = &MockMessagingPublishingTypesMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessagingPublishingTypes) EXPECT() *MockMessagingPublishingTypesMockRecorder {
+	return m.recorder
 }
 
 // MockMessagingProducer is a mock of MessagingProducer interface.

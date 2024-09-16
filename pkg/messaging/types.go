@@ -54,16 +54,8 @@ type MessagingListenerTypes interface {
 	*amqp.Delivery | *samqp.Message | *nats.Msg
 }
 
-type MessagingPublishingTypes interface {
-	//TODO: Add the types for the different messaging systems
-}
-
 type MessagingListener[T MessagingListenerTypes] interface {
 	OnMessage(ctx context.Context, message T) error
-}
-
-type MessagingTargetTypes interface {
-	*amqp.Channel | *stream.Environment
 }
 
 type MessagingEvent = chan string
@@ -72,6 +64,10 @@ type MessagingConsumer interface {
 	MessagingContext() MessagingContext
 	Consume(ctx context.Context) (MessagingEvent, error)
 	Close()
+}
+
+type MessagingPublishingTypes interface {
+	//TODO: Add the types for the different messaging systems
 }
 
 type MessagingProducer[T MessagingPublishingTypes] interface {
