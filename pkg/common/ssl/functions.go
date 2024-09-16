@@ -31,5 +31,6 @@ func TLS(serverName string, caCertificate string, clientCertificate string, clie
 		InsecureSkipVerify: false,
 		MinVersion:         tls.VersionTLS12,
 	}
+
 	return tlsConfig, nil
 }
