@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
@@ -133,6 +134,8 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 }
 
 func (streams *RabbitMQStreamsConsumer) Close() {
+	time.Sleep(MessagingDelay)
+
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams - closing connection")
 		if err := streams.environment.Close(); err != nil {

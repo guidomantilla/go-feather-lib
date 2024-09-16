@@ -32,18 +32,25 @@ func WithCmd(cmdArgs []string) DefaultEnvironmentOption {
 func WithSSL() DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
 
-		BuildOrEmpty := func(key string) string {
+		ValueOrEmpty := func(key string) string {
 			if value, exists := os.LookupEnv(key); exists {
+				return value
+			}
+			return ""
+		}
+
+		BuildOrEmpty := func(key string) string {
+			if value := ValueOrEmpty(key); value != "" {
 				return strings.Join([]string{os.Getenv("PWD"), "ssl", value}, "/")
 			}
 			return ""
 		}
 
 		sslProperties := properties.NewDefaultProperties()
-		sslProperties.Add(SslServerName, BuildOrEmpty(os.Getenv(SslServerName)))
-		sslProperties.Add(SslCaCertificate, BuildOrEmpty(os.Getenv(SslCaCertificate)))
-		sslProperties.Add(SslClientCertificate, BuildOrEmpty(os.Getenv(SslClientCertificate)))
-		sslProperties.Add(SslClientKey, BuildOrEmpty(os.Getenv(SslClientKey)))
+		sslProperties.Add(SslServerName, ValueOrEmpty(SslServerName))
+		sslProperties.Add(SslCaCertificate, BuildOrEmpty(SslCaCertificate))
+		sslProperties.Add(SslClientCertificate, BuildOrEmpty(SslClientCertificate))
+		sslProperties.Add(SslClientKey, BuildOrEmpty(SslClientKey))
 		environment.propertySources = append(environment.propertySources, properties.NewDefaultPropertySource(SslPropertySourceName, sslProperties))
 	}
 }

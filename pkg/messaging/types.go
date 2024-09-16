@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	makeConnectionDelay = 2 * time.Second
+	MessagingDelay = 2 * time.Second
 )
 
 var (
@@ -64,7 +64,7 @@ type MessagingConsumer interface {
 }
 
 type MessagingPublishingTypes interface {
-	//TODO: Add the types for the different messaging systems
+	*amqp.Publishing | *samqp.Message
 }
 
 type MessagingProducer[T MessagingPublishingTypes] interface {

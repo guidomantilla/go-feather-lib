@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
@@ -109,34 +110,34 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 	return consumer
 }
 
-func (queue *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
+func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
 
-	queue.mu.Lock()
-	defer queue.mu.Unlock()
+	consumer.mu.Lock()
+	defer consumer.mu.Unlock()
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = queue.messagingConnection.Connect(); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", queue.name, err.Error()))
+	if connection, err = consumer.messagingConnection.Connect(); err != nil {
+		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 		return nil, err
 	}
 
-	if !(queue.channel != nil && !queue.channel.IsClosed()) {
-		if queue.channel, err = connection.Channel(); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", queue.name, err.Error()))
+	if !(consumer.channel != nil && !consumer.channel.IsClosed()) {
+		if consumer.channel, err = connection.Channel(); err != nil {
+			log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 			return nil, err
 		}
 	}
 
-	if queue.queue, err = queue.channel.QueueDeclare(queue.name, queue.durable, queue.autoDelete, queue.exclusive, queue.noWait, queue.args); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", queue.name, err.Error()))
+	if consumer.queue, err = consumer.channel.QueueDeclare(consumer.name, consumer.durable, consumer.autoDelete, consumer.exclusive, consumer.noWait, consumer.args); err != nil {
+		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 		return nil, err
 	}
 
-	log.Debug(fmt.Sprintf("rabbitmq consumer - connected to queue %s", queue.name))
+	log.Debug(fmt.Sprintf("rabbitmq consumer - connected to queue %s", consumer.name))
 
 	var deliveries <-chan amqp.Delivery
-	if deliveries, err = queue.channel.ConsumeWithContext(ctx, queue.name, queue.consumer, queue.autoAck, queue.exclusive, queue.noLocal, queue.noWait, queue.args); err != nil {
+	if deliveries, err = consumer.channel.ConsumeWithContext(ctx, consumer.name, consumer.consumer, consumer.autoAck, consumer.exclusive, consumer.noLocal, consumer.noWait, consumer.args); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq consumer - failed comsuming from queue: %s", err.Error()))
 		return nil, err
 	}
@@ -160,22 +161,24 @@ func (queue *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, err
 		log.Debug(fmt.Sprintf("rabbitmq consumer - disconected from queue %s", queue))
 	}
 
-	go closeHandler(ctx, queue.listener, queue.channel, queue.name, closeChannel)
+	go closeHandler(ctx, consumer.listener, consumer.channel, consumer.name, closeChannel)
 	return closeChannel, nil
 }
 
-func (queue *RabbitMQConsumer) Close() {
-	if queue.channel != nil && !queue.channel.IsClosed() {
+func (consumer *RabbitMQConsumer) Close() {
+	time.Sleep(MessagingDelay)
+
+	if consumer.channel != nil && !consumer.channel.IsClosed() {
 		log.Debug("rabbitmq consumer - closing connection")
-		if err := queue.channel.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq consumer - failed to close connection to queue %s: %s", queue.name, err.Error()))
+		if err := consumer.channel.Close(); err != nil {
+			log.Error(fmt.Sprintf("rabbitmq consumer - failed to close connection to queue %s: %s", consumer.name, err.Error()))
 		}
 	}
-	queue.channel = nil
-	queue.messagingConnection.Close()
-	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", queue.name))
+	consumer.channel = nil
+	consumer.messagingConnection.Close()
+	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
 }
 
-func (queue *RabbitMQConsumer) MessagingContext() MessagingContext {
-	return queue.messagingConnection.MessagingContext()
+func (consumer *RabbitMQConsumer) MessagingContext() MessagingContext {
+	return consumer.messagingConnection.MessagingContext()
 }

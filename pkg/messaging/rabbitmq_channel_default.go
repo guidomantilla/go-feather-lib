@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"fmt"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
@@ -46,6 +47,7 @@ func (channel *DefaultRabbitMQChannel) Connect() (*amqp.Channel, error) {
 }
 
 func (channel *DefaultRabbitMQChannel) Close() {
+	time.Sleep(MessagingDelay)
 
 	if channel.channel != nil && !channel.channel.IsClosed() {
 		log.Debug("rabbitmq channel - closing connection")

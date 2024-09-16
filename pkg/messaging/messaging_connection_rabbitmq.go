@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"sync"
+	"time"
 
 	retry "github.com/avast/retry-go/v4"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -90,7 +91,7 @@ func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 		return connection.connection, nil
 	}
 
-	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(makeConnectionDelay),
+	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(MessagingDelay),
 		retry.LastErrorOnly(true), retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
 		}),
@@ -117,6 +118,7 @@ func (connection *RabbitMQConnection[T]) connect() error {
 }
 
 func (connection *RabbitMQConnection[T]) Close() {
+	time.Sleep(MessagingDelay)
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		log.Debug("rabbitmq connection - closing connection")
