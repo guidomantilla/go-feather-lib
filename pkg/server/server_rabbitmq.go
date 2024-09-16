@@ -9,9 +9,9 @@ import (
 )
 
 type RabbitMQServer struct {
-	ctx       context.Context
-	consumers []messaging.MessagingConsumer
-	stopCh    chan struct{}
+	ctx          context.Context
+	consumers    []messaging.MessagingConsumer
+	closeChannel chan struct{}
 }
 
 func BuildRabbitMQServer(consumers ...messaging.MessagingConsumer) Server {
@@ -21,8 +21,8 @@ func BuildRabbitMQServer(consumers ...messaging.MessagingConsumer) Server {
 	}
 
 	return &RabbitMQServer{
-		consumers: consumers,
-		stopCh:    make(chan struct{}),
+		consumers:    consumers,
+		closeChannel: make(chan struct{}),
 	}
 }
 
@@ -32,10 +32,10 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].MessagingContext().Server()))
 
 	for _, consumer := range server.consumers {
-		go func(ctx context.Context, consumer messaging.MessagingConsumer, stopCh chan struct{}) {
+		go func(ctx context.Context, consumer messaging.MessagingConsumer, closeChannel chan struct{}) {
 			for {
 				select {
-				case <-stopCh:
+				case <-closeChannel:
 					return
 
 				default:
@@ -48,15 +48,16 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 					<-closeChannel
 				}
 			}
-		}(ctx, consumer, server.stopCh)
+		}(ctx, consumer, server.closeChannel)
 	}
+	<-server.closeChannel
 	return nil
 }
 
 func (server *RabbitMQServer) Stop(_ context.Context) error {
 
 	log.Debug("server shutting down - stopping rabbitmq server")
-	close(server.stopCh)
+	close(server.closeChannel)
 	for _, consumer := range server.consumers {
 		consumer.Close()
 	}

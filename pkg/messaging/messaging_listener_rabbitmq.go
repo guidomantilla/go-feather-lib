@@ -20,6 +20,6 @@ func NewRabbitMQListener() *RabbitMQListener {
 func (listener *RabbitMQListener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
 
 	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
-	<-time.After(5 * time.Second)
+	time.Sleep(5 * time.Second)
 	return nil
 }

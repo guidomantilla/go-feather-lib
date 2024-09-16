@@ -27,6 +27,6 @@ func (listener *RabbitMQStreamsListener) OnMessage(ctx context.Context, message 
 	}
 	log.Debug(fmt.Sprintf("Received a consumerContext: %s", consumerContext.Consumer.GetName()))
 	log.Info(fmt.Sprintf("Received a message: %s", message.Data))
-	<-time.After(5 * time.Second)
+	time.Sleep(5 * time.Second)
 	return nil
 }

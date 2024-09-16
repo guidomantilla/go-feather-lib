@@ -9,8 +9,9 @@ import (
 )
 
 type CronServer struct {
-	ctx      context.Context
-	internal *cron.Cron
+	ctx          context.Context
+	internal     *cron.Cron
+	closeChannel chan struct{}
 }
 
 func BuildCronServer(cron *cron.Cron) Server {
@@ -20,7 +21,8 @@ func BuildCronServer(cron *cron.Cron) Server {
 	}
 
 	return &CronServer{
-		internal: cron,
+		internal:     cron,
+		closeChannel: make(chan struct{}),
 	}
 }
 
@@ -29,12 +31,14 @@ func (server *CronServer) Run(ctx context.Context) error {
 	server.ctx = ctx
 	log.Info("starting up - starting cron server")
 	server.internal.Start()
+	<-server.closeChannel
 	return nil
 }
 
 func (server *CronServer) Stop(_ context.Context) error {
 
 	log.Info("shutting down - stopping cron server")
+	close(server.closeChannel)
 	server.internal.Stop()
 	log.Debug("shutting down - cron server stopped")
 	return nil
