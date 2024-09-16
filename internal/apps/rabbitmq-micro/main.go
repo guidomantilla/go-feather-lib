@@ -25,7 +25,7 @@ func main() {
 	)
 
 	tlsConfig, _ := ssl.BuildTLS()
-	messagingContext := messaging.NewDefaultMessagingContext("amqps://:username::password@:server:vhost",
+	messagingContext := messaging.NewDefaultMessagingContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
 		"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", messaging.WithVhost("/"))
 	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialerTLS(tlsConfig))
 
