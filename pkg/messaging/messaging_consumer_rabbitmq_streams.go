@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -36,7 +37,7 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	}
 }
 
-func (streams *RabbitMQStreamsConsumer) Consume() (MessagingEvent, error) {
+func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
 
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
@@ -75,16 +76,19 @@ func (streams *RabbitMQStreamsConsumer) Consume() (MessagingEvent, error) {
 	}
 
 	closeChannel := make(chan string)
-	go func(closeChannel chan string) {
+	closeHandler := func(consumer *stream.Consumer, stream string, closeChannel chan string) {
+		var err error
 		for range consumer.NotifyClose() {
 			if err = consumer.Close(); err != nil {
+				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to close consumer from stream %s: %s", stream, err.Error()))
 				return
 			}
 			close(closeChannel)
 		}
-		log.Debug(fmt.Sprintf("rabbitmq streams consumer - disconected from stream %s", streams.name))
-	}(closeChannel)
+		log.Debug(fmt.Sprintf("rabbitmq streams consumer - disconected from stream %s", stream))
+	}
 
+	go closeHandler(consumer, streams.name, closeChannel)
 	return closeChannel, nil
 }
 

@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -36,7 +37,7 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 	}
 }
 
-func (queue *RabbitMQConsumer) Consume() (MessagingEvent, error) {
+func (queue *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
 
 	queue.mu.Lock()
 	defer queue.mu.Unlock()
@@ -69,17 +70,20 @@ func (queue *RabbitMQConsumer) Consume() (MessagingEvent, error) {
 	}
 
 	closeChannel := make(chan string)
-	go func(closeChannel chan string) {
+	closeHandler := func(ctx context.Context, channel *amqp.Channel, queue string, closeChannel chan string) {
+		var err error
 		for message := range deliveries {
 			go log.Info(fmt.Sprintf("rabbitmq consumer - message received: %s", message.Body))
 		}
-		if err := queue.channel.Close(); err != nil {
+		if err = channel.Close(); err != nil {
+			log.Debug(fmt.Sprintf("rabbitmq consumer - failed to close channel to queue %s: %s", queue, err.Error()))
 			return
 		}
 		close(closeChannel)
-		log.Debug(fmt.Sprintf("rabbitmq consumer - disconected from queue %s", queue.name))
-	}(closeChannel)
+		log.Debug(fmt.Sprintf("rabbitmq consumer - disconected from queue %s", queue))
+	}
 
+	go closeHandler(ctx, queue.channel, queue.name, closeChannel)
 	return closeChannel, nil
 }
 

@@ -32,23 +32,23 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].MessagingContext().Server()))
 
 	for _, consumer := range server.consumers {
-		go func(consumer messaging.MessagingConsumer) {
+		go func(ctx context.Context, consumer messaging.MessagingConsumer, stopCh chan struct{}) {
 			for {
 				select {
-				case <-server.stopCh:
+				case <-stopCh:
 					return
 
 				default:
 					var err error
 					var closeChannel chan string
-					if closeChannel, err = consumer.Consume(); err != nil {
+					if closeChannel, err = consumer.Consume(ctx); err != nil {
 						log.Error(fmt.Sprintf("rabbitmq server - error: %s", err.Error()))
 						continue
 					}
 					<-closeChannel
 				}
 			}
-		}(consumer)
+		}(ctx, consumer, server.stopCh)
 	}
 	return nil
 }

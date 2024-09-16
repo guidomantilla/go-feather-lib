@@ -10,6 +10,7 @@
 package messaging
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -130,6 +131,29 @@ func (mr *MockMessagingConnectionMockRecorder[T]) MessagingContext() *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingConnection[T])(nil).MessagingContext))
 }
 
+// MockMessagingPublishingTypes is a mock of MessagingPublishingTypes interface.
+type MockMessagingPublishingTypes struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessagingPublishingTypesMockRecorder
+}
+
+// MockMessagingPublishingTypesMockRecorder is the mock recorder for MockMessagingPublishingTypes.
+type MockMessagingPublishingTypesMockRecorder struct {
+	mock *MockMessagingPublishingTypes
+}
+
+// NewMockMessagingPublishingTypes creates a new mock instance.
+func NewMockMessagingPublishingTypes(ctrl *gomock.Controller) *MockMessagingPublishingTypes {
+	mock := &MockMessagingPublishingTypes{ctrl: ctrl}
+	mock.recorder = &MockMessagingPublishingTypesMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessagingPublishingTypes) EXPECT() *MockMessagingPublishingTypesMockRecorder {
+	return m.recorder
+}
+
 // MockMessagingListener is a mock of MessagingListener interface.
 type MockMessagingListener[T MessagingListenerTypes] struct {
 	ctrl     *gomock.Controller
@@ -203,18 +227,18 @@ func (mr *MockMessagingConsumerMockRecorder) Close() *gomock.Call {
 }
 
 // Consume mocks base method.
-func (m *MockMessagingConsumer) Consume() (MessagingEvent, error) {
+func (m *MockMessagingConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Consume")
+	ret := m.ctrl.Call(m, "Consume", ctx)
 	ret0, _ := ret[0].(MessagingEvent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Consume indicates an expected call of Consume.
-func (mr *MockMessagingConsumerMockRecorder) Consume() *gomock.Call {
+func (mr *MockMessagingConsumerMockRecorder) Consume(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consume", reflect.TypeOf((*MockMessagingConsumer)(nil).Consume))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consume", reflect.TypeOf((*MockMessagingConsumer)(nil).Consume), ctx)
 }
 
 // MessagingContext mocks base method.
@@ -229,4 +253,67 @@ func (m *MockMessagingConsumer) MessagingContext() MessagingContext {
 func (mr *MockMessagingConsumerMockRecorder) MessagingContext() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingConsumer)(nil).MessagingContext))
+}
+
+// MockMessagingProducer is a mock of MessagingProducer interface.
+type MockMessagingProducer[T MessagingPublishingTypes] struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessagingProducerMockRecorder[T]
+}
+
+// MockMessagingProducerMockRecorder is the mock recorder for MockMessagingProducer.
+type MockMessagingProducerMockRecorder[T MessagingPublishingTypes] struct {
+	mock *MockMessagingProducer[T]
+}
+
+// NewMockMessagingProducer creates a new mock instance.
+func NewMockMessagingProducer[T MessagingPublishingTypes](ctrl *gomock.Controller) *MockMessagingProducer[T] {
+	mock := &MockMessagingProducer[T]{ctrl: ctrl}
+	mock.recorder = &MockMessagingProducerMockRecorder[T]{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessagingProducer[T]) EXPECT() *MockMessagingProducerMockRecorder[T] {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockMessagingProducer[T]) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockMessagingProducerMockRecorder[T]) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockMessagingProducer[T])(nil).Close))
+}
+
+// MessagingContext mocks base method.
+func (m *MockMessagingProducer[T]) MessagingContext() MessagingContext {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MessagingContext")
+	ret0, _ := ret[0].(MessagingContext)
+	return ret0
+}
+
+// MessagingContext indicates an expected call of MessagingContext.
+func (mr *MockMessagingProducerMockRecorder[T]) MessagingContext() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MessagingContext", reflect.TypeOf((*MockMessagingProducer[T])(nil).MessagingContext))
+}
+
+// Produce mocks base method.
+func (m *MockMessagingProducer[T]) Produce(ctx context.Context, message T) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Produce", ctx, message)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Produce indicates an expected call of Produce.
+func (mr *MockMessagingProducerMockRecorder[T]) Produce(ctx, message any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Produce", reflect.TypeOf((*MockMessagingProducer[T])(nil).Produce), ctx, message)
 }

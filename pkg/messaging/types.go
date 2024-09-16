@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"time"
 
 	nats "github.com/nats-io/nats.go"
@@ -53,6 +54,10 @@ type MessagingListenerTypes interface {
 	*amqp.Delivery | *samqp.Message | *nats.Msg
 }
 
+type MessagingPublishingTypes interface {
+	//TODO: Add the types for the different messaging systems
+}
+
 type MessagingListener[T MessagingListenerTypes] interface {
 	OnMessage(message T) error
 }
@@ -65,6 +70,12 @@ type MessagingEvent = chan string
 
 type MessagingConsumer interface {
 	MessagingContext() MessagingContext
-	Consume() (MessagingEvent, error)
+	Consume(ctx context.Context) (MessagingEvent, error)
+	Close()
+}
+
+type MessagingProducer[T MessagingPublishingTypes] interface {
+	MessagingContext() MessagingContext
+	Produce(ctx context.Context, message T) error
 	Close()
 }
