@@ -9,9 +9,8 @@ import (
 )
 
 type DefaultRabbitMQChannel struct {
-	messagingConnection   MessagingConnection[*amqp.Connection]
-	channel               *amqp.Channel
-	notifyOnClosedChannel chan *amqp.Error
+	messagingConnection MessagingConnection[*amqp.Connection]
+	channel             *amqp.Channel
 }
 
 func NewDefaultRabbitMQChannel(messagingConnection MessagingConnection[*amqp.Connection]) *DefaultRabbitMQChannel {
@@ -21,8 +20,7 @@ func NewDefaultRabbitMQChannel(messagingConnection MessagingConnection[*amqp.Con
 	}
 
 	return &DefaultRabbitMQChannel{
-		messagingConnection:   messagingConnection,
-		notifyOnClosedChannel: make(chan *amqp.Error),
+		messagingConnection: messagingConnection,
 	}
 }
 

@@ -11,14 +11,12 @@ import (
 )
 
 type RabbitMQQueue struct {
-	messagingConnection   MessagingConnection[*amqp.Connection]
-	channel               *amqp.Channel
-	notifyOnClosedChannel chan *amqp.Error
-	queue                 amqp.Queue
-	name                  string
-	consumer              string
-	notifyOnClosedQueue   chan string
-	mu                    sync.Mutex
+	messagingConnection MessagingConnection[*amqp.Connection]
+	channel             *amqp.Channel
+	queue               amqp.Queue
+	name                string
+	consumer            string
+	mu                  sync.Mutex
 }
 
 func NewRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection], queue string) *RabbitMQQueue {
@@ -32,11 +30,9 @@ func NewRabbitMQQueue(messagingConnection MessagingConnection[*amqp.Connection],
 	}
 
 	return &RabbitMQQueue{
-		messagingConnection:   messagingConnection,
-		notifyOnClosedChannel: make(chan *amqp.Error),
-		name:                  queue,
-		consumer:              "consumer-" + queue,
-		notifyOnClosedQueue:   make(chan string),
+		messagingConnection: messagingConnection,
+		name:                queue,
+		consumer:            "consumer-" + queue,
 	}
 }
 
