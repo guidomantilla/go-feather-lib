@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"os"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
+	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -47,9 +47,10 @@ func main() {
 
 	{ // Keep an 1:1 relationship between the environment and the publisher
 		connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
-		conn, _ := connection.Connect()
-		producer, _ := conn.NewProducer(appName+"-stream", stream.NewProducerOptions())
-		_ = producer.Send(amqp.NewMessage([]byte("Hello world")))
+		producer := messaging.NewRabbitMQStreamsProducer(connection, appName+"-stream")
+		if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
+			log.Fatal("Error producing message: %v", err)
+		}
 		connection.Close()
 	}
 

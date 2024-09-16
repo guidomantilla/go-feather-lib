@@ -44,7 +44,6 @@ type RabbitMQStreamsConsumer struct {
 	listener            MessagingListener[*amqp.Message]
 	environment         *stream.Environment
 	name                string
-	consumer            string
 	streamOptions       *stream.StreamOptions
 	consumerOptions     *stream.ConsumerOptions
 	messagesHandler     stream.MessagesHandler
@@ -64,7 +63,6 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	consumer := &RabbitMQStreamsConsumer{
 		messagingConnection: messagingConnection,
 		name:                name,
-		consumer:            "consumer-" + name,
 		streamOptions:       stream.NewStreamOptions(),
 		consumerOptions:     stream.NewConsumerOptions(),
 		listener:            listener,
@@ -85,7 +83,6 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 }
 
 func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
-
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -137,7 +134,7 @@ func (streams *RabbitMQStreamsConsumer) Close() {
 	time.Sleep(MessagingDelay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
-		log.Debug("rabbitmq streams - closing connection")
+		log.Debug("rabbitmq streams consumer - closing connection")
 		if err := streams.environment.Close(); err != nil {
 			log.Error(fmt.Sprintf("rabbitmq streams consumer - failed to close connection to stream %s: %s", streams.name, err.Error()))
 		}

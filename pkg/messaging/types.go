@@ -64,7 +64,7 @@ type MessagingConsumer interface {
 }
 
 type MessagingPublishingTypes interface {
-	*amqp.Publishing | *samqp.Message
+	*amqp.Publishing | *samqp.AMQP10
 }
 
 type MessagingProducer[T MessagingPublishingTypes] interface {
