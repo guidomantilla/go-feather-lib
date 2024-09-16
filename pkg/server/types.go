@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	_ Dispatcher = (*RabbitMQMessageDispatcher)(nil)
-	_ Server     = (*CronServer)(nil)
-	_ Server     = (*GrpcServer)(nil)
-	_ Server     = (*HttpServer)(nil)
-	_ Server     = (*MockServer)(nil)
+	_ Server = (*RabbitMQServer)(nil)
+	_ Server = (*CronServer)(nil)
+	_ Server = (*GrpcServer)(nil)
+	_ Server = (*HttpServer)(nil)
+	_ Server = (*MockServer)(nil)
 )
 
 type Dispatcher interface {

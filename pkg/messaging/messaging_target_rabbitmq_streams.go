@@ -2,10 +2,10 @@ package messaging
 
 import (
 	"fmt"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"strings"
 	"sync"
 
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"

@@ -1,0 +1,8 @@
+func (server *RabbitMQDispatcher) Dispatch(message any) {
+
+	var err error
+	msg := message.(*amqp.Delivery)
+	if err = server.listener.OnMessage(msg); err != nil {
+		log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s, message: %s", err.Error(), msg.Body))
+	}
+}
