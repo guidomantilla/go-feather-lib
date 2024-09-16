@@ -2,11 +2,11 @@ package main
 
 import (
 	"os"
-	"strings"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
@@ -25,10 +25,12 @@ func main() {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	serverName := os.Getenv("SSL_SERVER_NAME")
-	caCertificate := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CA_CERTIFICATE")}, "/")
-	clientCertificate := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CLIENT_CERTIFICATE")}, "/")
-	clientKey := strings.Join([]string{os.Getenv("PWD"), "ssl", os.Getenv("SSL_CLIENT_KEY")}, "/")
+	envs := environment.Default()
+
+	serverName := envs.Value(environment.SslServerName).AsString()
+	caCertificate := envs.Value(environment.SslCaCertificate).AsString()
+	clientCertificate := envs.Value(environment.SslClientCertificate).AsString()
+	clientKey := envs.Value(environment.SslClientKey).AsString()
 	tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
 	messagingContext := messaging.NewDefaultMessagingContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL

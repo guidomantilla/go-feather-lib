@@ -1,41 +1,71 @@
 package environment
 
 import (
+	"os"
+	"strings"
+
 	properties "github.com/guidomantilla/go-feather-lib/pkg/common/properties"
 )
 
 const (
+	SslPropertySourceName = "SSL_PROPERTY_SOURCE_NAME"
 	OsPropertySourceName  = "OS_PROPERTY_SOURCE_NAME"
 	CmdPropertySourceName = "CMD_PROPERTY_SOURCE_NAME" //nolint:gosec
 )
 
+const (
+	SslServerName        = "SSL_SERVER_NAME"
+	SslCaCertificate     = "SSL_CA_CERTIFICATE"
+	SslClientCertificate = "SSL_CLIENT_CERTIFICATE"
+	SslClientKey         = "SSL_CLIENT_KEY"
+)
+
 type DefaultEnvironmentOption func(environment *DefaultEnvironment)
 
-func WithOsArgsArray(osArgsArray []string) DefaultEnvironmentOption {
+func WithCmd(cmdArgs []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))
-		environment.propertySources = append(environment.propertySources, source)
+		cmdProperties := properties.NewDefaultProperties(properties.FromSlice(cmdArgs))
+		environment.propertySources = append(environment.propertySources, properties.NewDefaultPropertySource(CmdPropertySourceName, cmdProperties))
 	}
 }
 
-func WithCmdArgsArray(cmdArgsArray []string) DefaultEnvironmentOption {
+func WithSSL() DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(CmdPropertySourceName, properties.NewDefaultProperties(properties.FromArray(cmdArgsArray)))
-		environment.propertySources = append(environment.propertySources, source)
+
+		BuildOrEmpty := func(key string) string {
+			if value, exists := os.LookupEnv(key); exists {
+				return strings.Join([]string{os.Getenv("PWD"), "ssl", value}, "/")
+			}
+			return ""
+		}
+
+		sslProperties := properties.NewDefaultProperties()
+		sslProperties.Add(SslServerName, BuildOrEmpty(os.Getenv(SslServerName)))
+		sslProperties.Add(SslCaCertificate, BuildOrEmpty(os.Getenv(SslCaCertificate)))
+		sslProperties.Add(SslClientCertificate, BuildOrEmpty(os.Getenv(SslClientCertificate)))
+		sslProperties.Add(SslClientKey, BuildOrEmpty(os.Getenv(SslClientKey)))
+		environment.propertySources = append(environment.propertySources, properties.NewDefaultPropertySource(SslPropertySourceName, sslProperties))
 	}
 }
 
-func WithArrays(osArgsArray []string, cmdArgsArray []string) DefaultEnvironmentOption {
+func WithOs(osArgs []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		osSource := properties.NewDefaultPropertySource(OsPropertySourceName, properties.NewDefaultProperties(properties.FromArray(osArgsArray)))
-		cmdSource := properties.NewDefaultPropertySource(CmdPropertySourceName, properties.NewDefaultProperties(properties.FromArray(cmdArgsArray)))
-		environment.propertySources = append(environment.propertySources, osSource, cmdSource)
+		osProperties := properties.NewDefaultProperties(properties.FromSlice(osArgs))
+		environment.propertySources = append(environment.propertySources, properties.NewDefaultPropertySource(OsPropertySourceName, osProperties))
+	}
+}
+
+func With(osArgs []string, cmdArgs []string) DefaultEnvironmentOption {
+	return func(environment *DefaultEnvironment) {
+		WithCmd(cmdArgs)(environment)
+		WithSSL()(environment)
+		WithOs(osArgs)(environment)
 	}
 }
 
 func WithArraySource(name string, array []string) DefaultEnvironmentOption {
 	return func(environment *DefaultEnvironment) {
-		source := properties.NewDefaultPropertySource(name, properties.NewDefaultProperties(properties.FromArray(array)))
+		source := properties.NewDefaultPropertySource(name, properties.NewDefaultProperties(properties.FromSlice(array)))
 		environment.propertySources = append(environment.propertySources, source)
 	}
 }

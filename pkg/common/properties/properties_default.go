@@ -9,7 +9,7 @@ import (
 
 type DefaultPropertiesOption func(properties *DefaultProperties)
 
-func FromArray(array []string) DefaultPropertiesOption {
+func FromSlice(array []string) DefaultPropertiesOption {
 	return func(properties *DefaultProperties) {
 		for _, env := range array {
 			pair := strings.SplitN(env, "=", 2)

@@ -80,7 +80,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 
 		Environment: func(appCtx *ApplicationContext) environment.Environment {
 			osArgs := os.Environ()
-			return environment.NewDefaultEnvironment(environment.WithArrays(osArgs, appCtx.CmdArgs))
+			return environment.NewDefaultEnvironment(environment.With(osArgs, appCtx.CmdArgs))
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")

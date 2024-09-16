@@ -20,8 +20,8 @@ func Default() Properties {
 	return properties
 }
 
-func Custom(array []string) Properties {
-	properties := NewDefaultProperties(FromArray(array))
+func Custom(slice []string) Properties {
+	properties := NewDefaultProperties(FromSlice(slice))
 	singleton.Store(properties)
 	return properties
 }

@@ -18,15 +18,13 @@ func retrieveSingleton() Environment {
 }
 
 func Default() Environment {
-	envs := os.Environ()
-	env := NewDefaultEnvironment(WithArraySource(OsPropertySourceName, envs))
+	env := NewDefaultEnvironment(WithSSL(), WithOs(os.Environ()))
 	singleton.Store(env)
 	return env
 }
 
-func Custom(cmdArgsArray []string) Environment {
-	envs := os.Environ()
-	env := NewDefaultEnvironment(WithArrays(envs, cmdArgsArray))
+func Custom(cmdArgs []string) Environment {
+	env := NewDefaultEnvironment(WithSSL(), With(os.Environ(), cmdArgs))
 	singleton.Store(env)
 	return env
 }
@@ -41,7 +39,7 @@ func ValueOrDefault(property string, defaultValue string) EnvVar {
 	return env.ValueOrDefault(property, defaultValue)
 }
 
-func PsropertySources() []properties.PropertySource {
+func PropertySources() []properties.PropertySource {
 	env := retrieveSingleton()
 	return env.PropertySources()
 }
