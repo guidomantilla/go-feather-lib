@@ -20,20 +20,20 @@ type RabbitMQConsumer struct {
 	mu                  sync.Mutex
 }
 
-func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connection], queue string) *RabbitMQConsumer {
+func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connection], name string) *RabbitMQConsumer {
 
 	if messagingConnection == nil {
 		log.Fatal("starting up - error setting up rabbitmq consumer: messagingConnection is nil")
 	}
 
-	if strings.TrimSpace(queue) == "" {
-		log.Fatal("starting up - error setting up rabbitmq consumer: queue is empty")
+	if strings.TrimSpace(name) == "" {
+		log.Fatal("starting up - error setting up rabbitmq consumer: name is empty")
 	}
 
 	return &RabbitMQConsumer{
 		messagingConnection: messagingConnection,
-		name:                queue,
-		consumer:            "consumer-" + queue,
+		name:                name,
+		consumer:            "consumer-" + name,
 	}
 }
 
@@ -64,7 +64,7 @@ func (queue *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, err
 	log.Debug(fmt.Sprintf("rabbitmq consumer - connected to queue %s", queue.name))
 
 	var deliveries <-chan amqp.Delivery
-	if deliveries, err = queue.channel.Consume(queue.name, queue.consumer, true, false, false, false, nil); err != nil {
+	if deliveries, err = queue.channel.ConsumeWithContext(ctx, queue.name, queue.consumer, true, false, false, false, nil); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq consumer - failed comsuming from queue: %s", err.Error()))
 		return nil, err
 	}

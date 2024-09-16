@@ -59,7 +59,7 @@ type MessagingPublishingTypes interface {
 }
 
 type MessagingListener[T MessagingListenerTypes] interface {
-	OnMessage(message T) error
+	OnMessage(ctx context.Context, message T) error
 }
 
 type MessagingTargetTypes interface {

@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -16,7 +17,7 @@ func NewNatsListener() *NatsListener {
 	return &NatsListener{}
 }
 
-func (listener *NatsListener) OnMessage(message *nats.Msg) error {
+func (listener *NatsListener) OnMessage(ctx context.Context, message *nats.Msg) error {
 	log.Info(fmt.Sprintf("Received a message: %s", message.Data))
 	<-time.After(5 * time.Second)
 	return nil

@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -15,7 +16,7 @@ func NewDefaultMessagingListener[T MessagingListenerTypes]() *DefaultMessagingLi
 	return &DefaultMessagingListener[T]{}
 }
 
-func (listener *DefaultMessagingListener[T]) OnMessage(message T) error {
+func (listener *DefaultMessagingListener[T]) OnMessage(ctx context.Context, message T) error {
 
 	var err error
 

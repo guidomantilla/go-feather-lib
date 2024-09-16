@@ -178,17 +178,17 @@ func (m *MockMessagingListener[T]) EXPECT() *MockMessagingListenerMockRecorder[T
 }
 
 // OnMessage mocks base method.
-func (m *MockMessagingListener[T]) OnMessage(message T) error {
+func (m *MockMessagingListener[T]) OnMessage(ctx context.Context, message T) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OnMessage", message)
+	ret := m.ctrl.Call(m, "OnMessage", ctx, message)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // OnMessage indicates an expected call of OnMessage.
-func (mr *MockMessagingListenerMockRecorder[T]) OnMessage(message any) *gomock.Call {
+func (mr *MockMessagingListenerMockRecorder[T]) OnMessage(ctx, message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockMessagingListener[T])(nil).OnMessage), message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnMessage", reflect.TypeOf((*MockMessagingListener[T])(nil).OnMessage), ctx, message)
 }
 
 // MockMessagingConsumer is a mock of MessagingConsumer interface.

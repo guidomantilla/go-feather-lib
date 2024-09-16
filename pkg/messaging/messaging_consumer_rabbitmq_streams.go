@@ -12,29 +12,77 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
+type RabbitMQStreamsConsumerOption func(*RabbitMQStreamsConsumer)
+
+func WithStreamOptions(options *stream.StreamOptions) RabbitMQStreamsConsumerOption {
+	return func(consumer *RabbitMQStreamsConsumer) {
+		consumer.streamOptions = options
+	}
+}
+
+func WithConsumerOptions(options *stream.ConsumerOptions) RabbitMQStreamsConsumerOption {
+	return func(consumer *RabbitMQStreamsConsumer) {
+		consumer.consumerOptions = options
+	}
+}
+
+func WithMessagesHandler(handler stream.MessagesHandler) RabbitMQStreamsConsumerOption {
+	return func(consumer *RabbitMQStreamsConsumer) {
+		consumer.messagesHandler = handler
+	}
+}
+
+func WithMessageListener(listener MessagingListener[*amqp.Message]) RabbitMQStreamsConsumerOption {
+	return func(consumer *RabbitMQStreamsConsumer) {
+		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
+			if err := listener.OnMessage(context.Background(), message); err != nil {
+				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
+			}
+		}
+	}
+}
+
 type RabbitMQStreamsConsumer struct {
 	messagingConnection MessagingConnection[*stream.Environment]
 	environment         *stream.Environment
 	name                string
 	consumer            string
+	streamOptions       *stream.StreamOptions
+	consumerOptions     *stream.ConsumerOptions
+	messagesHandler     stream.MessagesHandler
 	mu                  sync.Mutex
 }
 
-func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.Environment], stream string) *RabbitMQStreamsConsumer {
+func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.Environment], name string, options ...RabbitMQStreamsConsumerOption) *RabbitMQStreamsConsumer {
 
 	if messagingConnection == nil {
 		log.Fatal("starting up - error setting up rabbitmq streams consumer: messagingConnection is nil")
 	}
 
-	if strings.TrimSpace(stream) == "" {
-		log.Fatal("starting up - error setting up rabbitmq streams consumer: stream is empty")
+	if strings.TrimSpace(name) == "" {
+		log.Fatal("starting up - error setting up rabbitmq streams consumer: name is empty")
 	}
 
-	return &RabbitMQStreamsConsumer{
+	consumer := &RabbitMQStreamsConsumer{
 		messagingConnection: messagingConnection,
-		name:                stream,
-		consumer:            "consumer-" + stream,
+		name:                name,
+		consumer:            "consumer-" + name,
+		streamOptions:       stream.NewStreamOptions(),
+		consumerOptions:     stream.NewConsumerOptions(),
+		messagesHandler: func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
+			if err := NewRabbitMQStreamsListener().OnMessage(context.Background(), message); err != nil {
+				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
+			}
+		},
 	}
+
+	for _, option := range options {
+		option(consumer)
+	}
+
+	return consumer
 }
 
 func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
@@ -55,8 +103,7 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 	}
 
 	if !streamExists {
-		streamOptions := stream.NewStreamOptions().SetMaxLengthBytes(stream.ByteCapacity{}.GB(2))
-		if err = streams.environment.DeclareStream(streams.name, streamOptions); err != nil {
+		if err = streams.environment.DeclareStream(streams.name, streams.streamOptions); err != nil {
 			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 			return nil, err
 		}
@@ -64,13 +111,8 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - connected to stream %s", streams.name))
 
-	messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-		log.Info(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
-	}
-
 	var consumer *stream.Consumer
-	consumerOptions := stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()).SetConsumerName(streams.consumer)
-	if consumer, err = streams.environment.NewConsumer(streams.name, messagesHandler, consumerOptions); err != nil {
+	if consumer, err = streams.environment.NewConsumer(streams.name, streams.messagesHandler, streams.consumerOptions); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed comsuming from stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
