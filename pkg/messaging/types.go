@@ -68,7 +68,3 @@ type MessagingTarget interface {
 	Consume() (MessagingEvent, error)
 	Close()
 }
-
-type MessagingConsumer interface {
-	Consumer() string
-}

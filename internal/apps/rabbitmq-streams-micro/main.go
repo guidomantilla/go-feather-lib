@@ -5,13 +5,10 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/qmdx00/lifecycle"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
+	"github.com/qmdx00/lifecycle"
 )
 
 func CheckErrReceive(err error) {
@@ -32,34 +29,19 @@ func main() {
 		"raven-dev", "raven-dev*+", "170.187.157.212:5552", messaging.WithVhost("/"))
 
 	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
-	streams := messaging.NewDefaultRabbitMQStreams(connection, "rabbitmq-stream-micro-stream")
-	options := stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()).SetConsumerName("rabbitmq-stream-micro-stream")
-
-	messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-		fmt.Printf("Stream: %s - Received message: %s\n", consumerContext.Consumer.GetStreamName(), message.Data)
-	}
+	streams := messaging.NewRabbitMQStreams(connection, "rabbitmq-stream-micro-stream")
 
 	go func() {
 		for {
 			select {
 			default:
 				var err error
-
-				var env *stream.Environment
-				if env, err = streams.Connect(); err != nil {
+				var closeChannel chan string
+				if closeChannel, err = streams.Consume(); err != nil {
 					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
 					continue
 				}
-
-				var consumer *stream.Consumer
-				if consumer, err = env.NewConsumer("rabbitmq-stream-micro-stream", messagesHandler, options); err != nil {
-					log.Error(fmt.Sprintf("rabbitmq dispatcher - error: %s", err.Error()))
-					continue
-				}
-
-				for event := range consumer.NotifyClose() {
-					log.Info("Stream: %s - Consumer closed", "rabbitmq-stream-micro-stream", event.Reason)
-				}
+				<-closeChannel
 			}
 		}
 	}()

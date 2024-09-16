@@ -68,7 +68,7 @@ func (queue *RabbitMQQueue) Consume() (MessagingEvent, error) {
 
 	var deliveries <-chan amqp.Delivery
 	if deliveries, err = queue.channel.Consume(queue.name, queue.consumer, true, false, false, false, nil); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq queue - error: %s", err.Error()))
+		log.Debug(fmt.Sprintf("rabbitmq queue - failed comsuming from queue: %s", err.Error()))
 		return nil, err
 	}
 

@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"fmt"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"strings"
 	"sync"
 
@@ -35,7 +36,7 @@ func NewRabbitMQStreams(messagingConnection MessagingConnection[*stream.Environm
 	}
 }
 
-func (streams *RabbitMQStreams) Connect() (*stream.Environment, error) {
+func (streams *RabbitMQStreams) Consume() (MessagingEvent, error) {
 
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
@@ -46,15 +47,36 @@ func (streams *RabbitMQStreams) Connect() (*stream.Environment, error) {
 		return nil, err
 	}
 
-	options := stream.NewStreamOptions().SetMaxLengthBytes(stream.ByteCapacity{}.GB(2))
-	if err = streams.environment.DeclareStream(streams.name, options); err != nil {
+	streamOptions := stream.NewStreamOptions().SetMaxLengthBytes(stream.ByteCapacity{}.GB(2))
+	if err = streams.environment.DeclareStream(streams.name, streamOptions); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams - failed connection to stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
 
 	log.Debug(fmt.Sprintf("rabbitmq streams - connected to stream %s", streams.name))
 
-	return streams.environment, nil
+	messagesHandler := func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+		log.Info(fmt.Sprintf("rabbitmq queue - message received: %s", message.Data))
+	}
+
+	var consumer *stream.Consumer
+	consumerOptions := stream.NewConsumerOptions().SetOffset(stream.OffsetSpecification{}.First()).SetConsumerName(streams.consumer)
+	if consumer, err = streams.environment.NewConsumer(streams.name, messagesHandler, consumerOptions); err != nil {
+		log.Debug(fmt.Sprintf("rabbitmq streams - failed comsuming from stream %s: %s", streams.name, err.Error()))
+		return nil, err
+	}
+
+	closeChannel := make(chan string)
+	go func(closeChannel chan string) {
+		for range consumer.NotifyClose() {
+			closeChannel <- "closed"
+			close(closeChannel)
+			break
+		}
+		log.Debug(fmt.Sprintf("rabbitmq streams - disconected to queue %s", streams.name))
+	}(closeChannel)
+
+	return closeChannel, nil
 }
 
 func (streams *RabbitMQStreams) Close() {
@@ -71,12 +93,4 @@ func (streams *RabbitMQStreams) Close() {
 
 func (streams *RabbitMQStreams) MessagingContext() MessagingContext {
 	return streams.messagingConnection.MessagingContext()
-}
-
-func (streams *RabbitMQStreams) Name() string {
-	return streams.name
-}
-
-func (streams *RabbitMQStreams) Consumer() string {
-	return streams.consumer
 }
