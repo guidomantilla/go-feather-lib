@@ -27,8 +27,8 @@ func main() {
 		"raven-dev", "raven-dev*+", "170.187.157.212:5552", messaging.WithVhost("/"))
 	connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialer())
 
-	streams := messaging.NewRabbitMQStreams(connection, "rabbitmq-stream-micro-stream")
-	app.Attach("RabbitMQServer", server.BuildRabbitMQServer(streams))
+	consumer := messaging.NewRabbitMQStreamsConsumer(connection, "rabbitmq-stream-micro-stream")
+	app.Attach("RabbitMQServer", server.BuildRabbitMQServer(consumer))
 
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())

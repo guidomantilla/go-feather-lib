@@ -43,11 +43,11 @@ type RabbitMQConnection[T MessagingConnectionTypes] struct {
 func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
 
 	if messagingContext == nil {
-		log.Fatal("starting up - error setting up rabbitMQConnection: messagingContext is nil")
+		log.Fatal("starting up - error setting up rabbitmq connection: messagingContext is nil")
 	}
 
 	if len(options) == 0 {
-		log.Fatal("starting up - error setting up rabbitMQConnection: options is empty")
+		log.Fatal("starting up - error setting up rabbitmq connection: options is empty")
 	}
 
 	connection := &RabbitMQConnection[T]{

@@ -9,30 +9,30 @@ import (
 )
 
 type RabbitMQServer struct {
-	ctx     context.Context
-	targets []messaging.MessagingTarget
-	stopCh  chan struct{}
+	ctx       context.Context
+	consumers []messaging.MessagingConsumer
+	stopCh    chan struct{}
 }
 
-func BuildRabbitMQServer(targets ...messaging.MessagingTarget) Server {
+func BuildRabbitMQServer(consumers ...messaging.MessagingConsumer) Server {
 
-	if len(targets) == 0 {
-		log.Fatal("starting up - error setting up rabbitmq server: targets is empty")
+	if len(consumers) == 0 {
+		log.Fatal("starting up - error setting up rabbitmq server: consumers is empty")
 	}
 
 	return &RabbitMQServer{
-		targets: targets,
-		stopCh:  make(chan struct{}),
+		consumers: consumers,
+		stopCh:    make(chan struct{}),
 	}
 }
 
 func (server *RabbitMQServer) Run(ctx context.Context) error {
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.targets[0].MessagingContext().Server()))
+	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].MessagingContext().Server()))
 
-	for _, target := range server.targets {
-		go func(target messaging.MessagingTarget) {
+	for _, consumer := range server.consumers {
+		go func(consumer messaging.MessagingConsumer) {
 			for {
 				select {
 				case <-server.stopCh:
@@ -41,14 +41,14 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 				default:
 					var err error
 					var closeChannel chan string
-					if closeChannel, err = target.Consume(); err != nil {
+					if closeChannel, err = consumer.Consume(); err != nil {
 						log.Error(fmt.Sprintf("rabbitmq server - error: %s", err.Error()))
 						continue
 					}
 					<-closeChannel
 				}
 			}
-		}(target)
+		}(consumer)
 	}
 	return nil
 }
@@ -57,8 +57,8 @@ func (server *RabbitMQServer) Stop(_ context.Context) error {
 
 	log.Debug("server shutting down - stopping rabbitmq server")
 	close(server.stopCh)
-	for _, target := range server.targets {
-		target.Close()
+	for _, consumer := range server.consumers {
+		consumer.Close()
 	}
 	log.Debug("server shutting down - rabbitmq server stopped")
 	return nil

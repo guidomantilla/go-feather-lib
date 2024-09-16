@@ -16,7 +16,7 @@ type DefaultRabbitMQChannel struct {
 func NewDefaultRabbitMQChannel(messagingConnection MessagingConnection[*amqp.Connection]) *DefaultRabbitMQChannel {
 
 	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitMQChannel: messagingConnection is nil")
+		log.Fatal("starting up - error setting up rabbitmq channel: messagingConnection is nil")
 	}
 
 	return &DefaultRabbitMQChannel{
