@@ -24,10 +24,13 @@ openssl req -passin pass:1111 -new -x509 -days 3650 -key ca.key -out ca.crt -sub
 openssl genrsa -passout pass:1111 -des3 -out server.key 4096
 
 # Step 3: Get a certificate signing request from the CA (server.csr)
-openssl req -passin pass:1111 -new -key server.key -out server.csr -subj "/CN=${SERVER_CN}" -config ssl.cnf
+openssl req -passin pass:1111 -new -key server.key -out server.csr -subj "/CN=${SERVER_CN}" -config /opt/homebrew/etc/openssl@3/openssl.cnf
 
 # Step 4: Sign the certificate with the CA we created (it's called self signing) - server.crt
-openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions req_ext -extfile ssl.cnf
+openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile /opt/homebrew/etc/openssl@3/openssl.cnf
 
 # Step 5: Convert the server certificate to .pem format (server.pem) - usable by gRPC
 openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
+
+# Create a PKCS#12 keystore from the server key and certificate for RabbitMQ
+openssl req -newkey rsa:2048 -nodes -keyout rabbitmq-key.pem -x509 -days 365 -out rabbitmq-cert.pem
