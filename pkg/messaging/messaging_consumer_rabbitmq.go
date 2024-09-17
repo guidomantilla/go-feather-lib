@@ -94,7 +94,7 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 		listener:            NewRabbitMQListener(),
 		name:                name,
 		consumer:            "consumer-" + name,
-		autoAck:             true,
+		autoAck:             false,
 		noLocal:             false,
 		durable:             false,
 		autoDelete:          false,
@@ -106,6 +106,7 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 	for _, option := range options {
 		option(consumer)
 	}
+	consumer.autoAck = false
 
 	return consumer
 }
@@ -150,7 +151,17 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, 
 				log.Debug(fmt.Sprintf("rabbitmq consumer - message received: %s", message.Body))
 				if err := listener.OnMessage(ctx, &message); err != nil {
 					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to process message: %s", err.Error()))
+					if err := message.Nack(false, true); err != nil {
+						log.Debug(fmt.Sprintf("rabbitmq consumer - failed to nack message: %s", err.Error()))
+					}
+					log.Debug(fmt.Sprintf("rabbitmq consumer - nack message: %s", err.Error()))
+					return
 				}
+				if err := message.Ack(false); err != nil {
+					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to ack message: %s", err.Error()))
+					return
+				}
+				log.Debug(fmt.Sprintf("rabbitmq consumer - ack message: %s", err.Error()))
 			}(ctx, message)
 		}
 		if err = channel.Close(); err != nil {
