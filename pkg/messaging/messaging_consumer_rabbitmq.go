@@ -146,12 +146,12 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, 
 	closeHandler := func(ctx context.Context, listener MessagingListener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {
 		var err error
 		for message := range deliveries {
-			go func() {
+			go func(ctx context.Context, message amqp.Delivery) {
 				log.Debug(fmt.Sprintf("rabbitmq consumer - message received: %s", message.Body))
 				if err := listener.OnMessage(ctx, &message); err != nil {
 					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to process message: %s", err.Error()))
 				}
-			}()
+			}(ctx, message)
 		}
 		if err = channel.Close(); err != nil {
 			log.Debug(fmt.Sprintf("rabbitmq consumer - failed to close channel to queue %s: %s", queue, err.Error()))

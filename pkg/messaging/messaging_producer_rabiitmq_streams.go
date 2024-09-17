@@ -25,6 +25,7 @@ type RabbitMQStreamsProducer struct {
 	messagingConnection MessagingConnection[*stream.Environment]
 	environment         *stream.Environment
 	name                string
+	streamOptions       *stream.StreamOptions
 	producerOptions     *stream.ProducerOptions
 	mu                  sync.Mutex
 }
@@ -42,6 +43,7 @@ func NewRabbitMQStreamsProducer(messagingConnection MessagingConnection[*stream.
 	producer := &RabbitMQStreamsProducer{
 		messagingConnection: messagingConnection,
 		name:                name,
+		streamOptions:       stream.NewStreamOptions(),
 		producerOptions:     stream.NewProducerOptions(),
 	}
 
@@ -60,6 +62,19 @@ func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *sa
 	if streams.environment, err = streams.messagingConnection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return err
+	}
+
+	var streamExists bool
+	if streamExists, err = streams.environment.StreamExists(streams.name); err != nil {
+		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
+		return err
+	}
+
+	if !streamExists {
+		if err = streams.environment.DeclareStream(streams.name, streams.streamOptions); err != nil {
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
+			return err
+		}
 	}
 
 	var producer *stream.Producer

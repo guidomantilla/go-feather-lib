@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -44,6 +45,7 @@ type RabbitMQStreamsConsumer struct {
 	listener            MessagingListener[*amqp.Message]
 	environment         *stream.Environment
 	name                string
+	consumer            string
 	streamOptions       *stream.StreamOptions
 	consumerOptions     *stream.ConsumerOptions
 	messagesHandler     stream.MessagesHandler
@@ -63,21 +65,28 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	consumer := &RabbitMQStreamsConsumer{
 		messagingConnection: messagingConnection,
 		name:                name,
+		consumer:            "consumer-" + name,
 		streamOptions:       stream.NewStreamOptions(),
-		consumerOptions:     stream.NewConsumerOptions(),
+		consumerOptions:     stream.NewConsumerOptions().SetConsumerName("consumer-" + name),
 		listener:            listener,
 		messagesHandler: func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
-			ctx := context.WithValue(context.Background(), stream.ConsumerContext{}, consumerContext)
-			if err := listener.OnMessage(ctx, message); err != nil {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
-			}
+			go func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+				log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
+				ctx := context.WithValue(context.Background(), stream.ConsumerContext{}, consumerContext)
+				if err := listener.OnMessage(ctx, message); err != nil {
+					log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
+					return
+				}
+			}(consumerContext, message)
 		},
 	}
 
 	for _, option := range options {
 		option(consumer)
 	}
+
+	consumer.consumerOptions.SetConsumerName(consumer.consumer)
+	consumer.consumerOptions.SetManualCommit()
 
 	return consumer
 }
@@ -107,6 +116,19 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - connected to stream %s", streams.name))
 
+	var storedOffset int64
+	if storedOffset, err = streams.environment.QueryOffset(streams.consumer, streams.name); err != nil {
+		if errors.Is(err, stream.OffsetNotFoundError) {
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to query offset from stream %s: %s", streams.name, err.Error()))
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - setting up offset to FIRST from stream %s", streams.name))
+			streams.consumerOptions.SetOffset(stream.OffsetSpecification{}.First())
+		} else {
+			newOffset := storedOffset + 1
+			log.Debug(fmt.Sprintf("rabbitmq streams consumer - setting up offset to %d from stream %s", newOffset, streams.name))
+			streams.consumerOptions.SetOffset(stream.OffsetSpecification{}.Offset(newOffset))
+		}
+	}
+
 	var consumer *stream.Consumer
 	if consumer, err = streams.environment.NewConsumer(streams.name, streams.messagesHandler, streams.consumerOptions); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed comsuming from stream %s: %s", streams.name, err.Error()))
@@ -117,6 +139,10 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 	closeHandler := func(consumer *stream.Consumer, stream string, closeChannel chan string) {
 		var err error
 		for range consumer.NotifyClose() {
+			if err := consumer.StoreOffset(); err != nil {
+				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to store consumer offset from stream %s: %s", stream, err.Error()))
+				return
+			}
 			if err = consumer.Close(); err != nil {
 				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to close consumer from stream %s: %s", stream, err.Error()))
 				return
