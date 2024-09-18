@@ -42,3 +42,4 @@ Thumbs.db
 *.csr
 *.p12
 *.crl
+.java-version
