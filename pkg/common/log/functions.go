@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 	"sync/atomic"
 )
 
@@ -23,7 +24,7 @@ func Slog(writers ...io.Writer) Logger {
 	if level == "" {
 		level = "INFO"
 	}
-	logger := NewSlogLogger(SlogLevelOff.ValueFromName(level), writers...)
+	logger := NewSlogLogger(SlogLevelOff.ValueFromName(strings.ToUpper(level)), writers...)
 	singleton.Store(logger)
 	return logger
 }

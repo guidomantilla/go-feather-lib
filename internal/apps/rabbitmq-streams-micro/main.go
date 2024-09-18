@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"os"
-	"syscall"
 
-	"github.com/qmdx00/lifecycle"
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
@@ -17,43 +16,37 @@ import (
 
 func main() {
 
-	os.Setenv("LOG_LEVEL", "DEBUG")
-	log.Custom()
-	environment.Default()
+	_ = os.Setenv("LOG_LEVEL", "DEBUG")
+	cserver.Run("rabbitmq-stream-micro", "1.0.0", func(application cserver.Application) error {
 
-	appName, version := "rabbitmq-stream-micro", "1.0.0"
-	app := lifecycle.NewApp(
-		lifecycle.WithName(appName), lifecycle.WithVersion(version),
-		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
-	)
+		name := "rabbitmq-stream-micro-stream"
 
-	serverName := environment.Value(environment.SslServerName).AsString()
-	caCertificate := environment.Value(environment.SslCaCertificate).AsString()
-	clientCertificate := environment.Value(environment.SslClientCertificate).AsString()
-	clientKey := environment.Value(environment.SslClientKey).AsString()
-	tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
+		serverName := environment.Value(environment.SslServerName).AsString()
+		caCertificate := environment.Value(environment.SslCaCertificate).AsString()
+		clientCertificate := environment.Value(environment.SslClientCertificate).AsString()
+		clientKey := environment.Value(environment.SslClientKey).AsString()
+		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
-		"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.WithVhost("/"))
+		messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.WithVhost("/"))
 
-	{ // Keep an 1:1 relationship between the environment and the consumer
-		connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
-		consumer := messaging.NewRabbitMQStreamsConsumer(connection, appName+"-stream")
+		{ // Keep an 1:1 relationship between the environment and the consumer
 
-		app.Attach("RabbitMQServer", server.BuildRabbitMQServer(consumer))
-	}
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
+			consumer := messaging.NewRabbitMQStreamsConsumer(connection, name)
 
-	{ // Keep an 1:1 relationship between the environment and the publisher
-		connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
-		producer := messaging.NewRabbitMQStreamsProducer(connection, appName+"-stream")
-		if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
-			log.Fatal("Error producing message: %v", err)
+			application.Attach("RabbitMQServer", server.BuildRabbitMQServer(consumer))
 		}
-		connection.Close()
-	}
 
-	var err error
-	if err = app.Run(); err != nil {
-		log.Fatal(err.Error())
-	}
+		{ // Keep an 1:1 relationship between the environment and the publisher
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
+			producer := messaging.NewRabbitMQStreamsProducer(connection, name)
+			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
+				log.Fatal("Error producing message: %v", err)
+			}
+			connection.Close()
+		}
+
+		return nil
+	})
 }

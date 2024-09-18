@@ -6,29 +6,29 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DummyServer struct {
+type DefaultServer struct {
 	ctx          context.Context
 	closeChannel chan struct{}
 }
 
-func BuildDummyServer() Server {
-	return &DummyServer{
+func BuildDefaultServer() Server {
+	return &DefaultServer{
 		closeChannel: make(chan struct{}),
 	}
 }
 
-func (server *DummyServer) Run(ctx context.Context) error {
+func (server *DefaultServer) Run(ctx context.Context) error {
 
 	server.ctx = ctx
-	log.Info("starting up - starting dummy server")
+	log.Info("starting up - starting default server")
 	<-server.closeChannel
 	return nil
 }
 
-func (server *DummyServer) Stop(_ context.Context) error {
+func (server *DefaultServer) Stop(_ context.Context) error {
 
-	log.Info("shutting down - stopping dummy server")
+	log.Info("shutting down - stopping default server")
 	close(server.closeChannel)
-	log.Debug("shutting down - dummy server stopped")
+	log.Debug("shutting down - default server stopped")
 	return nil
 }
