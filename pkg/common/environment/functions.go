@@ -9,42 +9,41 @@ import (
 
 var singleton atomic.Value
 
-func retrieveSingleton() Environment {
+func retrieve() Environment {
 	value := singleton.Load()
 	if value == nil {
-		return Default()
+		return Load()
 	}
 	return value.(Environment)
 }
 
-func Default() Environment {
-	env := NewDefaultEnvironment(WithSSL(), WithOs(os.Environ()))
-	singleton.Store(env)
-	return env
-}
-
-func Custom(cmdArgs []string) Environment {
-	env := NewDefaultEnvironment(WithSSL(), With(os.Environ(), cmdArgs))
+func Load(args ...[]string) Environment {
+	withArgs := make([]DefaultEnvironmentOption, 0)
+	withArgs = append(withArgs, WithSSL(), WithOs(os.Environ()))
+	for _, arg := range args {
+		withArgs = append(withArgs, WithCmd(arg))
+	}
+	env := NewDefaultEnvironment(withArgs...)
 	singleton.Store(env)
 	return env
 }
 
 func Value(property string) EnvVar {
-	env := retrieveSingleton()
+	env := retrieve()
 	return env.Value(property)
 }
 
 func ValueOrDefault(property string, defaultValue string) EnvVar {
-	env := retrieveSingleton()
+	env := retrieve()
 	return env.ValueOrDefault(property, defaultValue)
 }
 
 func PropertySources() []properties.PropertySource {
-	env := retrieveSingleton()
+	env := retrieve()
 	return env.PropertySources()
 }
 
 func AppendPropertySources(propertySources ...properties.PropertySource) {
-	env := retrieveSingleton()
+	env := retrieve()
 	env.AppendPropertySources(propertySources...)
 }
