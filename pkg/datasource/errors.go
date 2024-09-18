@@ -2,8 +2,9 @@ package datasource
 
 import (
 	"errors"
+	"fmt"
 )
 
 func ErrDBConnectionFailed(errs ...error) error {
-	return errors.New("db connection failed: " + errors.Join(errs...).Error())
+	return fmt.Errorf("db connection failed: %s", errors.Join(errs...).Error())
 }

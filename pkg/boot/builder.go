@@ -23,11 +23,11 @@ type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environ
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
-type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource.DatasourceContext
+type StoreContextBuilderFunc func(appCtx *ApplicationContext) datasource.StoreContext
 
-type DatasourceBuilderFunc func(appCtx *ApplicationContext) datasource.Datasource
+type StoreConnectionBuilderFunc func(appCtx *ApplicationContext) datasource.StoreConnection[*gorm.DB]
 
-type TransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.TransactionHandler
+type StoreTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.StoreTransactionHandler[*gorm.DB]
 
 type PasswordGeneratorBuilderFunc func(appCtx *ApplicationContext) security.PasswordGenerator
 
@@ -52,22 +52,22 @@ type HttpServerBuilderFunc func(appCtx *ApplicationContext) (*gin.Engine, *gin.R
 type GrpcServerBuilderFunc func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any)
 
 type BeanBuilder struct {
-	Environment            EnvironmentBuilderFunc
-	Config                 ConfigLoaderFunc
-	DatasourceContext      DatasourceContextBuilderFunc
-	Datasource             DatasourceBuilderFunc
-	TransactionHandler     TransactionHandlerBuilderFunc
-	PasswordEncoder        PasswordEncoderBuilderFunc
-	PasswordGenerator      PasswordGeneratorBuilderFunc
-	PasswordManager        PasswordManagerBuilderFunc
-	PrincipalManager       PrincipalManagerBuilderFunc
-	TokenManager           TokenManagerBuilderFunc
-	AuthenticationService  AuthenticationServiceBuilderFunc
-	AuthorizationService   AuthorizationServiceBuilderFunc
-	AuthenticationEndpoint AuthenticationEndpointBuilderFunc
-	AuthorizationFilter    AuthorizationFilterBuilderFunc
-	HttpServer             HttpServerBuilderFunc
-	GrpcServer             GrpcServerBuilderFunc
+	Environment             EnvironmentBuilderFunc
+	Config                  ConfigLoaderFunc
+	StoreContext            StoreContextBuilderFunc
+	StoreConnection         StoreConnectionBuilderFunc
+	StoreTransactionHandler StoreTransactionHandlerBuilderFunc
+	PasswordEncoder         PasswordEncoderBuilderFunc
+	PasswordGenerator       PasswordGeneratorBuilderFunc
+	PasswordManager         PasswordManagerBuilderFunc
+	PrincipalManager        PrincipalManagerBuilderFunc
+	TokenManager            TokenManagerBuilderFunc
+	AuthenticationService   AuthenticationServiceBuilderFunc
+	AuthorizationService    AuthorizationServiceBuilderFunc
+	AuthenticationEndpoint  AuthenticationEndpointBuilderFunc
+	AuthorizationFilter     AuthorizationFilterBuilderFunc
+	HttpServer              HttpServerBuilderFunc
+	GrpcServer              GrpcServerBuilderFunc
 }
 
 func NewBeanBuilder(ctx context.Context) *BeanBuilder {
@@ -85,19 +85,19 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
 		},
-		DatasourceContext: func(appCtx *ApplicationContext) datasource.DatasourceContext {
+		StoreContext: func(appCtx *ApplicationContext) datasource.StoreContext {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource.NewDefaultDatasourceContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
+				return datasource.NewOrmContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		Datasource: func(appCtx *ApplicationContext) datasource.Datasource {
+		StoreConnection: func(appCtx *ApplicationContext) datasource.StoreConnection[*gorm.DB] {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
@@ -108,19 +108,19 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
-				return datasource.NewDefaultDatasource(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)
+				return datasource.NewOrmConnection(appCtx.StoreContext, mysql.Open(appCtx.StoreContext.Url()), config)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		TransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler {
+		StoreTransactionHandler: func(appCtx *ApplicationContext) datasource.StoreTransactionHandler[*gorm.DB] {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource.NewTransactionHandler(appCtx.Datasource)
+				return datasource.NewOrmTransactionHandler(appCtx.StoreConnection)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
@@ -141,7 +141,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return security.NewGormPrincipalManager(appCtx.TransactionHandler, appCtx.PasswordManager)
+				return security.NewGormPrincipalManager(appCtx.StoreTransactionHandler, appCtx.PasswordManager)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")

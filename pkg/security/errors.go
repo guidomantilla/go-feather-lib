@@ -2,6 +2,7 @@ package security
 
 import (
 	"errors"
+	"fmt"
 
 	secerrors "github.com/guidomantilla/go-feather-lib/pkg/common/errors"
 )
@@ -46,33 +47,33 @@ var (
 )
 
 func ErrAuthenticationFailed(errs ...error) error {
-	return errors.New("authentication failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("authentication failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrAuthorizationFailed(errs ...error) error {
-	return errors.New("authorization failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("authorization failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrTokenGenerationFailed(errs ...error) error {
-	return errors.New("token generation failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("token generation failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrTokenValidationFailed(errs ...error) error {
-	return errors.New("token validation failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("token validation failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordEncodingFailed(errs ...error) error {
-	return errors.New("password encoding failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("password encoding failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordMatchingFailed(errs ...error) error {
-	return errors.New("password matching failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("password matching failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordUpgradeEncodingValidationFailed(errs ...error) error {
-	return errors.New("password upgrade encoding validation failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("password upgrade encoding validation failed: %s", secerrors.ErrJoin(errs...).Error())
 }
 
 func ErrPasswordValidationFailed(errs ...error) error {
-	return errors.New("password validation failed: " + secerrors.ErrJoin(errs...).Error())
+	return fmt.Errorf("password validation failed: %s", secerrors.ErrJoin(errs...).Error())
 }
