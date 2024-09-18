@@ -1,4 +1,4 @@
-module go-feather-lib/internal/apps/nats-micro
+module go-feather-lib/internal/apps/play-micro
 
 go 1.23.1
 
