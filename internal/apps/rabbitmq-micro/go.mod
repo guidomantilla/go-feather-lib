@@ -1,10 +1,11 @@
 module go-feather-lib/internal/apps/rabbitmq-micro
 
-go 1.22.2
+go 1.23.1
 
 require (
 	github.com/guidomantilla/go-feather-lib v0.0.0-20240915182351-e20a807e64cb
 	github.com/qmdx00/lifecycle v1.1.1
+	github.com/rabbitmq/amqp091-go v1.10.0
 )
 
 replace github.com/guidomantilla/go-feather-lib v0.0.0-20240915182351-e20a807e64cb => ../../../
@@ -13,10 +14,9 @@ require (
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/rabbitmq/rabbitmq-stream-go-client v1.4.9 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
