@@ -1,12 +1,36 @@
 package messaging
 
-import "time"
+import (
+	"time"
 
-type Headers map[string]any
+	"github.com/google/uuid"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/properties"
+)
+
+const (
+	HeaderId           = "HeaderId"
+	HeaderTimestamp    = "HeaderTimestamp"
+	HeaderReplyChannel = "HeaderReplyChannel"
+	HeaderErrorChannel = "HeaderErrorChannel"
+)
+
+type Headers interface {
+	properties.Properties
+	Id() uuid.UUID
+	Timestamp() time.Time
+	ReplyChannel() string
+	ErrorChannel() string
+}
 
 type Message interface {
 	Headers() Headers
 	Payload() any
+}
+
+type ErrorMessage interface {
+	Message
+	Message()
 }
 
 type ChannelOptions func(channel Channel)
@@ -21,7 +45,7 @@ func WithTimeout(timeout time.Duration) ChannelOptions {
 
 type Channel interface {
 	Send(message Message, options ...ChannelOptions) error
-	Timeout(timeout time.Duration)
+	Timeout(timeout time.Duration) Channel
 }
 
 type MessageHandler interface {

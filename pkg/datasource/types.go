@@ -24,7 +24,7 @@ type StoreContext interface {
 //
 
 type StoreConnectionTypes interface {
-	*gorm.DB | int
+	*gorm.DB | struct{}
 }
 
 //type StoreConnectionTypes = *gorm.DB

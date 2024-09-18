@@ -17,22 +17,20 @@ import (
 
 func main() {
 
-	var err error
-	appName, version := "rabbitmq-stream-micro", "1.0.0"
 	os.Setenv("LOG_LEVEL", "DEBUG")
 	log.Custom()
+	environment.Default()
 
+	appName, version := "rabbitmq-stream-micro", "1.0.0"
 	app := lifecycle.NewApp(
 		lifecycle.WithName(appName), lifecycle.WithVersion(version),
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	envs := environment.Default()
-
-	serverName := envs.Value(environment.SslServerName).AsString()
-	caCertificate := envs.Value(environment.SslCaCertificate).AsString()
-	clientCertificate := envs.Value(environment.SslClientCertificate).AsString()
-	clientKey := envs.Value(environment.SslClientKey).AsString()
+	serverName := environment.Value(environment.SslServerName).AsString()
+	caCertificate := environment.Value(environment.SslCaCertificate).AsString()
+	clientCertificate := environment.Value(environment.SslClientCertificate).AsString()
+	clientKey := environment.Value(environment.SslClientKey).AsString()
 	tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
 	messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
@@ -54,6 +52,7 @@ func main() {
 		connection.Close()
 	}
 
+	var err error
 	if err = app.Run(); err != nil {
 		log.Fatal(err.Error())
 	}
