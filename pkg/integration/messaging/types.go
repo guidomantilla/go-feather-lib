@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,13 +10,25 @@ import (
 )
 
 const (
-	HeaderId           = "HeaderId"
-	HeaderTimestamp    = "HeaderTimestamp"
-	HeaderReplyChannel = "HeaderReplyChannel"
-	HeaderErrorChannel = "HeaderErrorChannel"
+	HeaderId           = "id"
+	HeaderTimestamp    = "timestamp"
+	HeaderReplyChannel = "reply-channel"
+	HeaderErrorChannel = "error-channel"
 )
 
+type HeadersOptions func(headers Headers)
+
+type HeadersOptionsChain interface {
+	Build() HeadersOptions
+	Id(id uuid.UUID) HeadersOptionsChain
+	Timestamp(timestamp time.Time) HeadersOptionsChain
+	ReplyChannel(replyChannel string) HeadersOptionsChain
+	ErrorChannel(errorChannel string) HeadersOptionsChain
+	Add(property string, value string) HeadersOptionsChain
+}
+
 type Headers interface {
+	fmt.Stringer
 	properties.Properties
 	Id() uuid.UUID
 	Timestamp() time.Time
@@ -24,6 +37,7 @@ type Headers interface {
 }
 
 type Message interface {
+	fmt.Stringer
 	Headers() Headers
 	Payload() any
 }
@@ -33,19 +47,26 @@ type ErrorMessage interface {
 	Message()
 }
 
-type ChannelOptions func(channel Channel)
-
-func WithTimeout(timeout time.Duration) ChannelOptions {
-	return func(channel Channel) {
-		channel.Timeout(timeout)
-	}
-}
-
 //
 
+type ChannelOptions func(channel Channel)
+
+type ChannelOptionsChain interface {
+	Build() ChannelOptions
+	Timeout(timeout time.Duration) ChannelOptionsChain
+}
+
+type ChannelPipe chan<- Message
+
+func (pipe ChannelPipe) String() string {
+	return fmt.Sprintf("chan<- Message %d", cap(pipe))
+}
+
 type Channel interface {
+	fmt.Stringer
 	Send(message Message, options ...ChannelOptions) error
-	Timeout(timeout time.Duration) Channel
+	Timeout(timeout time.Duration)
+	Pipe(pipe ChannelPipe)
 }
 
 type MessageHandler interface {
@@ -54,7 +75,7 @@ type MessageHandler interface {
 
 type PollableChannel interface {
 	Channel
-	Receive(options ...ChannelOptions) (Message, error)
+	Receive(options ChannelOptions) (Message, error)
 }
 
 type SubscribableChannel interface {
