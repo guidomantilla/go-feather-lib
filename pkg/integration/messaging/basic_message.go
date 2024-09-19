@@ -56,12 +56,12 @@ func (payload *BasicErrorPayload) Errors() []string {
 	return payload.errors
 }
 
-func (payload *BasicErrorPayload) Error() string {
+func (payload *BasicErrorPayload) String() string {
 	return fmt.Sprintf("code:%v, message:%v, errors:%v", payload.code, payload.message, payload.errors)
 }
 
-func (payload *BasicErrorPayload) String() string {
-	return fmt.Sprintf("code:%v, message:%v, errors:%v", payload.code, payload.message, payload.errors)
+func (payload *BasicErrorPayload) Error() string {
+	return payload.String()
 }
 
 //
