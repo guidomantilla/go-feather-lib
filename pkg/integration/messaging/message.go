@@ -2,6 +2,8 @@ package messaging
 
 import (
 	"fmt"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 type BaseMessage[T any] struct {
@@ -10,6 +12,8 @@ type BaseMessage[T any] struct {
 }
 
 func NewBaseMessage[T any](headers Headers, payload T) *BaseMessage[T] {
+	assert.NotNil(headers, fmt.Sprintf("integration messaging: %s error - headers is required", "base-message"))
+	assert.NotNil(payload, fmt.Sprintf("integration messaging: %s error - payload is required", "base-message"))
 	return &BaseMessage[T]{
 		headers: headers,
 		payload: payload,
@@ -37,6 +41,8 @@ type BaseErrorPayload struct {
 }
 
 func NewBaseErrorPayload(code string, message string, errors ...string) *BaseErrorPayload {
+	assert.NotEmpty(code, fmt.Sprintf("integration messaging: %s error - code is required", "base-message"))
+	assert.NotEmpty(message, fmt.Sprintf("integration messaging: %s error - message is required", "base-message"))
 	return &BaseErrorPayload{
 		code:    code,
 		message: message,
@@ -73,6 +79,9 @@ type BaseErrorMessage[T any] struct {
 }
 
 func NewBaseErrorMessage[T any](headers Headers, payload ErrorPayload, message Message[T]) *BaseErrorMessage[T] {
+	assert.NotNil(headers, fmt.Sprintf("integration messaging: %s error - headers is required", "base-message"))
+	assert.NotNil(payload, fmt.Sprintf("integration messaging: %s error - payload is required", "base-message"))
+	assert.NotNil(message, fmt.Sprintf("integration messaging: %s error - message is required", "base-message"))
 	return &BaseErrorMessage[T]{
 		headers: headers,
 		payload: payload,

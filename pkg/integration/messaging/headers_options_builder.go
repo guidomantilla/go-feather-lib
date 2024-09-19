@@ -29,8 +29,38 @@ func (options *BaseHeadersOptionsChain) Id(id uuid.UUID) HeadersOptionsChain {
 	return options
 }
 
+func (options *BaseHeadersOptionsChain) MessageType(messageType string) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.MessageType(messageType))
+	return options
+}
+
 func (options *BaseHeadersOptionsChain) Timestamp(timestamp time.Time) HeadersOptionsChain {
 	options.chain = append(options.chain, headersOptions.Timestamp(timestamp))
+	return options
+}
+
+func (options *BaseHeadersOptionsChain) Expired(expired bool) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.Expired(expired))
+	return options
+}
+
+func (options *BaseHeadersOptionsChain) TimeToLive(timeToLive time.Duration) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.TimeToLive(timeToLive))
+	return options
+}
+
+func (options *BaseHeadersOptionsChain) ContentType(contentType string) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.ContentType(contentType))
+	return options
+}
+
+func (options *BaseHeadersOptionsChain) OriginChannel(originChannel string) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.OriginChannel(originChannel))
+	return options
+}
+
+func (options *BaseHeadersOptionsChain) DestinationChannel(destinationChannel string) HeadersOptionsChain {
+	options.chain = append(options.chain, headersOptions.DestinationChannel(destinationChannel))
 	return options
 }
 

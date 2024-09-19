@@ -18,3 +18,7 @@ func NewBaseReceiverChannel[T any](handler ReceiverHandler[T]) *BaseReceiverChan
 func (channel *BaseReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
 	return channel.handler(ctx, timeout)
 }
+
+func (channel *BaseReceiverChannel[T]) Name() string {
+	return "base-receiver-channel"
+}

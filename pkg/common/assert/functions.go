@@ -2,38 +2,47 @@ package assert
 
 import (
 	"reflect"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-func NotEmpty(object any) bool {
-	return !isEmpty(object)
+func NotEmpty(object any, message string) {
+	if isEmpty(object) {
+		log.Fatal(message)
+	}
 }
 
-func Nil(object any) bool {
-	return isNil(object)
+func NotNil(object any, message string) {
+	if isNil(object) {
+		log.Fatal(message)
+	}
 }
 
-func NotNil(object any) bool {
-	return !isNil(object)
+func Equal(val1 any, val2 any, message string) {
+	if !isEqual(val1, val2) {
+		log.Fatal(message)
+	}
 }
 
-func Equal(val1 any, val2 any) bool {
-	return isEqual(val1, val2)
-}
-
-func NotEqual(val1 any, val2 any) bool {
-	return !isEqual(val1, val2)
+func NotEqual(val1 any, val2 any, message string) {
+	if isEqual(val1, val2) {
+		log.Fatal(message)
+	}
 }
 
 //
 
-func isEmpty(object interface{}) bool {
+func nil(object any) bool {
+	return isNil(object)
+}
 
-	// get nil case out of the way
-	if object == nil {
+//
+
+func isEmpty(object any) bool {
+	objValue := reflect.ValueOf(object)
+	if !objValue.IsValid() {
 		return true
 	}
-
-	objValue := reflect.ValueOf(object)
 
 	switch objValue.Kind() {
 	// collection types are empty when they have no element
@@ -54,12 +63,11 @@ func isEmpty(object interface{}) bool {
 	}
 }
 
-func isNil(object interface{}) bool {
-	if object == nil {
+func isNil(object any) bool {
+	value := reflect.ValueOf(object)
+	if !value.IsValid() {
 		return true
 	}
-
-	value := reflect.ValueOf(object)
 	switch value.Kind() {
 	case
 		reflect.Chan, reflect.Func,
@@ -72,7 +80,7 @@ func isNil(object interface{}) bool {
 	return false
 }
 
-func isEqual(val1, val2 interface{}) bool {
+func isEqual(val1, val2 any) bool {
 	v1 := reflect.ValueOf(val1)
 	v2 := reflect.ValueOf(val2)
 

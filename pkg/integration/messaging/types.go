@@ -13,7 +13,7 @@ type MoreComplexSenderChannel[T any] struct {
 
 func NewMoreComplexSenderChannel[T any](handler SenderHandler[T]) *MoreComplexSenderChannel[T] {
 	return &MoreComplexSenderChannel[T]{
-		SenderChannel: NewBaseSenderChannel[T](handler),
+		SenderChannel: NewLoggedSenderChannel("", handler),
 	}
 }
 
