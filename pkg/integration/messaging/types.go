@@ -1,16 +1,22 @@
 package messaging
 
-type MessageHandler interface {
-	Handle(message Message[any], options ...ChannelOptions) error
+import (
+	"context"
+	"time"
+)
+
+//
+
+type MoreComplexSenderChannel[T any] struct {
+	SenderChannel[T]
 }
 
-type PollableChannel interface {
-	Channel
-	Receive(options ChannelOptions) (Message[any], error)
+func NewMoreComplexSenderChannel[T any](handler SenderHandler[T]) *MoreComplexSenderChannel[T] {
+	return &MoreComplexSenderChannel[T]{
+		SenderChannel: NewBaseSenderChannel[T](handler),
+	}
 }
 
-type SubscribableChannel interface {
-	Channel
-	Subscribe(handler MessageHandler, options ...ChannelOptions) error
-	Unsubscribe(handler MessageHandler, options ...ChannelOptions) error
+func (channel *MoreComplexSenderChannel[T]) Send(ctx context.Context, message Message[T], timeout time.Duration) error {
+	return channel.SenderChannel.Send(ctx, message, timeout)
 }

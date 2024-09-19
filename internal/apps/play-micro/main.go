@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
@@ -37,11 +39,25 @@ func main() {
 		//
 
 		message := messaging.NewBasicMessage(headers, "Hola Mundo")
-		//log.Info(fmt.Sprintf("Message: %v", message))
+		log.Info(fmt.Sprintf("Message: %v", message))
 
 		payload := messaging.NewBasicErrorPayload("code", "message", "error")
-		error := messaging.NewBasicErrorMessage(headers, payload, message)
-		log.Info(fmt.Sprintf("Error: %v", error))
+		errMessage := messaging.NewBasicErrorMessage(headers, payload, message)
+		log.Info(fmt.Sprintf("Error: %v", errMessage))
+
+		//
+		senderHandler := func(ctx context.Context, message messaging.Message[string], timeout time.Duration) error {
+			log.Info(fmt.Sprintf("message traveling: %v", message))
+			return nil
+		}
+		basicSender := messaging.NewBasicSenderChannel(senderHandler)
+		err := basicSender.Send(context.Background(), message, 10*time.Second)
+		log.Info(fmt.Sprintf("Done: %v, Err: %v", errMessage, err))
+
+		x := messaging.NewChannelLoggerInterceptor(basicSender)
+		y := messaging.NewChannelLoggerInterceptor(x)
+		z := messaging.NewChannelLoggerInterceptor(y)
+		err := z.Send(context.Background(), message, 10*time.Second)
 
 		return nil
 	})

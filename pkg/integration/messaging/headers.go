@@ -16,7 +16,7 @@ type HeadersConfig struct {
 	Headers      map[string]string
 }
 
-type BasicHeaders struct {
+type BaseHeaders struct {
 	internal     map[string]string
 	id           uuid.UUID
 	timestamp    time.Time
@@ -24,8 +24,8 @@ type BasicHeaders struct {
 	errorChannel string
 }
 
-func NewBasicHeaders(options ...HeadersOptions) *BasicHeaders {
-	headers := &BasicHeaders{
+func NewBaseHeaders(options ...HeadersOptions) *BaseHeaders {
+	headers := &BaseHeaders{
 		internal:     make(map[string]string),
 		id:           uuid.New(),
 		timestamp:    time.Now(),
@@ -45,32 +45,32 @@ func NewBasicHeaders(options ...HeadersOptions) *BasicHeaders {
 	return headers
 }
 
-func NewBasicHeadersFromConfig(config *HeadersConfig) *BasicHeaders {
-	return NewBasicHeaders(NewHeadersOptionsFromConfig(config))
+func NewBasicHeadersFromConfig(config *HeadersConfig) *BaseHeaders {
+	return NewBaseHeaders(NewHeadersOptionsFromConfig(config))
 }
 
 //
 
-func (headers *BasicHeaders) Id() uuid.UUID {
+func (headers *BaseHeaders) Id() uuid.UUID {
 	return uuid.MustParse(headers.internal[HeaderId])
 }
 
-func (headers *BasicHeaders) Timestamp() time.Time {
+func (headers *BaseHeaders) Timestamp() time.Time {
 	value, _ := time.Parse(time.RFC3339, headers.internal[HeaderTimestamp])
 	return value
 }
 
-func (headers *BasicHeaders) ReplyChannel() string {
+func (headers *BaseHeaders) ReplyChannel() string {
 	return headers.internal[HeaderReplyChannel]
 }
 
-func (headers *BasicHeaders) ErrorChannel() string {
+func (headers *BaseHeaders) ErrorChannel() string {
 	return headers.internal[HeaderErrorChannel]
 }
 
 //
 
-func (headers *BasicHeaders) Add(property string, value string) {
+func (headers *BaseHeaders) Add(property string, value string) {
 
 	property, value = strings.TrimSpace(property), strings.TrimSpace(value)
 	if property == "" || value == "" {
@@ -94,14 +94,14 @@ func (headers *BasicHeaders) Add(property string, value string) {
 	headers.internal[property] = value
 }
 
-func (headers *BasicHeaders) Get(property string) string {
+func (headers *BaseHeaders) Get(property string) string {
 	return headers.internal[property]
 }
 
-func (headers *BasicHeaders) AsMap() map[string]string {
+func (headers *BaseHeaders) AsMap() map[string]string {
 	return headers.internal
 }
 
-func (headers *BasicHeaders) String() string {
+func (headers *BaseHeaders) String() string {
 	return fmt.Sprintf("%v", headers.internal)
 }
