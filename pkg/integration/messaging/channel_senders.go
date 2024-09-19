@@ -25,6 +25,14 @@ func NewLoggedSenderChannel[T any](name string, handler SenderHandler[T]) *Logge
 
 func (channel *LoggedSenderChannel[T]) Send(ctx context.Context, message Message[T], timeout time.Duration) error {
 
+	if ctx == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", channel.name)
+	}
+
+	if message == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
+	}
+
 	log.Debug(fmt.Sprintf("integration messaging: sending message: %v", message))
 	if err := channel.handler(ctx, message, timeout); err != nil {
 		log.Debug(fmt.Sprintf("integration messaging: error - message not sent: %v", message))
@@ -57,6 +65,14 @@ func NewTimeoutSenderChannel[T any](name string, sender SenderChannel[T]) *Timeo
 
 func (channel *TimeoutSenderChannel[T]) Send(ctx context.Context, message Message[T], timeout time.Duration) error {
 
+	if ctx == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", channel.name)
+	}
+
+	if message == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -68,9 +84,10 @@ func (channel *TimeoutSenderChannel[T]) Send(ctx context.Context, message Messag
 
 	select {
 	case <-ctx.Done():
+		log.Debug(fmt.Sprintf("integration messaging: %s error - message sending timeout: %v", channel.name, ctx.Err().Error()))
 		message.Headers().Add(HeaderExpired, "true")
-		message.Headers().Add("x-error-extras", ctx.Err().Error())
-		return ctx.Err()
+		message.Headers().Add("x-error-detail", ctx.Err().Error())
+		return fmt.Errorf("message sending timeout: %v", ctx.Err().Error())
 	case err := <-errChan:
 		return err
 	}

@@ -2,9 +2,9 @@ module go-feather-lib/internal/apps/play-micro
 
 go 1.23.1
 
-require github.com/guidomantilla/go-feather-lib v0.0.0-20240918195235-31ef8cafaaf1
+require github.com/guidomantilla/go-feather-lib v0.0.0-20240919202448-f78613cbcea6
 
-replace github.com/guidomantilla/go-feather-lib v0.0.0-20240918195235-31ef8cafaaf1 => ../../../
+replace github.com/guidomantilla/go-feather-lib v0.0.0-20240919202448-f78613cbcea6 => ../../../
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
