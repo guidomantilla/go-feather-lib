@@ -34,7 +34,7 @@ func NewBasicChannelOptions(options ...ChannelOptions) *BasicChannel {
 
 //
 
-func (channel *BasicChannel) Send(message Message, options ...ChannelOptions) error {
+func (channel *BasicChannel) Send(message Message[any], options ...ChannelOptions) error {
 	for _, option := range options {
 		option(channel)
 	}

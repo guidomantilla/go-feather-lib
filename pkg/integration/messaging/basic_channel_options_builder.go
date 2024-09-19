@@ -3,24 +3,24 @@ package messaging
 import "time"
 
 type BasicChannelOptionsChain struct {
-	chain []ChannelOptions
+	Chain []ChannelOptions
 }
 
 func ChannelOptionsChainBuilder() ChannelOptionsChain {
 	return &BasicChannelOptionsChain{
-		chain: make([]ChannelOptions, 0),
+		Chain: make([]ChannelOptions, 0),
 	}
 }
 
 func (options *BasicChannelOptionsChain) Build() ChannelOptions {
 	return func(channel Channel) {
-		for _, option := range options.chain {
+		for _, option := range options.Chain {
 			option(channel)
 		}
 	}
 }
 
 func (options *BasicChannelOptionsChain) Timeout(timeout time.Duration) ChannelOptionsChain {
-	options.chain = append(options.chain, channelOptions.Timeout(timeout))
+	options.Chain = append(options.Chain, channelOptions.Timeout(timeout))
 	return options
 }

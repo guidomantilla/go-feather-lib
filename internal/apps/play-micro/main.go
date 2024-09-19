@@ -34,6 +34,15 @@ func main() {
 		headers = messaging.NewBasicHeadersFromConfig(config)
 		log.Info(fmt.Sprintf("Headers: %v", headers))
 
+		//
+
+		message := messaging.NewBasicMessage(headers, "Hola Mundo")
+		//log.Info(fmt.Sprintf("Message: %v", message))
+
+		payload := messaging.NewBasicErrorPayload("code", "message", "error")
+		error := messaging.NewBasicErrorMessage(headers, payload, message)
+		log.Info(fmt.Sprintf("Error: %v", error))
+
 		return nil
 	})
 }
