@@ -11,23 +11,23 @@ import (
 
 const (
 	HeaderId                 = "x-id"
+	HeaderCorrelationId      = "x-correlation-id"
 	HeaderMessageType        = "x-message-type"
 	HeaderTimestamp          = "x-timestamp"
-	HeaderExpired            = "x-expired"
-	HeaderTimeToLive         = "x-ttl"
 	HeaderContentType        = "x-content-type"
+	HeaderExpired            = "x-expired"
+	HeaderExpiredTimeToLive  = "x-expired-ttl"
+	HeaderExpiredTimestamp   = "x-expired-timestamp"
+	HeaderExpiredChannel     = "x-expired-channel"
+	HeaderInvalid            = "x-invalid"
+	HeaderInvalidCause       = "x-invalid-cause"
+	HeaderInvalidChannel     = "x-invalid-channel"
+	HeaderError              = "x-error"
+	HeaderErrorCause         = "x-error-cause"
+	HeaderErrorChannel       = "x-error-channel"
 	HeaderOriginChannel      = "x-origin-channel"
 	HeaderDestinationChannel = "x-destination-channel"
 	HeaderReplyChannel       = "x-reply-channel"
-	HeaderErrorChannel       = "x-error-channel"
-	/*
-		HeaderCorrelationId = "x-correlation-id"
-		HeaderPriority      = "x-priority"
-		HeaderUserId        = "x-user-id"
-		HeaderSessionId     = "x-session-id"
-		HeaderSource        = "x-source"
-		HeaderDestination   = "x-destination"
-	*/
 )
 
 type HeadersOptions func(headers Headers)

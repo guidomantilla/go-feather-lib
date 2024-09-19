@@ -63,7 +63,7 @@ func (options HeadersOptions) Expired(expired bool) HeadersOptions {
 func (options HeadersOptions) TimeToLive(timeToLive time.Duration) HeadersOptions {
 	return func(headers Headers) {
 		if timeToLive > 0 {
-			headers.Add(HeaderTimeToLive, timeToLive.String())
+			headers.Add(HeaderExpiredTimeToLive, timeToLive.String())
 		}
 	}
 }

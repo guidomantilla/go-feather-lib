@@ -77,8 +77,8 @@ func main() {
 				return message, nil
 			}
 
-			receiver = messaging.NewLoggedReceiverChannel("logged-receiver-01", receiverHandler)
-			receiver = messaging.NewTimeoutReceiverChannel("logged-receiver-01", receiver)
+			receiver = messaging.NewLoggedReceiverChannel("logged-receiver-02", receiverHandler)
+			receiver = messaging.NewTimeoutReceiverChannel("timeout-receiver-02", receiver)
 			message, err = receiver.Receive(context.Background(), 5*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}

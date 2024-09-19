@@ -59,7 +59,7 @@ func NewBaseHeaders(options ...HeadersOptions) *BaseHeaders {
 	headers.Add(HeaderDestinationChannel, headers.destinationChannel)
 	headers.Add(HeaderOriginChannel, headers.originChannel)
 	headers.Add(HeaderContentType, headers.contentType)
-	headers.Add(HeaderTimeToLive, headers.timeToLive.String())
+	headers.Add(HeaderExpiredTimeToLive, headers.timeToLive.String())
 	headers.Add(HeaderExpired, strconv.FormatBool(headers.expired))
 	headers.Add(HeaderTimestamp, headers.timestamp.Format(time.RFC3339))
 	headers.Add(HeaderMessageType, headers.messageType)
@@ -98,7 +98,7 @@ func (headers *BaseHeaders) Expired() bool {
 }
 
 func (headers *BaseHeaders) TimeToLive() time.Duration {
-	value, _ := time.ParseDuration(headers.internal[HeaderTimeToLive])
+	value, _ := time.ParseDuration(headers.internal[HeaderExpiredTimeToLive])
 	return value
 }
 
@@ -144,7 +144,7 @@ func (headers *BaseHeaders) Add(property string, value string) {
 	if property == HeaderExpired {
 		headers.expired, _ = strconv.ParseBool(value)
 	}
-	if property == HeaderTimeToLive {
+	if property == HeaderExpiredTimeToLive {
 		headers.timeToLive, _ = time.ParseDuration(value)
 	}
 	if property == HeaderContentType {
