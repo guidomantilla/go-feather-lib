@@ -104,17 +104,17 @@ func (channel *TimeoutReceiverChannel[T]) Receive(ctx context.Context, timeout t
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	errChan := make(chan *response[T])
-	go func(errChan chan *response[T]) {
-		defer close(errChan)
-		errChan <- convert(channel.receiver.Receive(ctx, timeout))
-	}(errChan)
+	responseChan := make(chan *response[T])
+	go func(responseChan chan *response[T]) {
+		defer close(responseChan)
+		responseChan <- convert(channel.receiver.Receive(ctx, timeout))
+	}(responseChan)
 
 	select {
 	case <-ctx.Done():
 		log.Debug(fmt.Sprintf("integration messaging: %s error - message receiving timeout: %v", channel.name, ctx.Err().Error()))
 		return nil, fmt.Errorf("message receiving timeout: %v", ctx.Err().Error())
-	case response := <-errChan:
+	case response := <-responseChan:
 		return response.message, response.err
 	}
 }
