@@ -15,17 +15,9 @@ type Properties interface {
 	AsMap() map[string]string
 }
 
-func NewProperties(options ...PropertiesOption) Properties {
-	return newProperties(options...)
-}
-
 //
 
 type PropertiesSource interface {
 	Get(property string) string
 	AsMap() map[string]any
-}
-
-func NewPropertiesSource(name string, properties Properties) PropertiesSource {
-	return newPropertiesSource(name, properties)
 }

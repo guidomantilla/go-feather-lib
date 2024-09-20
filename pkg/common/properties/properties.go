@@ -26,7 +26,7 @@ type properties struct {
 	mu       sync.RWMutex
 }
 
-func newProperties(options ...PropertiesOption) *properties {
+func NewProperties(options ...PropertiesOption) Properties {
 	properties := &properties{
 		internal: make(map[string]string),
 	}

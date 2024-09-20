@@ -18,10 +18,6 @@ type Environment interface {
 	AppendPropertiesSources(propertySources ...properties.PropertiesSource)
 }
 
-func NewEnvironment(options ...EnvironmentOption) Environment {
-	return newEnvironment(options...)
-}
-
 //
 
 type EnvVar string

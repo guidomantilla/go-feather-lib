@@ -4,12 +4,12 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type DefaultPasswordManager struct {
+type passwordManager struct {
 	passwordEncoder   PasswordEncoder
 	passwordGenerator PasswordGenerator
 }
 
-func NewDefaultPasswordManager(passwordEncoder PasswordEncoder, passwordGenerator PasswordGenerator) *DefaultPasswordManager {
+func NewPasswordManager(passwordEncoder PasswordEncoder, passwordGenerator PasswordGenerator) PasswordManager {
 
 	if passwordEncoder == nil {
 		log.Fatal("starting up - error setting up passwordManager: passwordEncoder is nil")
@@ -19,13 +19,13 @@ func NewDefaultPasswordManager(passwordEncoder PasswordEncoder, passwordGenerato
 		log.Fatal("starting up - error setting up passwordManager: passwordGenerator is nil")
 	}
 
-	return &DefaultPasswordManager{
+	return &passwordManager{
 		passwordEncoder:   passwordEncoder,
 		passwordGenerator: passwordGenerator,
 	}
 }
 
-func (manager *DefaultPasswordManager) Encode(rawPassword string) (*string, error) {
+func (manager *passwordManager) Encode(rawPassword string) (*string, error) {
 
 	var err error
 	var password *string
@@ -36,7 +36,7 @@ func (manager *DefaultPasswordManager) Encode(rawPassword string) (*string, erro
 	return password, nil
 }
 
-func (manager *DefaultPasswordManager) Matches(encodedPassword string, rawPassword string) (*bool, error) {
+func (manager *passwordManager) Matches(encodedPassword string, rawPassword string) (*bool, error) {
 
 	var err error
 	var ok *bool
@@ -47,7 +47,7 @@ func (manager *DefaultPasswordManager) Matches(encodedPassword string, rawPasswo
 	return ok, nil
 }
 
-func (manager *DefaultPasswordManager) UpgradeEncoding(encodedPassword string) (*bool, error) {
+func (manager *passwordManager) UpgradeEncoding(encodedPassword string) (*bool, error) {
 
 	var err error
 	var ok *bool
@@ -58,11 +58,11 @@ func (manager *DefaultPasswordManager) UpgradeEncoding(encodedPassword string) (
 	return ok, nil
 }
 
-func (manager *DefaultPasswordManager) Generate() string {
+func (manager *passwordManager) Generate() string {
 	return manager.passwordGenerator.Generate()
 }
 
-func (manager *DefaultPasswordManager) Validate(rawPassword string) error {
+func (manager *passwordManager) Validate(rawPassword string) error {
 
 	var err error
 	if err = manager.passwordGenerator.Validate(rawPassword); err != nil {

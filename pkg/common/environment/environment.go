@@ -90,7 +90,7 @@ type environment struct {
 	propertiesSources []properties.PropertiesSource
 }
 
-func newEnvironment(options ...EnvironmentOption) Environment {
+func NewEnvironment(options ...EnvironmentOption) Environment {
 	environment := &environment{
 		propertiesSources: make([]properties.PropertiesSource, 0),
 	}

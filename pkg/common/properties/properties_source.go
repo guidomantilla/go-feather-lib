@@ -12,7 +12,7 @@ type propertiesSource struct {
 	internal   map[string]any
 }
 
-func newPropertiesSource(name string, properties Properties) *propertiesSource {
+func NewPropertiesSource(name string, properties Properties) PropertiesSource {
 	assert.NotEmpty(name, fmt.Sprintf("common properties: %s error - name is required", name))
 	assert.NotNil(properties, fmt.Sprintf("common properties: %s error - handler is required", name))
 

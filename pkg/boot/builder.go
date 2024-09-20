@@ -128,10 +128,10 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return security.NewBcryptPasswordEncoder()
 		},
 		PasswordGenerator: func(appCtx *ApplicationContext) security.PasswordGenerator {
-			return security.NewDefaultPasswordGenerator()
+			return security.NewPasswordGenerator()
 		},
 		PasswordManager: func(appCtx *ApplicationContext) security.PasswordManager {
-			return security.NewDefaultPasswordManager(appCtx.PasswordEncoder, appCtx.PasswordGenerator)
+			return security.NewPasswordManager(appCtx.PasswordEncoder, appCtx.PasswordGenerator)
 		},
 		PrincipalManager: func(appCtx *ApplicationContext) security.PrincipalManager {
 			if !appCtx.Enablers.DatabaseEnabled {

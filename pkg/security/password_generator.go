@@ -16,18 +16,18 @@ const (
 	//allCharSet = lowerCharSet + upperCharSet + numberSet
 )
 
-type DefaultPasswordGeneratorOption func(generator *DefaultPasswordGenerator)
+type DefaultPasswordGeneratorOption func(generator *passwordGenerator)
 
-type DefaultPasswordGenerator struct {
+type passwordGenerator struct {
 	passwordLength int
 	minSpecialChar int
 	minNum         int
 	minUpperCase   int
 }
 
-func NewDefaultPasswordGenerator(options ...DefaultPasswordGeneratorOption) *DefaultPasswordGenerator {
+func NewPasswordGenerator(options ...DefaultPasswordGeneratorOption) PasswordGenerator {
 
-	generator := &DefaultPasswordGenerator{
+	generator := &passwordGenerator{
 		passwordLength: 16,
 		minSpecialChar: 2,
 		minNum:         2,
@@ -42,30 +42,30 @@ func NewDefaultPasswordGenerator(options ...DefaultPasswordGeneratorOption) *Def
 }
 
 func WithPasswordLength(length int) DefaultPasswordGeneratorOption {
-	return func(generator *DefaultPasswordGenerator) {
+	return func(generator *passwordGenerator) {
 		generator.passwordLength = length
 	}
 }
 
 func WithMinSpecialChar(minSpecialChar int) DefaultPasswordGeneratorOption {
-	return func(generator *DefaultPasswordGenerator) {
+	return func(generator *passwordGenerator) {
 		generator.minSpecialChar = minSpecialChar
 	}
 }
 
 func WithMinNum(minNum int) DefaultPasswordGeneratorOption {
-	return func(generator *DefaultPasswordGenerator) {
+	return func(generator *passwordGenerator) {
 		generator.minNum = minNum
 	}
 }
 
 func WithMinUpperCase(minUpperCase int) DefaultPasswordGeneratorOption {
-	return func(generator *DefaultPasswordGenerator) {
+	return func(generator *passwordGenerator) {
 		generator.minUpperCase = minUpperCase
 	}
 }
 
-func (generator *DefaultPasswordGenerator) Generate() string {
+func (generator *passwordGenerator) Generate() string {
 	var password strings.Builder
 
 	//Set special character
@@ -98,7 +98,7 @@ func (generator *DefaultPasswordGenerator) Generate() string {
 	return string(inRune)
 }
 
-func (generator *DefaultPasswordGenerator) Validate(rawPassword string) error {
+func (generator *passwordGenerator) Validate(rawPassword string) error {
 
 	if len(rawPassword) < generator.passwordLength {
 		return ErrPasswordLength

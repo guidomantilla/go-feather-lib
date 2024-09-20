@@ -6,10 +6,10 @@ var (
 	_ PasswordEncoder   = (*Pbkdf2PasswordEncoder)(nil)
 	_ PasswordEncoder   = (*ScryptPasswordEncoder)(nil)
 	_ PasswordEncoder   = (*DelegatingPasswordEncoder)(nil)
-	_ PasswordEncoder   = (*DefaultPasswordManager)(nil)
-	_ PasswordGenerator = (*DefaultPasswordGenerator)(nil)
-	_ PasswordGenerator = (*DefaultPasswordManager)(nil)
-	_ PasswordManager   = (*DefaultPasswordManager)(nil)
+	_ PasswordEncoder   = (*passwordManager)(nil)
+	_ PasswordGenerator = (*passwordGenerator)(nil)
+	_ PasswordGenerator = (*passwordManager)(nil)
+	_ PasswordManager   = (*passwordManager)(nil)
 )
 
 const (
@@ -29,6 +29,8 @@ type PasswordGenerator interface {
 	Generate() string
 	Validate(rawPassword string) error
 }
+
+//
 
 type PasswordManager interface {
 	PasswordEncoder
