@@ -11,20 +11,20 @@ import (
 
 var singleton atomic.Value
 
-func retrieve() Logger {
+func instance() Logger[*slog.Logger] {
 	value := singleton.Load()
 	if value == nil {
 		return Slog()
 	}
-	return value.(Logger)
+	return value.(Logger[*slog.Logger])
 }
 
-func Slog(writers ...io.Writer) Logger {
+func Slog(writers ...io.Writer) Logger[*slog.Logger] {
 	level := os.Getenv("LOG_LEVEL")
 	if level == "" {
 		level = "INFO"
 	}
-	logger := NewSlogLogger(SlogLevelOff.ValueFromName(strings.ToUpper(level)), writers...)
+	logger := NewLogger(SlogLevelOff.ValueFromName(strings.ToUpper(level)), writers...)
 	singleton.Store(logger)
 	return logger
 }
@@ -32,34 +32,28 @@ func Slog(writers ...io.Writer) Logger {
 //
 
 func Debug(msg string, args ...any) {
-	slogLogger := retrieve()
-	slogLogger.Debug(context.Background(), msg, args...)
+	instance().Debug(context.Background(), msg, args...)
 }
 
 func Info(msg string, args ...any) {
-	slogLogger := retrieve()
-	slogLogger.Info(context.Background(), msg, args...)
+	instance().Info(context.Background(), msg, args...)
 }
 
 func Warn(msg string, args ...any) {
-	slogLogger := retrieve()
-	slogLogger.Warn(context.Background(), msg, args...)
+	instance().Warn(context.Background(), msg, args...)
 }
 
 func Error(msg string, args ...any) {
-	slogLogger := retrieve()
-	slogLogger.Error(context.Background(), msg, args...)
+	instance().Error(context.Background(), msg, args...)
 }
 
 func Fatal(msg string, args ...any) {
-	slogLogger := retrieve()
-	slogLogger.Fatal(context.Background(), msg, args...)
+	instance().Fatal(context.Background(), msg, args...)
 	os.Exit(1)
 }
 
 //
 
 func AsSlogLogger() *slog.Logger {
-	slogLogger := retrieve()
-	return slogLogger.Logger().(*slog.Logger)
+	return instance().Logger()
 }

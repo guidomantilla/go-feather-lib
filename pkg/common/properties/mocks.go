@@ -78,31 +78,31 @@ func (mr *MockPropertiesMockRecorder) Get(property any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockProperties)(nil).Get), property)
 }
 
-// MockPropertySource is a mock of PropertySource interface.
-type MockPropertySource struct {
+// MockPropertiesSource is a mock of PropertiesSource interface.
+type MockPropertiesSource struct {
 	ctrl     *gomock.Controller
-	recorder *MockPropertySourceMockRecorder
+	recorder *MockPropertiesSourceMockRecorder
 }
 
-// MockPropertySourceMockRecorder is the mock recorder for MockPropertySource.
-type MockPropertySourceMockRecorder struct {
-	mock *MockPropertySource
+// MockPropertiesSourceMockRecorder is the mock recorder for MockPropertiesSource.
+type MockPropertiesSourceMockRecorder struct {
+	mock *MockPropertiesSource
 }
 
-// NewMockPropertySource creates a new mock instance.
-func NewMockPropertySource(ctrl *gomock.Controller) *MockPropertySource {
-	mock := &MockPropertySource{ctrl: ctrl}
-	mock.recorder = &MockPropertySourceMockRecorder{mock}
+// NewMockPropertiesSource creates a new mock instance.
+func NewMockPropertiesSource(ctrl *gomock.Controller) *MockPropertiesSource {
+	mock := &MockPropertiesSource{ctrl: ctrl}
+	mock.recorder = &MockPropertiesSourceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPropertySource) EXPECT() *MockPropertySourceMockRecorder {
+func (m *MockPropertiesSource) EXPECT() *MockPropertiesSourceMockRecorder {
 	return m.recorder
 }
 
 // AsMap mocks base method.
-func (m *MockPropertySource) AsMap() map[string]any {
+func (m *MockPropertiesSource) AsMap() map[string]any {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AsMap")
 	ret0, _ := ret[0].(map[string]any)
@@ -110,13 +110,13 @@ func (m *MockPropertySource) AsMap() map[string]any {
 }
 
 // AsMap indicates an expected call of AsMap.
-func (mr *MockPropertySourceMockRecorder) AsMap() *gomock.Call {
+func (mr *MockPropertiesSourceMockRecorder) AsMap() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsMap", reflect.TypeOf((*MockPropertySource)(nil).AsMap))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsMap", reflect.TypeOf((*MockPropertiesSource)(nil).AsMap))
 }
 
 // Get mocks base method.
-func (m *MockPropertySource) Get(property string) string {
+func (m *MockPropertiesSource) Get(property string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", property)
 	ret0, _ := ret[0].(string)
@@ -124,7 +124,7 @@ func (m *MockPropertySource) Get(property string) string {
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockPropertySourceMockRecorder) Get(property any) *gomock.Call {
+func (mr *MockPropertiesSourceMockRecorder) Get(property any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPropertySource)(nil).Get), property)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPropertiesSource)(nil).Get), property)
 }

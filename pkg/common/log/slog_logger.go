@@ -7,11 +7,11 @@ import (
 	"os"
 )
 
-type SlogLogger struct {
+type slogLogger struct {
 	internal *slog.Logger
 }
 
-func NewSlogLogger(level CustomSlogLevel, writers ...io.Writer) *SlogLogger {
+func newSlogLogger(level SlogLevel, writers ...io.Writer) *slogLogger {
 	opts := &slog.HandlerOptions{
 		Level: level.ToSlogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
@@ -28,41 +28,41 @@ func NewSlogLogger(level CustomSlogLevel, writers ...io.Writer) *SlogLogger {
 	for _, writer := range writers {
 		handlers = append(handlers, SlogJsonFormat.Handler(writer, opts))
 	}
-	internal := slog.New(NewFanoutHandler(handlers...))
+	internal := slog.New(NewSlogFanoutHandler(handlers...))
 	slog.SetDefault(internal)
-	slogLogger := &SlogLogger{internal: internal}
-	return slogLogger
+
+	return &slogLogger{internal: internal}
 }
 
-func (logger *SlogLogger) Debug(ctx context.Context, msg string, args ...any) {
+func (logger *slogLogger) Debug(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelDebug.ToSlogLevel(), msg, args...)
 }
 
-func (logger *SlogLogger) Info(ctx context.Context, msg string, args ...any) {
+func (logger *slogLogger) Info(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelInfo.ToSlogLevel(), msg, args...)
 }
 
-func (logger *SlogLogger) Warn(ctx context.Context, msg string, args ...any) {
+func (logger *slogLogger) Warn(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelWarning.ToSlogLevel(), msg, args...)
 }
 
-func (logger *SlogLogger) Error(ctx context.Context, msg string, args ...any) {
+func (logger *slogLogger) Error(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelError.ToSlogLevel(), msg, args...)
 }
 
-func (logger *SlogLogger) Fatal(ctx context.Context, msg string, args ...any) {
+func (logger *slogLogger) Fatal(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelFatal.ToSlogLevel(), msg, args...)
 	os.Exit(1)
 }
 
-func (logger *SlogLogger) Logger() any {
+func (logger *slogLogger) Logger() *slog.Logger {
 	return logger.internal
 }
 
 //
 
 const (
-	SlogLevelDebug CustomSlogLevel = iota
+	SlogLevelDebug SlogLevel = iota
 	SlogLevelInfo
 	SlogLevelWarning
 	SlogLevelError
@@ -70,9 +70,9 @@ const (
 	SlogLevelOff
 )
 
-type CustomSlogLevel int
+type SlogLevel int
 
-func (enum CustomSlogLevel) String() string {
+func (enum SlogLevel) String() string {
 
 	switch enum {
 	case SlogLevelDebug:
@@ -91,7 +91,7 @@ func (enum CustomSlogLevel) String() string {
 	return "OFF"
 }
 
-func (enum CustomSlogLevel) ToSlogLevel() slog.Level {
+func (enum SlogLevel) ToSlogLevel() slog.Level {
 	switch enum {
 	case SlogLevelDebug:
 		return slog.LevelDebug
@@ -109,7 +109,7 @@ func (enum CustomSlogLevel) ToSlogLevel() slog.Level {
 	return slog.Level(16)
 }
 
-func (enum CustomSlogLevel) ValueFromName(slogLevel string) CustomSlogLevel {
+func (enum SlogLevel) ValueFromName(slogLevel string) SlogLevel {
 	switch slogLevel {
 	case "DEBUG":
 		return SlogLevelDebug
@@ -127,7 +127,7 @@ func (enum CustomSlogLevel) ValueFromName(slogLevel string) CustomSlogLevel {
 	return SlogLevelOff
 }
 
-func (enum CustomSlogLevel) ValueFromCardinal(slogLevel int) CustomSlogLevel {
+func (enum SlogLevel) ValueFromCardinal(slogLevel int) SlogLevel {
 	switch slogLevel {
 	case int(SlogLevelDebug):
 		return SlogLevelDebug
@@ -145,7 +145,7 @@ func (enum CustomSlogLevel) ValueFromCardinal(slogLevel int) CustomSlogLevel {
 	return SlogLevelOff
 }
 
-func (enum CustomSlogLevel) ValueFromSlogLevel(slogLevel slog.Level) CustomSlogLevel {
+func (enum SlogLevel) ValueFromSlogLevel(slogLevel slog.Level) SlogLevel {
 	switch slogLevel {
 	case slog.LevelDebug:
 		return SlogLevelDebug
@@ -166,13 +166,13 @@ func (enum CustomSlogLevel) ValueFromSlogLevel(slogLevel slog.Level) CustomSlogL
 //
 
 const (
-	SlogTextFormat CustomSlogFormat = iota
+	SlogTextFormat SlogFormat = iota
 	SlogJsonFormat
 )
 
-type CustomSlogFormat int
+type SlogFormat int
 
-func (enum CustomSlogFormat) String() string {
+func (enum SlogFormat) String() string {
 	switch enum {
 	case SlogTextFormat:
 		return "TEXT"
@@ -182,7 +182,7 @@ func (enum CustomSlogFormat) String() string {
 	return "TEXT"
 }
 
-func (enum CustomSlogFormat) ValueFromName(loggerFormat string) CustomSlogFormat {
+func (enum SlogFormat) ValueFromName(loggerFormat string) SlogFormat {
 	switch loggerFormat {
 	case "TEXT":
 		return SlogTextFormat
@@ -192,7 +192,7 @@ func (enum CustomSlogFormat) ValueFromName(loggerFormat string) CustomSlogFormat
 	return SlogTextFormat
 }
 
-func (enum CustomSlogFormat) ValueFromCardinal(loggerFormat int) CustomSlogFormat {
+func (enum SlogFormat) ValueFromCardinal(loggerFormat int) SlogFormat {
 	switch loggerFormat {
 	case int(SlogTextFormat):
 		return SlogTextFormat
@@ -202,7 +202,7 @@ func (enum CustomSlogFormat) ValueFromCardinal(loggerFormat int) CustomSlogForma
 	return SlogTextFormat
 }
 
-func (enum CustomSlogFormat) Handler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
+func (enum SlogFormat) Handler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
 	switch enum {
 	case SlogTextFormat:
 		return slog.NewTextHandler(w, opts)

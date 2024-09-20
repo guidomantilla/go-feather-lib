@@ -20,3 +20,14 @@ type ReceiverChannel[T any] interface {
 	Receive(ctx context.Context, timeout time.Duration) (Message[T], error)
 	Name() string
 }
+
+//
+
+type MessageHandler[T any] func(ctx context.Context, message Message[T]) error
+
+type MessageActivator[T any] interface {
+	SenderChannel[T]
+	ReceiverChannel[T]
+	Listen(ctx context.Context, message Message[T]) error
+	Name() string
+}

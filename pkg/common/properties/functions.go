@@ -6,7 +6,7 @@ import (
 
 var singleton atomic.Value
 
-func retrieve() Properties {
+func instance() Properties {
 	value := singleton.Load()
 	if value == nil {
 		return Load()
@@ -15,26 +15,23 @@ func retrieve() Properties {
 }
 
 func Load(slices ...[]string) Properties {
-	withSlices := make([]DefaultPropertiesOption, 0)
+	withSlices := make([]PropertiesOption, 0)
 	for _, slice := range slices {
 		withSlices = append(withSlices, FromSlice(slice))
 	}
-	properties := NewDefaultProperties(withSlices...)
+	properties := NewProperties(withSlices...)
 	singleton.Store(properties)
 	return properties
 }
 
 func Add(property string, value string) {
-	properties := retrieve()
-	properties.Add(property, value)
+	instance().Add(property, value)
 }
 
 func Get(property string) string {
-	properties := retrieve()
-	return properties.Get(property)
+	return instance().Get(property)
 }
 
 func AsMap() map[string]string {
-	properties := retrieve()
-	return properties.AsMap()
+	return instance().AsMap()
 }

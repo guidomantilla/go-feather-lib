@@ -1,11 +1,13 @@
 package properties
 
 var (
-	_ Properties     = (*DefaultProperties)(nil)
-	_ PropertySource = (*DefaultPropertySource)(nil)
-	_ PropertySource = (*MockPropertySource)(nil)
-	_ Properties     = (*MockProperties)(nil)
+	_ Properties       = (*properties)(nil)
+	_ PropertiesSource = (*propertiesSource)(nil)
+	_ PropertiesSource = (*MockPropertiesSource)(nil)
+	_ Properties       = (*MockProperties)(nil)
 )
+
+type PropertiesOption func(properties *properties)
 
 type Properties interface {
 	Add(property string, value string)
@@ -13,7 +15,17 @@ type Properties interface {
 	AsMap() map[string]string
 }
 
-type PropertySource interface {
+func NewProperties(options ...PropertiesOption) Properties {
+	return newProperties(options...)
+}
+
+//
+
+type PropertiesSource interface {
 	Get(property string) string
 	AsMap() map[string]any
+}
+
+func NewPropertiesSource(name string, properties Properties) PropertiesSource {
+	return newPropertiesSource(name, properties)
 }

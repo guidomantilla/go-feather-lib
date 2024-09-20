@@ -7,15 +7,19 @@ import (
 )
 
 var (
-	_ Environment = (*DefaultEnvironment)(nil)
+	_ Environment = (*env)(nil)
 	_ Environment = (*MockEnvironment)(nil)
 )
 
 type Environment interface {
 	Value(property string) EnvVar
 	ValueOrDefault(property string, defaultValue string) EnvVar
-	PropertySources() []properties.PropertySource
-	AppendPropertySources(propertySources ...properties.PropertySource)
+	PropertiesSources() []properties.PropertiesSource
+	AppendPropertiesSources(propertySources ...properties.PropertiesSource)
+}
+
+func NewEnvironment(options ...EnvironmentOption) Environment {
+	return newEnvironment(options...)
 }
 
 //

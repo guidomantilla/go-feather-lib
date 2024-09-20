@@ -97,7 +97,7 @@ func main() {
 				return nil
 			}
 
-			sender = integration.BaseSenderChannel("logged-sender-01", senderHandler)
+			sender = integration.BaseSenderChannel("based-sender-01", senderHandler)
 			err = sender.Send(context.Background(), message, 10*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 
@@ -107,8 +107,7 @@ func main() {
 				return nil
 			}
 
-			sender = integration.BaseSenderChannel("logged-sender-02", senderHandler)
-			sender = messaging.NewTimeoutSenderChannel("timeout-sender-02", sender)
+			sender = integration.BaseSenderChannel("based-sender-02", senderHandler)
 			err = sender.Send(context.Background(), message, 5*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}

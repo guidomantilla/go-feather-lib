@@ -39,34 +39,34 @@ func (m *MockEnvironment) EXPECT() *MockEnvironmentMockRecorder {
 	return m.recorder
 }
 
-// AppendPropertySources mocks base method.
-func (m *MockEnvironment) AppendPropertySources(propertySources ...properties.PropertySource) {
+// AppendPropertiesSources mocks base method.
+func (m *MockEnvironment) AppendPropertiesSources(propertySources ...properties.PropertiesSource) {
 	m.ctrl.T.Helper()
 	varargs := []any{}
 	for _, a := range propertySources {
 		varargs = append(varargs, a)
 	}
-	m.ctrl.Call(m, "AppendPropertySources", varargs...)
+	m.ctrl.Call(m, "AppendPropertiesSources", varargs...)
 }
 
-// AppendPropertySources indicates an expected call of AppendPropertySources.
-func (mr *MockEnvironmentMockRecorder) AppendPropertySources(propertySources ...any) *gomock.Call {
+// AppendPropertiesSources indicates an expected call of AppendPropertiesSources.
+func (mr *MockEnvironmentMockRecorder) AppendPropertiesSources(propertySources ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendPropertySources", reflect.TypeOf((*MockEnvironment)(nil).AppendPropertySources), propertySources...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendPropertiesSources", reflect.TypeOf((*MockEnvironment)(nil).AppendPropertiesSources), propertySources...)
 }
 
-// PropertySources mocks base method.
-func (m *MockEnvironment) PropertySources() []properties.PropertySource {
+// PropertiesSources mocks base method.
+func (m *MockEnvironment) PropertiesSources() []properties.PropertiesSource {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PropertySources")
-	ret0, _ := ret[0].([]properties.PropertySource)
+	ret := m.ctrl.Call(m, "PropertiesSources")
+	ret0, _ := ret[0].([]properties.PropertiesSource)
 	return ret0
 }
 
-// PropertySources indicates an expected call of PropertySources.
-func (mr *MockEnvironmentMockRecorder) PropertySources() *gomock.Call {
+// PropertiesSources indicates an expected call of PropertiesSources.
+func (mr *MockEnvironmentMockRecorder) PropertiesSources() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PropertySources", reflect.TypeOf((*MockEnvironment)(nil).PropertySources))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PropertiesSources", reflect.TypeOf((*MockEnvironment)(nil).PropertiesSources))
 }
 
 // Value mocks base method.
