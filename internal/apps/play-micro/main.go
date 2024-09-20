@@ -8,6 +8,7 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
+	"github.com/guidomantilla/go-feather-lib/pkg/integration"
 	"github.com/guidomantilla/go-feather-lib/pkg/integration/messaging"
 )
 
@@ -67,7 +68,7 @@ func main() {
 				return message, nil
 			}
 
-			receiver = messaging.NewLoggedReceiverChannel("logged-receiver-01", receiverHandler)
+			receiver = integration.BaseReceiverChannel("base-receiver-01", receiverHandler)
 			message, err = receiver.Receive(context.Background(), 10*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 
@@ -76,9 +77,7 @@ func main() {
 				<-time.After(10 * time.Second)
 				return message, nil
 			}
-
-			receiver = messaging.NewLoggedReceiverChannel("logged-receiver-02", receiverHandler)
-			receiver = messaging.NewTimeoutReceiverChannel("timeout-receiver-02", receiver)
+			receiver = integration.BaseReceiverChannel("base-receiver-02", receiverHandler)
 			message, err = receiver.Receive(context.Background(), 5*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}
@@ -98,7 +97,7 @@ func main() {
 				return nil
 			}
 
-			sender = messaging.NewLoggedSenderChannel("logged-sender-01", senderHandler)
+			sender = integration.BaseSenderChannel("logged-sender-01", senderHandler)
 			err = sender.Send(context.Background(), message, 10*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 
@@ -108,7 +107,7 @@ func main() {
 				return nil
 			}
 
-			sender = messaging.NewLoggedSenderChannel("logged-sender-02", senderHandler)
+			sender = integration.BaseSenderChannel("logged-sender-02", senderHandler)
 			sender = messaging.NewTimeoutSenderChannel("timeout-sender-02", sender)
 			err = sender.Send(context.Background(), message, 5*time.Second)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))

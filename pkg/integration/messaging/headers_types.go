@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -60,4 +61,10 @@ type Headers interface {
 	DestinationChannel() string
 	ReplyChannel() string
 	ErrorChannel() string
+}
+
+type HeadersValidatorHandler func(ctx context.Context, headers Headers) error
+
+type HeadersValidator interface {
+	Validate(ctx context.Context, headers Headers) error
 }

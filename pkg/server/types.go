@@ -12,11 +12,6 @@ var (
 	_ Server = (*MockServer)(nil)
 )
 
-type Dispatcher interface {
-	lifecycle.Server
-	Dispatch(message any)
-}
-
 type Server interface {
 	lifecycle.Server
 }
