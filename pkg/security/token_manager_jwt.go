@@ -8,12 +8,10 @@ import (
 	"github.com/xorcare/pointer"
 )
 
-type DefaultClaims struct {
+type Claims struct {
 	jwt.RegisteredClaims
 	Principal
 }
-
-type JwtTokenManagerOption func(tokenManager *JwtTokenManager)
 
 type JwtTokenManager struct {
 	issuer        string
@@ -40,39 +38,9 @@ func NewJwtTokenManager(options ...JwtTokenManagerOption) *JwtTokenManager {
 	return tokenManager
 }
 
-func WithIssuer(issuer string) JwtTokenManagerOption {
-	return func(tokenManager *JwtTokenManager) {
-		tokenManager.issuer = issuer
-	}
-}
-
-func WithTimeout(timeout time.Duration) JwtTokenManagerOption {
-	return func(tokenManager *JwtTokenManager) {
-		tokenManager.timeout = timeout
-	}
-}
-
-func WithSigningMethod(signingMethod jwt.SigningMethod) JwtTokenManagerOption {
-	return func(tokenManager *JwtTokenManager) {
-		tokenManager.signingMethod = signingMethod
-	}
-}
-
-func WithSigningKey(signingKey any) JwtTokenManagerOption {
-	return func(tokenManager *JwtTokenManager) {
-		tokenManager.signingKey = signingKey
-	}
-}
-
-func WithVerifyingKey(verifyingKey any) JwtTokenManagerOption {
-	return func(tokenManager *JwtTokenManager) {
-		tokenManager.verifyingKey = verifyingKey
-	}
-}
-
 func (manager *JwtTokenManager) Generate(principal *Principal) (*string, error) {
 
-	claims := &DefaultClaims{
+	claims := &Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    manager.issuer,
 			Subject:   *principal.Username,

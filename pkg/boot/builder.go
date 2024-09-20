@@ -146,9 +146,10 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return nil
 		},
 		TokenManager: func(appCtx *ApplicationContext) security.TokenManager {
-			return security.NewJwtTokenManager(security.WithIssuer(appCtx.AppName),
-				security.WithSigningKey([]byte(*appCtx.SecurityConfig.TokenSignatureKey)),
-				security.WithVerifyingKey([]byte(*appCtx.SecurityConfig.TokenVerificationKey)))
+			options := security.JwtTokenManagerOptionsChainBuilder().WithIssuer(appCtx.AppName).
+				WithSigningKey([]byte(*appCtx.SecurityConfig.TokenSignatureKey)).
+				WithVerifyingKey([]byte(*appCtx.SecurityConfig.TokenVerificationKey)).Build()
+			return security.NewJwtTokenManager(options)
 		},
 		AuthenticationService: func(appCtx *ApplicationContext) security.AuthenticationService {
 			return security.NewDefaultAuthenticationService(appCtx.PasswordManager, appCtx.PrincipalManager, appCtx.TokenManager)
