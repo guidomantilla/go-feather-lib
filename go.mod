@@ -18,7 +18,6 @@ require (
 	github.com/xorcare/pointer v1.2.2
 	go.uber.org/mock v0.4.0
 	golang.org/x/crypto v0.27.0
-	golang.org/x/net v0.29.0
 	google.golang.org/grpc v1.66.2
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
@@ -58,6 +57,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.30.0 // indirect
 	golang.org/x/arch v0.10.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
