@@ -3,7 +3,6 @@ package boot
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	slogGorm "github.com/orandin/slog-gorm"
@@ -79,8 +78,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 	return &BeanBuilder{
 
 		Environment: func(appCtx *ApplicationContext) environment.Environment {
-			osArgs := os.Environ()
-			return environment.NewEnvironment(environment.With(osArgs, appCtx.CmdArgs))
+			return environment.NewEnvironment(environment.WithSSL(), environment.With(appCtx.CmdArgs))
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")

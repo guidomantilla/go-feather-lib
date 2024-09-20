@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"os"
 	"sync/atomic"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/properties"
@@ -19,7 +18,7 @@ func instance() Environment {
 
 func Load(args ...[]string) Environment {
 	withArgs := make([]EnvironmentOption, 0)
-	withArgs = append(withArgs, WithSSL(), WithOs(os.Environ()))
+	withArgs = append(withArgs, WithSSL(), WithOs())
 	for _, arg := range args {
 		withArgs = append(withArgs, WithCmd(arg))
 	}

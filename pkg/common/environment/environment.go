@@ -55,18 +55,18 @@ func WithSSL() EnvironmentOption {
 	}
 }
 
-func WithOs(osArgs []string) EnvironmentOption {
+func WithOs() EnvironmentOption {
 	return func(environment Environment) {
-		osProperties := properties.NewProperties(properties.FromSlice(osArgs))
+		osProperties := properties.NewProperties(properties.FromSlice(os.Environ()))
 		environment.AppendPropertiesSources(properties.NewPropertiesSource(OsPropertySourceName, osProperties))
 	}
 }
 
-func With(osArgs []string, cmdArgs []string) EnvironmentOption {
+func With(cmdArgs []string) EnvironmentOption {
 	return func(environment Environment) {
 		WithCmd(cmdArgs)(environment)
 		WithSSL()(environment)
-		WithOs(osArgs)(environment)
+		WithOs()(environment)
 	}
 }
 
