@@ -33,21 +33,25 @@ func (handler *FunctionAdapterSenderChannel[T]) Name() string {
 
 //
 
-type LoggedSenderChannel[T any] struct {
-	name   string
-	sender SenderChannel[T]
+type HeadersValidatorSenderChannel[T any] struct {
+	name       string
+	sender     SenderChannel[T]
+	validators []HeadersValidator
 }
 
-func NewLoggedSenderChannel[T any](name string, sender SenderChannel[T]) *LoggedSenderChannel[T] {
+func NewHeadersValidatorSenderChannel[T any](name string, sender SenderChannel[T], validators ...HeadersValidator) *HeadersValidatorSenderChannel[T] {
 	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
 	assert.NotNil(sender, fmt.Sprintf("integration messaging: %s error - sender is required", name))
-	return &LoggedSenderChannel[T]{
-		name:   name,
-		sender: sender,
+	assert.NotNil(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
+	assert.NotEmpty(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
+	return &HeadersValidatorSenderChannel[T]{
+		name:       name,
+		sender:     sender,
+		validators: validators,
 	}
 }
 
-func (channel *LoggedSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
+func (channel *HeadersValidatorSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
 
 	if ctx == nil {
 		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", channel.name)
@@ -57,17 +61,21 @@ func (channel *LoggedSenderChannel[T]) Send(ctx context.Context, timeout time.Du
 		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: sending message: %v", message))
-	if err := channel.sender.Send(ctx, timeout, message); err != nil {
-		log.Trace(fmt.Sprintf("integration messaging: error - message not sent: %v", message))
+	var err error
+	for _, validator := range channel.validators {
+		if err = validator.Validate(ctx, message.Headers()); err != nil {
+			return err
+		}
+	}
+
+	if err = channel.sender.Send(ctx, timeout, message); err != nil {
 		return err
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: message sent: %v", message))
 	return nil
 }
 
-func (channel *LoggedSenderChannel[T]) Name() string {
+func (channel *HeadersValidatorSenderChannel[T]) Name() string {
 	return channel.name
 }
 
@@ -122,25 +130,21 @@ func (channel *TimeoutSenderChannel[T]) Name() string {
 
 //
 
-type HeadersValidatorSenderChannel[T any] struct {
-	name       string
-	sender     SenderChannel[T]
-	validators []HeadersValidator
+type LoggedSenderChannel[T any] struct {
+	name   string
+	sender SenderChannel[T]
 }
 
-func NewHeadersValidatorSenderChannel[T any](name string, sender SenderChannel[T], validators ...HeadersValidator) *HeadersValidatorSenderChannel[T] {
+func NewLoggedSenderChannel[T any](name string, sender SenderChannel[T]) *LoggedSenderChannel[T] {
 	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
 	assert.NotNil(sender, fmt.Sprintf("integration messaging: %s error - sender is required", name))
-	assert.NotNil(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
-	assert.NotEmpty(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
-	return &HeadersValidatorSenderChannel[T]{
-		name:       name,
-		sender:     sender,
-		validators: validators,
+	return &LoggedSenderChannel[T]{
+		name:   name,
+		sender: sender,
 	}
 }
 
-func (channel *HeadersValidatorSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
+func (channel *LoggedSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
 
 	if ctx == nil {
 		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", channel.name)
@@ -150,20 +154,16 @@ func (channel *HeadersValidatorSenderChannel[T]) Send(ctx context.Context, timeo
 		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
 	}
 
-	var err error
-	for _, validator := range channel.validators {
-		if err = validator.Validate(ctx, message.Headers()); err != nil {
-			return err
-		}
-	}
-
-	if err = channel.sender.Send(ctx, timeout, message); err != nil {
+	log.Trace(fmt.Sprintf("integration messaging: sending message: %v", message))
+	if err := channel.sender.Send(ctx, timeout, message); err != nil {
+		log.Trace(fmt.Sprintf("integration messaging: error - message not sent: %v", message))
 		return err
 	}
 
+	log.Trace(fmt.Sprintf("integration messaging: message sent: %v", message))
 	return nil
 }
 
-func (channel *HeadersValidatorSenderChannel[T]) Name() string {
+func (channel *LoggedSenderChannel[T]) Name() string {
 	return channel.name
 }

@@ -35,43 +35,43 @@ func (handler *FunctionAdapterReceiverChannel[T]) Name() string {
 
 //
 
-type LoggedReceiverChannel[T any] struct {
-	name     string
-	receiver ReceiverChannel[T]
+type HeadersValidatorReceiverChannel[T any] struct {
+	name       string
+	receiver   ReceiverChannel[T]
+	validators []HeadersValidator
 }
 
-func NewLoggedReceiverChannel[T any](name string, receiver ReceiverChannel[T]) *LoggedReceiverChannel[T] {
+func NewHeadersValidatorReceiverChannel[T any](name string, receiver ReceiverChannel[T], validators ...HeadersValidator) *HeadersValidatorReceiverChannel[T] {
 	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
 	assert.NotNil(receiver, fmt.Sprintf("integration messaging: %s error - receiver is required", name))
-	return &LoggedReceiverChannel[T]{
-		name:     name,
-		receiver: receiver,
+	assert.NotNil(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
+	assert.NotEmpty(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
+	return &HeadersValidatorReceiverChannel[T]{
+		name:       name,
+		receiver:   receiver,
+		validators: validators,
 	}
 }
 
-func (channel *LoggedReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
-
-	if ctx == nil {
-		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", channel.name)
-	}
-
-	if timeout <= 0 {
-		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", channel.name)
-	}
+func (channel *HeadersValidatorReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
 
 	var err error
 	var message Message[T]
-	log.Trace(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
-		log.Trace(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
 		return nil, err
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
+	for _, validator := range channel.validators {
+		if err = validator.Validate(ctx, message.Headers()); err != nil {
+			return nil, err
+		}
+	}
+
 	return message, nil
+
 }
 
-func (channel *LoggedReceiverChannel[T]) Name() string {
+func (channel *HeadersValidatorReceiverChannel[T]) Name() string {
 	return channel.name
 }
 
@@ -122,8 +122,6 @@ func (channel *TimeoutReceiverChannel[T]) Name() string {
 	return channel.name
 }
 
-//
-
 type response[T any] struct {
 	message Message[T]
 	err     error
@@ -138,42 +136,42 @@ func convert[T any](message Message[T], err error) *response[T] {
 
 //
 
-type HeadersValidatorReceiverChannel[T any] struct {
-	name       string
-	receiver   ReceiverChannel[T]
-	validators []HeadersValidator
+type LoggedReceiverChannel[T any] struct {
+	name     string
+	receiver ReceiverChannel[T]
 }
 
-func NewHeadersValidatorReceiverChannel[T any](name string, receiver ReceiverChannel[T], validators ...HeadersValidator) *HeadersValidatorReceiverChannel[T] {
+func NewLoggedReceiverChannel[T any](name string, receiver ReceiverChannel[T]) *LoggedReceiverChannel[T] {
 	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
 	assert.NotNil(receiver, fmt.Sprintf("integration messaging: %s error - receiver is required", name))
-	assert.NotNil(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
-	assert.NotEmpty(validators, fmt.Sprintf("integration messaging: %s error - validators are required", name))
-	return &HeadersValidatorReceiverChannel[T]{
-		name:       name,
-		receiver:   receiver,
-		validators: validators,
+	return &LoggedReceiverChannel[T]{
+		name:     name,
+		receiver: receiver,
 	}
 }
 
-func (channel *HeadersValidatorReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
+func (channel *LoggedReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
+
+	if ctx == nil {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", channel.name)
+	}
+
+	if timeout <= 0 {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", channel.name)
+	}
 
 	var err error
 	var message Message[T]
+	log.Trace(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
+		log.Trace(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
 		return nil, err
 	}
 
-	for _, validator := range channel.validators {
-		if err = validator.Validate(ctx, message.Headers()); err != nil {
-			return nil, err
-		}
-	}
-
+	log.Trace(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
 	return message, nil
-
 }
 
-func (channel *HeadersValidatorReceiverChannel[T]) Name() string {
+func (channel *LoggedReceiverChannel[T]) Name() string {
 	return channel.name
 }

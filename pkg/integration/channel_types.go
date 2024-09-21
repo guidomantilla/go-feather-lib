@@ -10,7 +10,7 @@ import (
 func BaseReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
 	var channel messaging.ReceiverChannel[T]
 	channel = messaging.NewFunctionAdapterReceiverChannel(name, handler)
-	channel = messaging.NewHeadersValidatorReceiverChannel(name, channel)
+	channel = messaging.NewHeadersValidatorReceiverChannel(name, channel, NullHeadersValidatorValidator())
 	channel = messaging.NewTimeoutReceiverChannel(name, channel)
 	channel = messaging.NewLoggedReceiverChannel(name, channel)
 	return channel
@@ -19,7 +19,7 @@ func BaseReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T
 func BaseSenderChannel[T any](name string, handler messaging.SenderHandler[T]) messaging.SenderChannel[T] {
 	var channel messaging.SenderChannel[T]
 	channel = messaging.NewFunctionAdapterSenderChannel(name, handler)
-	channel = messaging.NewHeadersValidatorSenderChannel(name, channel)
+	channel = messaging.NewHeadersValidatorSenderChannel(name, channel, NullHeadersValidatorValidator())
 	channel = messaging.NewTimeoutSenderChannel(name, channel)
 	channel = messaging.NewLoggedSenderChannel(name, channel)
 	return channel
