@@ -8,11 +8,21 @@ import (
 )
 
 func BaseReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
-	return HeadersValidatorReceiverChannel(name, handler)
+	var channel messaging.ReceiverChannel[T]
+	channel = messaging.NewFunctionAdapterReceiverChannel(name, handler)
+	channel = messaging.NewHeadersValidatorReceiverChannel(name, channel)
+	channel = messaging.NewTimeoutReceiverChannel(name, channel)
+	channel = messaging.NewLoggedReceiverChannel(name, channel)
+	return channel
 }
 
 func BaseSenderChannel[T any](name string, handler messaging.SenderHandler[T]) messaging.SenderChannel[T] {
-	return HeadersValidatorSenderChannel(name, handler)
+	var channel messaging.SenderChannel[T]
+	channel = messaging.NewFunctionAdapterSenderChannel(name, handler)
+	channel = messaging.NewHeadersValidatorSenderChannel(name, channel)
+	channel = messaging.NewTimeoutSenderChannel(name, channel)
+	channel = messaging.NewLoggedSenderChannel(name, channel)
+	return channel
 }
 
 //
@@ -25,38 +35,14 @@ func NullReceiverChannel[T any](name string) messaging.ReceiverChannel[T] {
 	return messaging.NewFunctionAdapterReceiverChannel(name, NullReceiverHandler[T])
 }
 
-func LoggedReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
-	return messaging.NewLoggedReceiverChannel(name, messaging.NewFunctionAdapterReceiverChannel(name, handler))
-}
-
-func TimeoutReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
-	return messaging.NewTimeoutReceiverChannel(name, LoggedReceiverChannel(name, handler))
-}
-
-func HeadersValidatorReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
-	return messaging.NewHeadersValidatorReceiverChannel(name, TimeoutReceiverChannel(name, handler), NullHeadersValidatorValidator())
-}
-
 //
 
-func NullSenderHandler[T any](ctx context.Context, message messaging.Message[T], timeout time.Duration) error {
+func NullSenderHandler[T any](ctx context.Context, timeout time.Duration, message messaging.Message[T]) error {
 	return nil
 }
 
 func NullSenderChannel[T any](name string) messaging.SenderChannel[T] {
 	return messaging.NewFunctionAdapterSenderChannel(name, NullSenderHandler[T])
-}
-
-func LoggedSenderChannel[T any](name string, handler messaging.SenderHandler[T]) messaging.SenderChannel[T] {
-	return messaging.NewLoggedSenderChannel(name, messaging.NewFunctionAdapterSenderChannel(name, handler))
-}
-
-func TimeoutSenderChannel[T any](name string, handler messaging.SenderHandler[T]) messaging.SenderChannel[T] {
-	return messaging.NewTimeoutSenderChannel(name, LoggedSenderChannel(name, handler))
-}
-
-func HeadersValidatorSenderChannel[T any](name string, handler messaging.SenderHandler[T]) messaging.SenderChannel[T] {
-	return messaging.NewHeadersValidatorSenderChannel(name, TimeoutSenderChannel(name, handler), NullHeadersValidatorValidator())
 }
 
 //

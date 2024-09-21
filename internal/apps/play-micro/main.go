@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	_ = os.Setenv("LOG_LEVEL", "DEBUG")
+	_ = os.Setenv("LOG_LEVEL", "TRACE")
 	cserver.Run("nats-micro", "1.0.0", func(application cserver.Application) error {
 
 		var err error
@@ -92,26 +92,67 @@ func main() {
 
 		{
 			message = messaging.NewBaseMessage(headers, "Hola Mundo")
-			senderHandler := func(ctx context.Context, message messaging.Message[string], timeout time.Duration) error {
+			senderHandler := func(ctx context.Context, timeout time.Duration, message messaging.Message[string]) error {
 				log.Debug(fmt.Sprintf("integration messaging: message traveling: %v", message))
 				return nil
 			}
 
 			sender = integration.BaseSenderChannel("based-sender-01", senderHandler)
-			err = sender.Send(context.Background(), message, 10*time.Second)
+			err = sender.Send(context.Background(), 10*time.Second, message)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 
-			senderHandler = func(ctx context.Context, message messaging.Message[string], timeout time.Duration) error {
+			senderHandler = func(ctx context.Context, timeout time.Duration, message messaging.Message[string]) error {
 				<-time.After(10 * time.Second)
 				log.Debug(fmt.Sprintf("integration messaging: message traveling: %v", message))
 				return nil
 			}
 
 			sender = integration.BaseSenderChannel("based-sender-02", senderHandler)
-			err = sender.Send(context.Background(), message, 5*time.Second)
+			err = sender.Send(context.Background(), 5*time.Second, message)
 			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}
 
+		fmt.Println()
+		fmt.Println()
+
+		//
+
+		fmt.Println()
+		fmt.Println()
+
+		{
+			message = messaging.NewBaseMessage(headers, "Hola Mundo")
+			consumerHandler := func(ctx context.Context, timeout time.Duration) (messaging.MessageStream[int], error) {
+				log.Debug(fmt.Sprintf("integration messaging: message arriving: %v", message))
+				inputStream := make(messaging.MessageStream[int])
+				go func(inputStream messaging.MessageStream[int], headers messaging.Headers) {
+					defer close(inputStream)
+					for i := range 5 {
+						inputStream <- messaging.NewBaseMessage(headers, i)
+					}
+				}(inputStream, headers)
+
+				return inputStream, nil
+			}
+
+			var inputStream messaging.MessageStream[int]
+			inputStream, err := consumerHandler(context.Background(), 10*time.Second)
+			for message := range inputStream {
+				log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+			}
+		}
+
+		fmt.Println()
+		fmt.Println()
+
+		//
+
+		fmt.Println()
+		fmt.Println()
+
+		{
+
+		}
 		return nil
 	})
 }

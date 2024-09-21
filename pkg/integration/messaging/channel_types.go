@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-type SenderHandler[T any] func(ctx context.Context, message Message[T], timeout time.Duration) error
+type SenderHandler[T any] func(ctx context.Context, timeout time.Duration, message Message[T]) error
 
 type SenderChannel[T any] interface {
-	Send(ctx context.Context, message Message[T], timeout time.Duration) error
+	Send(ctx context.Context, timeout time.Duration, message Message[T]) error
 	Name() string
 }
 
@@ -25,9 +25,15 @@ type ReceiverChannel[T any] interface {
 
 type MessageHandler[T any] func(ctx context.Context, message Message[T]) error
 
-type MessageActivator[T any] interface {
+type MessageChannel[T any] interface {
 	SenderChannel[T]
 	ReceiverChannel[T]
-	Listen(ctx context.Context, message Message[T]) error
-	Name() string
 }
+
+//
+
+type ProducerHandler[T any] func(ctx context.Context, timeout time.Duration, stream MessagePipeline[T]) error
+
+type ConsumerHandler[T any] func(ctx context.Context, timeout time.Duration) (MessagePipeline[T], error)
+
+//

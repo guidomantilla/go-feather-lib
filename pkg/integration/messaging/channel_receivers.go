@@ -61,13 +61,13 @@ func (channel *LoggedReceiverChannel[T]) Receive(ctx context.Context, timeout ti
 
 	var err error
 	var message Message[T]
-	log.Debug(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
+	log.Trace(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
-		log.Debug(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
+		log.Trace(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
 		return nil, err
 	}
 
-	log.Debug(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
+	log.Trace(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
 	return message, nil
 }
 
@@ -112,7 +112,6 @@ func (channel *TimeoutReceiverChannel[T]) Receive(ctx context.Context, timeout t
 
 	select {
 	case <-ctx.Done():
-		log.Debug(fmt.Sprintf("integration messaging: %s error - message receiving timeout: %v", channel.name, ctx.Err().Error()))
 		return nil, fmt.Errorf("message receiving timeout: %v", ctx.Err().Error())
 	case response := <-responseChan:
 		return response.message, response.err
@@ -159,19 +158,9 @@ func NewHeadersValidatorReceiverChannel[T any](name string, receiver ReceiverCha
 
 func (channel *HeadersValidatorReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
 
-	if ctx == nil {
-		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", channel.name)
-	}
-
-	if timeout <= 0 {
-		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", channel.name)
-	}
-
 	var err error
 	var message Message[T]
-	log.Debug(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
-		log.Debug(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
 		return nil, err
 	}
 
@@ -181,7 +170,6 @@ func (channel *HeadersValidatorReceiverChannel[T]) Receive(ctx context.Context, 
 		}
 	}
 
-	log.Debug(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
 	return message, nil
 
 }

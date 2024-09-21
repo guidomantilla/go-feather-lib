@@ -31,6 +31,10 @@ func Slog(writers ...io.Writer) Logger[*slog.Logger] {
 
 //
 
+func Trace(msg string, args ...any) {
+	instance().Trace(context.Background(), msg, args...)
+}
+
 func Debug(msg string, args ...any) {
 	instance().Debug(context.Background(), msg, args...)
 }

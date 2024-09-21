@@ -18,5 +18,5 @@ func NewMoreComplexSenderChannel[T any](handler SenderHandler[T]) *MoreComplexSe
 }
 
 func (channel *MoreComplexSenderChannel[T]) Send(ctx context.Context, message Message[T], timeout time.Duration) error {
-	return channel.SenderChannel.Send(ctx, message, timeout)
+	return channel.SenderChannel.Send(ctx, timeout, message)
 }

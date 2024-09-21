@@ -12,6 +12,7 @@ var (
 )
 
 type Logger[T any] interface {
+	Trace(ctx context.Context, msg string, args ...any)
 	Debug(ctx context.Context, msg string, args ...any)
 	Info(ctx context.Context, msg string, args ...any)
 	Warn(ctx context.Context, msg string, args ...any)

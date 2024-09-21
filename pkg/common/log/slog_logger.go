@@ -34,6 +34,10 @@ func newSlogLogger(level SlogLevel, writers ...io.Writer) *slogLogger {
 	return &slogLogger{internal: internal}
 }
 
+func (logger *slogLogger) Trace(ctx context.Context, msg string, args ...any) {
+	logger.internal.Log(ctx, SlogLevelTrace.ToSlogLevel(), msg, args...)
+}
+
 func (logger *slogLogger) Debug(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelDebug.ToSlogLevel(), msg, args...)
 }
@@ -62,7 +66,8 @@ func (logger *slogLogger) Logger() *slog.Logger {
 //
 
 const (
-	SlogLevelDebug SlogLevel = iota
+	SlogLevelTrace SlogLevel = iota
+	SlogLevelDebug
 	SlogLevelInfo
 	SlogLevelWarning
 	SlogLevelError
@@ -75,6 +80,8 @@ type SlogLevel int
 func (enum SlogLevel) String() string {
 
 	switch enum {
+	case SlogLevelTrace:
+		return "TRACE"
 	case SlogLevelDebug:
 		return "DEBUG"
 	case SlogLevelInfo:
@@ -93,6 +100,8 @@ func (enum SlogLevel) String() string {
 
 func (enum SlogLevel) ToSlogLevel() slog.Level {
 	switch enum {
+	case SlogLevelTrace:
+		return slog.Level(-8)
 	case SlogLevelDebug:
 		return slog.LevelDebug
 	case SlogLevelInfo:
@@ -111,6 +120,8 @@ func (enum SlogLevel) ToSlogLevel() slog.Level {
 
 func (enum SlogLevel) ValueFromName(slogLevel string) SlogLevel {
 	switch slogLevel {
+	case "TRACE":
+		return SlogLevelTrace
 	case "DEBUG":
 		return SlogLevelDebug
 	case "INFO":
@@ -129,6 +140,8 @@ func (enum SlogLevel) ValueFromName(slogLevel string) SlogLevel {
 
 func (enum SlogLevel) ValueFromCardinal(slogLevel int) SlogLevel {
 	switch slogLevel {
+	case int(SlogLevelTrace):
+		return SlogLevelTrace
 	case int(SlogLevelDebug):
 		return SlogLevelDebug
 	case int(SlogLevelInfo):
@@ -147,6 +160,8 @@ func (enum SlogLevel) ValueFromCardinal(slogLevel int) SlogLevel {
 
 func (enum SlogLevel) ValueFromSlogLevel(slogLevel slog.Level) SlogLevel {
 	switch slogLevel {
+	case slog.Level(-8):
+		return SlogLevelTrace
 	case slog.LevelDebug:
 		return SlogLevelDebug
 	case slog.LevelInfo:
