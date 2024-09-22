@@ -7,6 +7,12 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/integration/messaging"
 )
 
+func BaseMessageChannel[T any](name string) messaging.MessageChannel[T] {
+	queueChannel := messaging.NewQueueChannel[T](name, 10000)
+	senderHandler, receiverHandler := BaseSenderChannel[T](name, queueChannel.Send), BaseReceiverChannel[T](name, queueChannel.Receive)
+	return messaging.NewPassThroughChannel(name, senderHandler, receiverHandler)
+}
+
 func BaseReceiverChannel[T any](name string, handler messaging.ReceiverHandler[T]) messaging.ReceiverChannel[T] {
 	var channel messaging.ReceiverChannel[T]
 	channel = messaging.NewFunctionAdapterReceiverChannel(name, handler)
