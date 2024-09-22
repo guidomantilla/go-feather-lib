@@ -9,6 +9,8 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
+// FunctionAdapterSenderChannel
+
 type FunctionAdapterSenderChannel[T any] struct {
 	name    string
 	handler SenderHandler[T]
@@ -24,6 +26,15 @@ func NewFunctionAdapterSenderChannel[T any](name string, handler SenderHandler[T
 }
 
 func (handler *FunctionAdapterSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
+
+	if ctx == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", handler.name)
+	}
+
+	if message == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", handler.name)
+	}
+
 	return handler.handler(ctx, timeout, message)
 }
 
@@ -31,7 +42,40 @@ func (handler *FunctionAdapterSenderChannel[T]) Name() string {
 	return handler.name
 }
 
-//
+// PassThroughSenderChannel
+
+type PassThroughSenderChannel[T any] struct {
+	name   string
+	sender SenderChannel[T]
+}
+
+func NewPassThroughSenderChannel[T any](name string, sender SenderChannel[T]) *PassThroughSenderChannel[T] {
+	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
+	assert.NotNil(sender, fmt.Sprintf("integration messaging: %s error - sender is required", name))
+	return &PassThroughSenderChannel[T]{
+		name:   name,
+		sender: sender,
+	}
+}
+
+func (channel *PassThroughSenderChannel[T]) Send(ctx context.Context, timeout time.Duration, message Message[T]) error {
+
+	if ctx == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, context is required", channel.name)
+	}
+
+	if message == nil {
+		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
+	}
+
+	return channel.sender.Send(ctx, timeout, message)
+}
+
+func (channel *PassThroughSenderChannel[T]) Name() string {
+	return channel.name
+}
+
+// HeadersValidatorSenderChannel
 
 type HeadersValidatorSenderChannel[T any] struct {
 	name       string
@@ -68,18 +112,14 @@ func (channel *HeadersValidatorSenderChannel[T]) Send(ctx context.Context, timeo
 		}
 	}
 
-	if err = channel.sender.Send(ctx, timeout, message); err != nil {
-		return err
-	}
-
-	return nil
+	return channel.sender.Send(ctx, timeout, message)
 }
 
 func (channel *HeadersValidatorSenderChannel[T]) Name() string {
 	return channel.name
 }
 
-//
+// TimeoutSenderChannel
 
 type TimeoutSenderChannel[T any] struct {
 	name   string
@@ -128,7 +168,7 @@ func (channel *TimeoutSenderChannel[T]) Name() string {
 	return channel.name
 }
 
-//
+// LoggedSenderChannel
 
 type LoggedSenderChannel[T any] struct {
 	name   string

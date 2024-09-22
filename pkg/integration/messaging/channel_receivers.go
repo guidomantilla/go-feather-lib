@@ -9,7 +9,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-//
+// FunctionAdapterReceiverChannel
 
 type FunctionAdapterReceiverChannel[T any] struct {
 	name    string
@@ -26,6 +26,15 @@ func NewFunctionAdapterReceiverChannel[T any](name string, handler ReceiverHandl
 }
 
 func (handler *FunctionAdapterReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
+
+	if ctx == nil {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", handler.name)
+	}
+
+	if timeout <= 0 {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", handler.name)
+	}
+
 	return handler.handler(ctx, timeout)
 }
 
@@ -33,7 +42,36 @@ func (handler *FunctionAdapterReceiverChannel[T]) Name() string {
 	return handler.name
 }
 
-//
+// PassThroughReceiverChannel
+
+type PassThroughReceiverChannel[T any] struct {
+	name     string
+	receiver ReceiverChannel[T]
+}
+
+func NewPassThroughReceiverChannel[T any](name string, receiver ReceiverChannel[T]) *PassThroughReceiverChannel[T] {
+	assert.NotEmpty(name, fmt.Sprintf("integration messaging: %s error - name is required", name))
+	assert.NotNil(receiver, fmt.Sprintf("integration messaging: %s error - receiver is required", name))
+	return &PassThroughReceiverChannel[T]{
+		name:     name,
+		receiver: receiver,
+	}
+}
+
+func (channel *PassThroughReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
+
+	if ctx == nil {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", channel.name)
+	}
+
+	if timeout <= 0 {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", channel.name)
+	}
+
+	return channel.receiver.Receive(ctx, timeout)
+}
+
+// HeadersValidatorReceiverChannel
 
 type HeadersValidatorReceiverChannel[T any] struct {
 	name       string
@@ -55,6 +93,14 @@ func NewHeadersValidatorReceiverChannel[T any](name string, receiver ReceiverCha
 
 func (channel *HeadersValidatorReceiverChannel[T]) Receive(ctx context.Context, timeout time.Duration) (Message[T], error) {
 
+	if ctx == nil {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, context is required", channel.name)
+	}
+
+	if timeout <= 0 {
+		return nil, fmt.Errorf("integration messaging: %s error - for receiving a message, timeout is required", channel.name)
+	}
+
 	var err error
 	var message Message[T]
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
@@ -75,7 +121,7 @@ func (channel *HeadersValidatorReceiverChannel[T]) Name() string {
 	return channel.name
 }
 
-//
+// TimeoutReceiverChannel
 
 type TimeoutReceiverChannel[T any] struct {
 	name     string
@@ -134,7 +180,7 @@ func convert[T any](message Message[T], err error) *response[T] {
 	}
 }
 
-//
+// LoggedReceiverChannel
 
 type LoggedReceiverChannel[T any] struct {
 	name     string

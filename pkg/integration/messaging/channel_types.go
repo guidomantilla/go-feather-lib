@@ -29,11 +29,3 @@ type MessageChannel[T any] interface {
 	SenderChannel[T]
 	ReceiverChannel[T]
 }
-
-//
-
-type ProducerHandler[T any] func(ctx context.Context, timeout time.Duration, stream MessagePipeline[T]) error
-
-type ConsumerHandler[T any] func(ctx context.Context, timeout time.Duration) (MessagePipeline[T], error)
-
-//
