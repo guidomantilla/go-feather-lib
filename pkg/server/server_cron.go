@@ -14,7 +14,7 @@ type CronServer struct {
 	closeChannel chan struct{}
 }
 
-func BuildCronServer(cron *cron.Cron) Server {
+func NewCronServer(cron *cron.Cron) Server {
 
 	if cron == nil {
 		log.Fatal("starting up - error setting up cron server: cron is nil")

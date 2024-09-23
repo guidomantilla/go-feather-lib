@@ -19,7 +19,7 @@ type GrpcServer struct {
 	internal *grpc.Server
 }
 
-func BuildGrpcServer(address string, server *grpc.Server) Server {
+func NewGrpcServer(address string, server *grpc.Server) Server {
 
 	if strings.TrimSpace(address) == "" {
 		log.Fatal("starting up - error setting up grpc server: address is empty")

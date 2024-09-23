@@ -65,7 +65,7 @@ func Init(appName string, version string, args []string, enablers *Enablers, bui
 			Handler:           ctx.PublicRouter,
 			ReadHeaderTimeout: 60000,
 		}
-		app.Attach("HttpServer", server.BuildHttpServer(httpServer))
+		app.Attach(server.BuildHttpServer(httpServer))
 	}
 
 	if ctx.Enablers.GrpcServerEnabled {
@@ -75,7 +75,7 @@ func Init(appName string, version string, args []string, enablers *Enablers, bui
 		srv := grpc.NewServer()
 		srv.RegisterService(ctx.GrpcServiceDesc, ctx.GrpcServiceServer)
 		reflection.Register(srv)
-		app.Attach("GrpcServer", server.BuildGrpcServer(net.JoinHostPort(*ctx.GrpcConfig.Host, *ctx.GrpcConfig.Port), srv))
+		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*ctx.GrpcConfig.Host, *ctx.GrpcConfig.Port), srv))
 	}
 
 	log.Info(fmt.Sprintf("Application %s started", strings.Join([]string{appName, version}, " - ")))
