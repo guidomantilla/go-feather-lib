@@ -57,7 +57,7 @@ type RabbitMQConnection[T MessagingConnectionTypes] struct {
 	messagingContext          MessagingContext
 	messagingConnectionDialer MessagingConnectionDialer[T]
 	connection                T
-	mu                        sync.Mutex
+	mu                        sync.RWMutex
 }
 
 func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
@@ -91,7 +91,7 @@ func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 		return connection.connection, nil
 	}
 
-	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(MessagingDelay),
+	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(Delay),
 		retry.LastErrorOnly(true), retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
 		}),
@@ -118,7 +118,7 @@ func (connection *RabbitMQConnection[T]) connect() error {
 }
 
 func (connection *RabbitMQConnection[T]) Close() {
-	time.Sleep(MessagingDelay)
+	time.Sleep(Delay)
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		log.Debug("rabbitmq connection - closing connection")

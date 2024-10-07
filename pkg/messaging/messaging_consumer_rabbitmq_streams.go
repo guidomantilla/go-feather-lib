@@ -49,7 +49,7 @@ type RabbitMQStreamsConsumer struct {
 	streamOptions       *stream.StreamOptions
 	consumerOptions     *stream.ConsumerOptions
 	messagesHandler     stream.MessagesHandler
-	mu                  sync.Mutex
+	mu                  sync.RWMutex
 }
 
 func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.Environment], name string, options ...RabbitMQStreamsConsumerOption) *RabbitMQStreamsConsumer {
@@ -157,7 +157,7 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingE
 }
 
 func (streams *RabbitMQStreamsConsumer) Close() {
-	time.Sleep(MessagingDelay)
+	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams consumer - closing connection")

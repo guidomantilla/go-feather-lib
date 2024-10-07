@@ -27,7 +27,7 @@ type RabbitMQStreamsProducer struct {
 	name                string
 	streamOptions       *stream.StreamOptions
 	producerOptions     *stream.ProducerOptions
-	mu                  sync.Mutex
+	mu                  sync.RWMutex
 }
 
 func NewRabbitMQStreamsProducer(messagingConnection MessagingConnection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
@@ -93,7 +93,7 @@ func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *sa
 }
 
 func (streams *RabbitMQStreamsProducer) Close() {
-	time.Sleep(MessagingDelay)
+	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams producer - closing connection")

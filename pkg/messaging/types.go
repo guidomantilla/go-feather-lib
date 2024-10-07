@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MessagingDelay = 2 * time.Second
+	Delay = 2 * time.Second
 )
 
 var (

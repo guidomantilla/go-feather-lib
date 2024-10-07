@@ -11,7 +11,7 @@ type DefaultServer struct {
 	closeChannel chan struct{}
 }
 
-func NewDefaultServer() Server {
+func NewDefaultServer() *DefaultServer {
 	return &DefaultServer{
 		closeChannel: make(chan struct{}),
 	}

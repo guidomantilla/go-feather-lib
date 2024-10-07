@@ -14,7 +14,7 @@ type HttpServer struct {
 	internal *http.Server
 }
 
-func NewHttpServer(server *http.Server) Server {
+func NewHttpServer(server *http.Server) *HttpServer {
 
 	if server == nil {
 		log.Fatal("starting up - error setting up http server: server is nil")

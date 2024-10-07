@@ -10,7 +10,7 @@ var sharedRsc = make(map[string]interface{})
 func main() {
 	var wg sync.WaitGroup
 
-	m := sync.Mutex{}
+	m := sync.RWMutex{}
 	c := sync.NewCond(&m)
 
 	wg.Add(1)

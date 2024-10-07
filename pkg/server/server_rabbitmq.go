@@ -14,7 +14,7 @@ type RabbitMQServer struct {
 	closeChannel chan struct{}
 }
 
-func NewRabbitMQServer(consumers ...messaging.MessagingConsumer) Server {
+func NewRabbitMQServer(consumers ...messaging.MessagingConsumer) *RabbitMQServer {
 
 	if len(consumers) == 0 {
 		log.Fatal("starting up - error setting up rabbitmq server: consumers is empty")

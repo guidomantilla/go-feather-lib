@@ -76,7 +76,7 @@ type RabbitMQConsumer struct {
 	exclusive           bool
 	noWait              bool
 	args                amqp.Table
-	mu                  sync.Mutex
+	mu                  sync.RWMutex
 }
 
 func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connection], name string, options ...RabbitMQConsumerOption) *RabbitMQConsumer {
@@ -177,7 +177,7 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, 
 }
 
 func (consumer *RabbitMQConsumer) Close() {
-	time.Sleep(MessagingDelay)
+	time.Sleep(Delay)
 
 	if consumer.channel != nil && !consumer.channel.IsClosed() {
 		log.Debug("rabbitmq consumer - closing connection")

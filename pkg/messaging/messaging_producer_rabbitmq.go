@@ -39,7 +39,7 @@ type RabbitMQProducer struct {
 	exchange            string
 	mandatory           bool
 	immediate           bool
-	mu                  sync.Mutex
+	mu                  sync.RWMutex
 }
 
 func NewRabbitMQProducer(messagingConnection MessagingConnection[*amqp.Connection], name string, options ...RabbitMQProducerOption) *RabbitMQProducer {
@@ -95,7 +95,7 @@ func (producer *RabbitMQProducer) Produce(ctx context.Context, message *amqp.Pub
 }
 
 func (producer *RabbitMQProducer) Close() {
-	time.Sleep(MessagingDelay)
+	time.Sleep(Delay)
 
 	if producer.channel != nil && !producer.channel.IsClosed() {
 		log.Debug("rabbitmq producer - closing connection")
