@@ -15,7 +15,7 @@ func instance() Properties {
 }
 
 func Load(slices ...[]string) Properties {
-	withSlices := make([]PropertiesOption, 0)
+	withSlices := make([]Option, 0)
 	for _, slice := range slices {
 		withSlices = append(withSlices, FromSlice(slice))
 	}

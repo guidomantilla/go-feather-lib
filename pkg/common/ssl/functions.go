@@ -4,8 +4,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"os"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 func TLS(serverName string, caCertificate string, clientCertificate string, clientKey string) (*tls.Config, error) {

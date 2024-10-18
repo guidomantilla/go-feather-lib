@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 
+	"google.golang.org/grpc"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 

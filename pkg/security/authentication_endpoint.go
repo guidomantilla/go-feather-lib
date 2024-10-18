@@ -1,11 +1,11 @@
 package security
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 )
 

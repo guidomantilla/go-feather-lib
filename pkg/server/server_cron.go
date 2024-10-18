@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 	cron "github.com/robfig/cron/v3"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 

@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 

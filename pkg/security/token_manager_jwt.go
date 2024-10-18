@@ -2,11 +2,12 @@ package security
 
 import (
 	"encoding/json"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/xorcare/pointer"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 type Claims struct {
