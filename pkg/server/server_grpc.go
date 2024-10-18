@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
+	"google.golang.org/grpc"
 	"net"
 	"net/http"
-	"strings"
-
-	"google.golang.org/grpc"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
@@ -20,14 +19,8 @@ type GrpcServer struct {
 }
 
 func NewGrpcServer(address string, server *grpc.Server) *GrpcServer {
-
-	if strings.TrimSpace(address) == "" {
-		log.Fatal("starting up - error setting up grpc server: address is empty")
-	}
-
-	if server == nil {
-		log.Fatal("starting up - error setting up grpc server: server is nil")
-	}
+	assert.NotEmpty(address, "starting up - error setting up grpc server: address is empty")
+	assert.NotNil(server, "starting up - error setting up grpc server: server is nil")
 
 	return &GrpcServer{
 		address:  address,
@@ -36,6 +29,7 @@ func NewGrpcServer(address string, server *grpc.Server) *GrpcServer {
 }
 
 func (server *GrpcServer) Run(ctx context.Context) error {
+	assert.NotNil(ctx, "grpc server - error starting up: context is nil")
 
 	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting grpc server: %s", server.address))
@@ -54,7 +48,8 @@ func (server *GrpcServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *GrpcServer) Stop(_ context.Context) error {
+func (server *GrpcServer) Stop(ctx context.Context) error {
+	assert.NotNil(ctx, "grpc server - error shutting down: context is nil")
 
 	log.Info("shutting down - stopping grpc server")
 	server.internal.GracefulStop()

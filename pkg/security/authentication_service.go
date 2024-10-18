@@ -2,8 +2,8 @@ package security
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/validation"
 )
 
@@ -14,18 +14,9 @@ type DefaultAuthenticationService struct {
 }
 
 func NewDefaultAuthenticationService(passwordEncoder PasswordEncoder, principalManager PrincipalManager, tokenManager TokenManager) *DefaultAuthenticationService {
-
-	if passwordEncoder == nil {
-		log.Fatal("starting up - error setting up authenticationService: passwordEncoder is nil")
-	}
-
-	if principalManager == nil {
-		log.Fatal("starting up - error setting up authenticationService: principalManager is nil")
-	}
-
-	if tokenManager == nil {
-		log.Fatal("starting up - error setting up authenticationService: tokenManager is nil")
-	}
+	assert.NotNil(passwordEncoder, "starting up - error setting up authenticationService: passwordEncoder is nil")
+	assert.NotNil(principalManager, "starting up - error setting up authenticationService: principalManager is nil")
+	assert.NotNil(tokenManager, "starting up - error setting up authenticationService: tokenManager is nil")
 
 	return &DefaultAuthenticationService{
 		passwordEncoder:  passwordEncoder,
@@ -35,6 +26,8 @@ func NewDefaultAuthenticationService(passwordEncoder PasswordEncoder, principalM
 }
 
 func (service *DefaultAuthenticationService) Authenticate(ctx context.Context, principal *Principal) error {
+	assert.NotNil(ctx, "authentication service - error authenticating: context is nil")
+	assert.NotNil(principal, "authentication service - error authenticating: principal is nil")
 
 	var err error
 	var user *Principal
@@ -62,6 +55,7 @@ func (service *DefaultAuthenticationService) Authenticate(ctx context.Context, p
 }
 
 func (service *DefaultAuthenticationService) Validate(principal *Principal) []error {
+	assert.NotNil(principal, "authentication service - error validating: principal is nil")
 
 	var errors []error
 

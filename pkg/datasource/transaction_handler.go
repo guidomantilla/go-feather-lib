@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 	"gorm.io/gorm"
 
@@ -13,10 +14,15 @@ type transactionHandler struct {
 }
 
 func NewOrmTransactionHandler(connection Connection[*gorm.DB]) TransactionHandler[*gorm.DB] {
+	assert.NotNil(connection, "starting up - error setting up orm transaction handler: connection is nil")
+
 	return &transactionHandler{connection: connection}
 }
 
 func (handler *transactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFn[*gorm.DB]) error {
+	assert.NotNil(ctx, "transaction handler - error handling transaction: context is nil")
+	assert.NotNil(fn, "transaction handler - error handling transaction: transaction handler function is nil")
+
 	dbx, err := handler.connection.Connect()
 	if err != nil {
 		log.Error(err.Error())

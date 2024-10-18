@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
@@ -15,10 +16,7 @@ type RabbitMQServer struct {
 }
 
 func NewRabbitMQServer(consumers ...messaging.MessagingConsumer) *RabbitMQServer {
-
-	if len(consumers) == 0 {
-		log.Fatal("starting up - error setting up rabbitmq server: consumers is empty")
-	}
+	assert.NotEmpty(consumers, "starting up - error setting up rabbitmq server: consumers is empty")
 
 	return &RabbitMQServer{
 		consumers:    consumers,
@@ -27,6 +25,7 @@ func NewRabbitMQServer(consumers ...messaging.MessagingConsumer) *RabbitMQServer
 }
 
 func (server *RabbitMQServer) Run(ctx context.Context) error {
+	assert.NotNil(ctx, "rabbitmq server - error starting up: context is nil")
 
 	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].MessagingContext().Server()))
@@ -55,6 +54,7 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 }
 
 func (server *RabbitMQServer) Stop(_ context.Context) error {
+	assert.NotNil(server.ctx, "rabbitmq server - error shutting down: context is nil")
 
 	log.Debug("server shutting down - stopping rabbitmq server")
 	close(server.closeChannel)

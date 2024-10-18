@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 	cron "github.com/robfig/cron/v3"
 
@@ -15,10 +16,7 @@ type CronServer struct {
 }
 
 func NewCronServer(cron *cron.Cron) *CronServer {
-
-	if cron == nil {
-		log.Fatal("starting up - error setting up cron server: cron is nil")
-	}
+	assert.NotNil(cron, "starting up - error setting up cron server: cron is nil")
 
 	return &CronServer{
 		internal:     cron,

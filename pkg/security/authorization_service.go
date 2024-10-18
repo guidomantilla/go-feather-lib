@@ -2,8 +2,7 @@ package security
 
 import (
 	"context"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 type DefaultAuthorizationService struct {
@@ -12,14 +11,8 @@ type DefaultAuthorizationService struct {
 }
 
 func NewDefaultAuthorizationService(tokenManager TokenManager, principalManager PrincipalManager) *DefaultAuthorizationService {
-
-	if tokenManager == nil {
-		log.Fatal("starting up - error setting up authorization service: authorization delegate is nil")
-	}
-
-	if principalManager == nil {
-		log.Fatal("starting up - error setting up authorization service:  principalManager is nil")
-	}
+	assert.NotNil(tokenManager, "starting up - error setting up authorization service: tokenManager is nil")
+	assert.NotNil(principalManager, "starting up - error setting up authorization service: principalManager is nil")
 
 	return &DefaultAuthorizationService{
 		tokenManager:     tokenManager,
@@ -28,6 +21,8 @@ func NewDefaultAuthorizationService(tokenManager TokenManager, principalManager 
 }
 
 func (service *DefaultAuthorizationService) Authorize(ctx context.Context, tokenString string) (*Principal, error) {
+	assert.NotNil(ctx, "authorization service - error authorizing: context is nil")
+	assert.NotEmpty(tokenString, "authorization service - error authorizing: tokenString is empty")
 
 	var err error
 	var principal *Principal

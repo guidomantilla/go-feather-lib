@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
@@ -11,6 +12,10 @@ import (
 )
 
 func Run(name string, version string, fn func(application Application) error) {
+	assert.NotEmpty(name, "server - error running: name is empty")
+	assert.NotEmpty(version, "server - error running: version is empty")
+	assert.NotNil(fn, "server - error running: function is nil")
+
 	log.Slog()
 	environment.Load()
 

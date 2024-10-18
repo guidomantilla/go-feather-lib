@@ -4,10 +4,15 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"os"
 )
 
 func TLS(serverName string, caCertificate string, clientCertificate string, clientKey string) (*tls.Config, error) {
+	assert.NotEmpty(serverName, "ssl - error setting up tls: serverName is empty")
+	assert.NotEmpty(caCertificate, "ssl - error setting up tls: caCertificate is empty")
+	assert.NotEmpty(clientCertificate, "ssl - error setting up tls: clientCertificate is empty")
+	assert.NotEmpty(clientKey, "ssl - error setting up tls: clientKey is empty")
 
 	var err error
 

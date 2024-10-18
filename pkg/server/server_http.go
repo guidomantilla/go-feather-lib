@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"net/http"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -15,10 +16,7 @@ type HttpServer struct {
 }
 
 func NewHttpServer(server *http.Server) *HttpServer {
-
-	if server == nil {
-		log.Fatal("starting up - error setting up http server: server is nil")
-	}
+	assert.NotNil(server, "starting up - error setting up http server: server is nil")
 
 	return &HttpServer{
 		internal: server,
@@ -26,6 +24,7 @@ func NewHttpServer(server *http.Server) *HttpServer {
 }
 
 func (server *HttpServer) Run(ctx context.Context) error {
+	assert.NotNil(ctx, "http server - error starting: context is nil")
 
 	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting http server: %s", server.internal.Addr))
@@ -38,6 +37,7 @@ func (server *HttpServer) Run(ctx context.Context) error {
 }
 
 func (server *HttpServer) Stop(ctx context.Context) error {
+	assert.NotNil(ctx, "http server - error shutting down: context is nil")
 
 	log.Info("shutting down - stopping http server")
 	if err := server.internal.Shutdown(ctx); err != nil {

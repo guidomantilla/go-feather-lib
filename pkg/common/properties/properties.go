@@ -8,7 +8,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-func FromSlice(array []string) PropertiesOption {
+func FromSlice(array []string) Option {
 	return func(properties *properties) {
 		for _, env := range array {
 			pair := strings.SplitN(env, "=", 2)
@@ -26,7 +26,7 @@ type properties struct {
 	mu       sync.RWMutex
 }
 
-func New(options ...PropertiesOption) Properties {
+func New(options ...Option) Properties {
 	properties := &properties{
 		internal: make(map[string]string),
 	}

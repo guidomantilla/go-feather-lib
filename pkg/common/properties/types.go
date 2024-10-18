@@ -7,7 +7,7 @@ var (
 	_ Properties       = (*MockProperties)(nil)
 )
 
-type PropertiesOption func(properties *properties)
+type Option func(properties *properties)
 
 type Properties interface {
 	Add(property string, value string)

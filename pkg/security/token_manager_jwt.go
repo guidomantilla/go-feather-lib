@@ -2,6 +2,7 @@ package security
 
 import (
 	"encoding/json"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -39,6 +40,7 @@ func NewJwtTokenManager(options ...JwtTokenManagerOption) *JwtTokenManager {
 }
 
 func (manager *JwtTokenManager) Generate(principal *Principal) (*string, error) {
+	assert.NotNil(principal, "token manager - error generating token: principal is nil")
 
 	claims := &Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -63,6 +65,7 @@ func (manager *JwtTokenManager) Generate(principal *Principal) (*string, error) 
 }
 
 func (manager *JwtTokenManager) Validate(tokenString string) (*Principal, error) {
+	assert.NotEmpty(tokenString, "token manager - error validating token: token is empty")
 
 	getKeyFunc := func(token *jwt.Token) (any, error) {
 		return manager.verifyingKey, nil

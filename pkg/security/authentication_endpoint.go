@@ -1,11 +1,11 @@
 package security
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 )
 
@@ -14,10 +14,7 @@ type DefaultAuthenticationEndpoint struct {
 }
 
 func NewDefaultAuthenticationEndpoint(authenticationService AuthenticationService) *DefaultAuthenticationEndpoint {
-
-	if authenticationService == nil {
-		log.Fatal("starting up - error setting up authenticationEndpoint: authenticationService is nil")
-	}
+	assert.NotNil(authenticationService, "starting up - error setting up authenticationEndpoint: authenticationService is nil")
 
 	return &DefaultAuthenticationEndpoint{
 		authenticationService: authenticationService,
@@ -25,6 +22,7 @@ func NewDefaultAuthenticationEndpoint(authenticationService AuthenticationServic
 }
 
 func (endpoint *DefaultAuthenticationEndpoint) Authenticate(ctx *gin.Context) {
+	assert.NotNil(ctx, "authentication endpoint - error authenticating: context is nil")
 
 	var err error
 	var principal *Principal

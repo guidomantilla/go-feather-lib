@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
@@ -18,6 +19,7 @@ func NewBaseServer() *BaseServer {
 }
 
 func (server *BaseServer) Run(ctx context.Context) error {
+	assert.NotNil(ctx, "base server - error starting up: context is nil")
 
 	server.ctx = ctx
 	log.Info("starting up - starting base server")
@@ -25,7 +27,8 @@ func (server *BaseServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *BaseServer) Stop(_ context.Context) error {
+func (server *BaseServer) Stop(ctx context.Context) error {
+	assert.NotNil(ctx, "base server - error shutting down: context is nil")
 
 	log.Info("shutting down - stopping base server")
 	close(server.closeChannel)

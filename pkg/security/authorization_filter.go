@@ -2,11 +2,11 @@ package security
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 )
 
@@ -15,10 +15,7 @@ type DefaultAuthorizationFilter struct {
 }
 
 func NewDefaultAuthorizationFilter(authorizationService AuthorizationService) *DefaultAuthorizationFilter {
-
-	if authorizationService == nil {
-		log.Fatal("starting up - error setting up authorizationFilter: authorizationService is nil")
-	}
+	assert.NotNil(authorizationService, "starting up - error setting up authorizationFilter: authorizationService is nil")
 
 	return &DefaultAuthorizationFilter{
 		authorizationService: authorizationService,
@@ -26,6 +23,7 @@ func NewDefaultAuthorizationFilter(authorizationService AuthorizationService) *D
 }
 
 func (filter *DefaultAuthorizationFilter) Authorize(ctx *gin.Context) {
+	assert.NotNil(ctx, "authorization filter - error authorizing: context is nil")
 
 	header := ctx.Request.Header.Get("Authorization")
 	if !strings.HasPrefix(header, "Bearer ") {
