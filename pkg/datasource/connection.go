@@ -6,6 +6,7 @@ import (
 	retry "github.com/avast/retry-go/v4"
 	"gorm.io/gorm"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
@@ -17,10 +18,9 @@ type connection struct {
 }
 
 func NewConnection(context Context, dialector gorm.Dialector, opts ...gorm.Option) Connection[*gorm.DB] {
-
-	if context == nil {
-		log.Fatal("starting up - error setting up datasource connection: context is nil")
-	}
+	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
+	assert.NotNil(dialector, "starting up - error setting up datasource connection: dialector is nil")
+	//assert.NotEmpty(opts, "starting up - error setting up datasource connection: opts is empty")
 
 	return &connection{
 		context:   context,

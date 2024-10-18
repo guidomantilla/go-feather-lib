@@ -5,6 +5,8 @@ import (
 	"io"
 	"log/slog"
 	"os"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 type slogLogger struct {
@@ -12,6 +14,9 @@ type slogLogger struct {
 }
 
 func New(level SlogLevel, writers ...io.Writer) Logger[*slog.Logger] {
+	assert.NotNil(level, "starting up - error setting up logger: level is nil")
+	//assert.NotEmpty(writers, "starting up - error setting up logger: writers is empty")
+
 	opts := &slog.HandlerOptions{
 		Level: level.ToSlogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {

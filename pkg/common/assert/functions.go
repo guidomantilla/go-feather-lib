@@ -1,10 +1,9 @@
 package assert
 
 import (
+	"log"
 	"reflect"
 	"strings"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 func NotEmpty(object any, message string) {
@@ -57,11 +56,8 @@ func isEmpty(object any) bool {
 		deref := objValue.Elem().Interface()
 		return isEmpty(deref)
 	case reflect.String:
-		if objValue.IsNil() {
-			return true
-		}
 		value := objValue.String()
-		return isEmpty(strings.TrimSpace(value))
+		return strings.TrimSpace(value) == ""
 	// for all other types, compare against the zero value
 	// array types are empty when they match their zero-initialized state
 	default:

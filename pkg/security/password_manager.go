@@ -1,8 +1,6 @@
 package security
 
-import (
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-)
+import "github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 
 type passwordManager struct {
 	passwordEncoder   PasswordEncoder
@@ -10,14 +8,8 @@ type passwordManager struct {
 }
 
 func NewPasswordManager(passwordEncoder PasswordEncoder, passwordGenerator PasswordGenerator) PasswordManager {
-
-	if passwordEncoder == nil {
-		log.Fatal("starting up - error setting up passwordManager: passwordEncoder is nil")
-	}
-
-	if passwordGenerator == nil {
-		log.Fatal("starting up - error setting up passwordManager: passwordGenerator is nil")
-	}
+	assert.NotNil(passwordEncoder, "starting up - error setting up passwordManager: passwordEncoder is nil")
+	assert.NotNil(passwordGenerator, "starting up - error setting up passwordManager: passwordGenerator is nil")
 
 	return &passwordManager{
 		passwordEncoder:   passwordEncoder,

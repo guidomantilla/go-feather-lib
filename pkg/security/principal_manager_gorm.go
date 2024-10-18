@@ -8,8 +8,8 @@ import (
 	"github.com/xorcare/pointer"
 	"gorm.io/gorm"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/config"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
 )
 
@@ -19,14 +19,8 @@ type GormPrincipalManager struct {
 }
 
 func NewGormPrincipalManager(transactionHandler datasource.TransactionHandler[*gorm.DB], passwordManager PasswordManager) *GormPrincipalManager {
-
-	if transactionHandler == nil {
-		log.Fatal("starting up - error setting up principalManager: transactionHandler is nil")
-	}
-
-	if passwordManager == nil {
-		log.Fatal("starting up - error setting up principalManager: passwordManager is nil")
-	}
+	assert.NotNil(transactionHandler, "starting up - error setting up principalManager: transactionHandler is nil")
+	assert.NotNil(passwordManager, "starting up - error setting up principalManager: passwordManager is nil")
 
 	return &GormPrincipalManager{
 		transactionHandler: transactionHandler,
