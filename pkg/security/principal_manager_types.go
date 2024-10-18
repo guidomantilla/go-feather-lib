@@ -3,7 +3,8 @@ package security
 import "context"
 
 var (
-	_ PrincipalManager = (*InMemoryPrincipalManager)(nil)
+	_ PrincipalManager = (*BasePrincipalManager)(nil)
+	_ PrincipalManager = (*GormPrincipalManager)(nil)
 	_ PrincipalManager = (*MockPrincipalManager)(nil)
 )
 

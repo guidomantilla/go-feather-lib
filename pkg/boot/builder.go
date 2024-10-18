@@ -135,7 +135,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 		},
 		PrincipalManager: func(appCtx *ApplicationContext) security.PrincipalManager {
 			if !appCtx.Enablers.DatabaseEnabled {
-				return security.NewInMemoryPrincipalManager(appCtx.PasswordManager)
+				return security.NewBasePrincipalManager(appCtx.PasswordManager)
 			}
 
 			if appCtx.DatabaseConfig != nil {

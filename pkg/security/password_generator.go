@@ -16,8 +16,6 @@ const (
 	//allCharSet = lowerCharSet + upperCharSet + numberSet
 )
 
-type DefaultPasswordGeneratorOption func(generator *passwordGenerator)
-
 type passwordGenerator struct {
 	passwordLength int
 	minSpecialChar int
@@ -25,7 +23,7 @@ type passwordGenerator struct {
 	minUpperCase   int
 }
 
-func NewPasswordGenerator(options ...DefaultPasswordGeneratorOption) PasswordGenerator {
+func NewPasswordGenerator(options ...PasswordGeneratorOption) PasswordGenerator {
 
 	generator := &passwordGenerator{
 		passwordLength: 16,
@@ -39,30 +37,6 @@ func NewPasswordGenerator(options ...DefaultPasswordGeneratorOption) PasswordGen
 	}
 
 	return generator
-}
-
-func WithPasswordLength(length int) DefaultPasswordGeneratorOption {
-	return func(generator *passwordGenerator) {
-		generator.passwordLength = length
-	}
-}
-
-func WithMinSpecialChar(minSpecialChar int) DefaultPasswordGeneratorOption {
-	return func(generator *passwordGenerator) {
-		generator.minSpecialChar = minSpecialChar
-	}
-}
-
-func WithMinNum(minNum int) DefaultPasswordGeneratorOption {
-	return func(generator *passwordGenerator) {
-		generator.minNum = minNum
-	}
-}
-
-func WithMinUpperCase(minUpperCase int) DefaultPasswordGeneratorOption {
-	return func(generator *passwordGenerator) {
-		generator.minUpperCase = minUpperCase
-	}
 }
 
 func (generator *passwordGenerator) Generate() string {
