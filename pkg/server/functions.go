@@ -9,8 +9,8 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-func BuildDefaultServer() (string, Server) {
-	return "default-server", NewDefaultServer()
+func BuildBaseServer() (string, Server) {
+	return "base-server", NewBaseServer()
 }
 
 func BuildCronServer(cron *cron.Cron) (string, Server) {

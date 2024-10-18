@@ -11,7 +11,7 @@ type slogLogger struct {
 	internal *slog.Logger
 }
 
-func newSlogLogger(level SlogLevel, writers ...io.Writer) *slogLogger {
+func New(level SlogLevel, writers ...io.Writer) Logger[*slog.Logger] {
 	opts := &slog.HandlerOptions{
 		Level: level.ToSlogLevel(),
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {

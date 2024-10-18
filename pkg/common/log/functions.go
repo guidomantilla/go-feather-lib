@@ -24,7 +24,7 @@ func Slog(writers ...io.Writer) Logger[*slog.Logger] {
 	if level == "" {
 		level = "INFO"
 	}
-	logger := NewLogger(SlogLevelOff.ValueFromName(strings.ToUpper(level)), writers...)
+	logger := New(SlogLevelOff.ValueFromName(strings.ToUpper(level)), writers...)
 	singleton.Store(logger)
 	return logger
 }

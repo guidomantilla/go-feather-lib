@@ -20,16 +20,16 @@ const (
 	SslClientKey         = "SSL_CLIENT_KEY"
 )
 
-type EnvironmentOption func(environment Environment)
+type Option func(environment Environment)
 
-func WithCmd(cmdArgs []string) EnvironmentOption {
+func WithCmd(cmdArgs []string) Option {
 	return func(environment Environment) {
-		cmdProperties := properties.NewProperties(properties.FromSlice(cmdArgs))
-		environment.AppendPropertiesSources(properties.NewPropertiesSource(CmdPropertySourceName, cmdProperties))
+		cmdProperties := properties.New(properties.FromSlice(cmdArgs))
+		environment.AppendPropertiesSources(properties.NewSource(CmdPropertySourceName, cmdProperties))
 	}
 }
 
-func WithSSL() EnvironmentOption {
+func WithSSL() Option {
 	return func(environment Environment) {
 
 		ValueOrEmpty := func(key string) string {
@@ -46,23 +46,23 @@ func WithSSL() EnvironmentOption {
 			return ""
 		}
 
-		sslProperties := properties.NewProperties()
+		sslProperties := properties.New()
 		sslProperties.Add(SslServerName, ValueOrEmpty(SslServerName))
 		sslProperties.Add(SslCaCertificate, BuildOrEmpty(SslCaCertificate))
 		sslProperties.Add(SslClientCertificate, BuildOrEmpty(SslClientCertificate))
 		sslProperties.Add(SslClientKey, BuildOrEmpty(SslClientKey))
-		environment.AppendPropertiesSources(properties.NewPropertiesSource(SslPropertySourceName, sslProperties))
+		environment.AppendPropertiesSources(properties.NewSource(SslPropertySourceName, sslProperties))
 	}
 }
 
-func WithOs() EnvironmentOption {
+func WithOs() Option {
 	return func(environment Environment) {
-		osProperties := properties.NewProperties(properties.FromSlice(os.Environ()))
-		environment.AppendPropertiesSources(properties.NewPropertiesSource(OsPropertySourceName, osProperties))
+		osProperties := properties.New(properties.FromSlice(os.Environ()))
+		environment.AppendPropertiesSources(properties.NewSource(OsPropertySourceName, osProperties))
 	}
 }
 
-func With(cmdArgs []string) EnvironmentOption {
+func With(cmdArgs []string) Option {
 	return func(environment Environment) {
 		WithCmd(cmdArgs)(environment)
 		WithSSL()(environment)
@@ -70,27 +70,23 @@ func With(cmdArgs []string) EnvironmentOption {
 	}
 }
 
-func WithArraySource(name string, array []string) EnvironmentOption {
+func WithArraySource(name string, array []string) Option {
 	return func(environment Environment) {
-		environment.AppendPropertiesSources(properties.NewPropertiesSource(name, properties.NewProperties(properties.FromSlice(array))))
+		environment.AppendPropertiesSources(properties.NewSource(name, properties.New(properties.FromSlice(array))))
 	}
 }
 
-func WithPropertySources(propertySources ...properties.PropertiesSource) EnvironmentOption {
+func WithPropertySources(propertySources ...properties.PropertiesSource) Option {
 	return func(environment Environment) {
 		environment.AppendPropertiesSources(propertySources...)
 	}
-}
-
-type env struct {
-	environment
 }
 
 type environment struct {
 	propertiesSources []properties.PropertiesSource
 }
 
-func NewEnvironment(options ...EnvironmentOption) Environment {
+func New(options ...Option) Environment {
 	environment := &environment{
 		propertiesSources: make([]properties.PropertiesSource, 0),
 	}

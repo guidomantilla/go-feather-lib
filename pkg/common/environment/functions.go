@@ -17,12 +17,12 @@ func instance() Environment {
 }
 
 func Load(args ...[]string) Environment {
-	withArgs := make([]EnvironmentOption, 0)
+	withArgs := make([]Option, 0)
 	withArgs = append(withArgs, WithSSL(), WithOs())
 	for _, arg := range args {
 		withArgs = append(withArgs, WithCmd(arg))
 	}
-	env := NewEnvironment(withArgs...)
+	env := New(withArgs...)
 	singleton.Store(env)
 	return env
 }

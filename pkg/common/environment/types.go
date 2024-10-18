@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	_ Environment = (*env)(nil)
+	_ Environment = (*environment)(nil)
 	_ Environment = (*MockEnvironment)(nil)
 )
 

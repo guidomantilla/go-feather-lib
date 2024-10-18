@@ -2,7 +2,6 @@ package log
 
 import (
 	"context"
-	"io"
 	"log/slog"
 )
 
@@ -19,8 +18,4 @@ type Logger[T any] interface {
 	Error(ctx context.Context, msg string, args ...any)
 	Fatal(ctx context.Context, msg string, args ...any)
 	Logger() T
-}
-
-func NewLogger(level SlogLevel, writers ...io.Writer) Logger[*slog.Logger] {
-	return newSlogLogger(level, writers...)
 }

@@ -9,20 +9,20 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type OrmConnection struct {
-	context   StoreContext
+type connection struct {
+	context   Context
 	database  *gorm.DB
 	dialector gorm.Dialector
 	opts      []gorm.Option
 }
 
-func NewOrmConnection(context StoreContext, dialector gorm.Dialector, opts ...gorm.Option) *OrmConnection {
+func NewConnection(context Context, dialector gorm.Dialector, opts ...gorm.Option) Connection[*gorm.DB] {
 
 	if context == nil {
 		log.Fatal("starting up - error setting up datasource connection: context is nil")
 	}
 
-	return &OrmConnection{
+	return &connection{
 		context:   context,
 		database:  nil,
 		dialector: dialector,
@@ -30,7 +30,7 @@ func NewOrmConnection(context StoreContext, dialector gorm.Dialector, opts ...go
 	}
 }
 
-func (datasource *OrmConnection) Connect() (*gorm.DB, error) {
+func (datasource *connection) Connect() (*gorm.DB, error) {
 
 	if datasource.database == nil {
 
@@ -49,7 +49,7 @@ func (datasource *OrmConnection) Connect() (*gorm.DB, error) {
 	return datasource.database, nil
 }
 
-func (datasource *OrmConnection) connect() error {
+func (datasource *connection) connect() error {
 
 	var err error
 	if datasource.database, err = gorm.Open(datasource.dialector, datasource.opts...); err != nil {
@@ -61,7 +61,7 @@ func (datasource *OrmConnection) connect() error {
 	return nil
 }
 
-func (datasource *OrmConnection) Close() {
+func (datasource *connection) Close() {
 
 	if datasource.database != nil {
 		log.Debug("datasource connection - closing connection")
@@ -74,6 +74,6 @@ func (datasource *OrmConnection) Close() {
 	log.Debug(fmt.Sprintf("datasource connection - closed connection to to %s/%s", datasource.context.Server(), datasource.context.Service()))
 }
 
-func (datasource *OrmConnection) Context() StoreContext {
+func (datasource *connection) Context() Context {
 	return datasource.context
 }

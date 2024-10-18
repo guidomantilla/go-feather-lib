@@ -19,7 +19,7 @@ func Load(slices ...[]string) Properties {
 	for _, slice := range slices {
 		withSlices = append(withSlices, FromSlice(slice))
 	}
-	properties := NewProperties(withSlices...)
+	properties := New(withSlices...)
 	singleton.Store(properties)
 	return properties
 }

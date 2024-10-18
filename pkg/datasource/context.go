@@ -6,13 +6,13 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type OrmContext struct {
+type context_ struct {
 	url     string
 	server  string
 	service string
 }
 
-func NewOrmContext(url string, username string, password string, server string, service string) *OrmContext {
+func NewContext(url string, username string, password string, server string, service string) Context {
 
 	if strings.TrimSpace(url) == "" {
 		log.Fatal("starting up - error setting up datasource context: url is empty")
@@ -39,21 +39,21 @@ func NewOrmContext(url string, username string, password string, server string, 
 	url = strings.Replace(url, ":server", server, 1)
 	url = strings.Replace(url, ":service", service, 1)
 
-	return &OrmContext{
+	return &context_{
 		url:     url,
 		server:  server,
 		service: service,
 	}
 }
 
-func (context *OrmContext) Url() string {
+func (context *context_) Url() string {
 	return context.url
 }
 
-func (context *OrmContext) Server() string {
+func (context *context_) Server() string {
 	return context.server
 }
 
-func (context *OrmContext) Service() string {
+func (context *context_) Service() string {
 	return context.service
 }

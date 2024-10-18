@@ -52,32 +52,32 @@ type DatabaseConfig struct {
 }
 
 type ApplicationContext struct {
-	AppName                 string
-	AppVersion              string
-	LogLevel                string
-	CmdArgs                 []string
-	Enablers                *Enablers
-	HttpConfig              *HttpConfig
-	GrpcConfig              *GrpcConfig
-	SecurityConfig          *SecurityConfig
-	DatabaseConfig          *DatabaseConfig
-	Environment             environment.Environment
-	StoreContext            datasource.StoreContext
-	StoreConnection         datasource.StoreConnection[*gorm.DB]
-	StoreTransactionHandler datasource.StoreTransactionHandler[*gorm.DB]
-	PasswordEncoder         security.PasswordEncoder
-	PasswordGenerator       security.PasswordGenerator
-	PasswordManager         security.PasswordManager
-	PrincipalManager        security.PrincipalManager
-	TokenManager            security.TokenManager
-	AuthenticationService   security.AuthenticationService
-	AuthenticationEndpoint  security.AuthenticationEndpoint
-	AuthorizationService    security.AuthorizationService
-	AuthorizationFilter     security.AuthorizationFilter
-	PublicRouter            *gin.Engine
-	PrivateRouter           *gin.RouterGroup
-	GrpcServiceDesc         *grpc.ServiceDesc
-	GrpcServiceServer       any
+	AppName                      string
+	AppVersion                   string
+	LogLevel                     string
+	CmdArgs                      []string
+	Enablers                     *Enablers
+	HttpConfig                   *HttpConfig
+	GrpcConfig                   *GrpcConfig
+	SecurityConfig               *SecurityConfig
+	DatabaseConfig               *DatabaseConfig
+	Environment                  environment.Environment
+	DatasourceContext            datasource.Context
+	DatasourceConnection         datasource.Connection[*gorm.DB]
+	DatasourceTransactionHandler datasource.TransactionHandler[*gorm.DB]
+	PasswordEncoder              security.PasswordEncoder
+	PasswordGenerator            security.PasswordGenerator
+	PasswordManager              security.PasswordManager
+	PrincipalManager             security.PrincipalManager
+	TokenManager                 security.TokenManager
+	AuthenticationService        security.AuthenticationService
+	AuthenticationEndpoint       security.AuthenticationEndpoint
+	AuthorizationService         security.AuthorizationService
+	AuthorizationFilter          security.AuthorizationFilter
+	PublicRouter                 *gin.Engine
+	PrivateRouter                *gin.RouterGroup
+	GrpcServiceDesc              *grpc.ServiceDesc
+	GrpcServiceServer            any
 }
 
 func NewApplicationContext(appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder) *ApplicationContext {
@@ -130,9 +130,9 @@ func NewApplicationContext(appName string, version string, args []string, enable
 
 	if ctx.Enablers.DatabaseEnabled {
 		log.Debug("starting up - setting up db connectivity")
-		ctx.StoreContext = builder.StoreContext(ctx)                       //nolint:staticcheck
-		ctx.StoreConnection = builder.StoreConnection(ctx)                 //nolint:staticcheck
-		ctx.StoreTransactionHandler = builder.StoreTransactionHandler(ctx) //nolint:staticcheck
+		ctx.DatasourceContext = builder.DatasourceContext(ctx)                       //nolint:staticcheck
+		ctx.DatasourceConnection = builder.DatasourceConnection(ctx)                 //nolint:staticcheck
+		ctx.DatasourceTransactionHandler = builder.DatasourceTransactionHandler(ctx) //nolint:staticcheck
 	} else {
 		log.Warn("starting up - warning setting up database configuration. database connectivity is disabled")
 	}
@@ -166,12 +166,12 @@ func (ctx *ApplicationContext) Stop() {
 
 	var err error
 
-	if ctx.StoreConnection != nil && ctx.StoreContext != nil {
+	if ctx.DatasourceConnection != nil && ctx.DatasourceContext != nil {
 
 		var database *gorm.DB
 		log.Debug("shutting down - closing up db connection")
 
-		if database, err = ctx.StoreConnection.Connect(); err != nil {
+		if database, err = ctx.DatasourceConnection.Connect(); err != nil {
 			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}

@@ -14,11 +14,11 @@ import (
 )
 
 type GormPrincipalManager struct {
-	transactionHandler datasource.StoreTransactionHandler[*gorm.DB]
+	transactionHandler datasource.TransactionHandler[*gorm.DB]
 	passwordManager    PasswordManager
 }
 
-func NewGormPrincipalManager(transactionHandler datasource.StoreTransactionHandler[*gorm.DB], passwordManager PasswordManager) *GormPrincipalManager {
+func NewGormPrincipalManager(transactionHandler datasource.TransactionHandler[*gorm.DB], passwordManager PasswordManager) *GormPrincipalManager {
 
 	if transactionHandler == nil {
 		log.Fatal("starting up - error setting up principalManager: transactionHandler is nil")

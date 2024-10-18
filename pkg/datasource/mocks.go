@@ -16,31 +16,31 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockStoreContext is a mock of StoreContext interface.
-type MockStoreContext struct {
+// MockContext is a mock of Context interface.
+type MockContext struct {
 	ctrl     *gomock.Controller
-	recorder *MockStoreContextMockRecorder
+	recorder *MockContextMockRecorder
 }
 
-// MockStoreContextMockRecorder is the mock recorder for MockStoreContext.
-type MockStoreContextMockRecorder struct {
-	mock *MockStoreContext
+// MockContextMockRecorder is the mock recorder for MockContext.
+type MockContextMockRecorder struct {
+	mock *MockContext
 }
 
-// NewMockStoreContext creates a new mock instance.
-func NewMockStoreContext(ctrl *gomock.Controller) *MockStoreContext {
-	mock := &MockStoreContext{ctrl: ctrl}
-	mock.recorder = &MockStoreContextMockRecorder{mock}
+// NewMockContext creates a new mock instance.
+func NewMockContext(ctrl *gomock.Controller) *MockContext {
+	mock := &MockContext{ctrl: ctrl}
+	mock.recorder = &MockContextMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockStoreContext) EXPECT() *MockStoreContextMockRecorder {
+func (m *MockContext) EXPECT() *MockContextMockRecorder {
 	return m.recorder
 }
 
 // Server mocks base method.
-func (m *MockStoreContext) Server() string {
+func (m *MockContext) Server() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Server")
 	ret0, _ := ret[0].(string)
@@ -48,13 +48,13 @@ func (m *MockStoreContext) Server() string {
 }
 
 // Server indicates an expected call of Server.
-func (mr *MockStoreContextMockRecorder) Server() *gomock.Call {
+func (mr *MockContextMockRecorder) Server() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockStoreContext)(nil).Server))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockContext)(nil).Server))
 }
 
 // Service mocks base method.
-func (m *MockStoreContext) Service() string {
+func (m *MockContext) Service() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Service")
 	ret0, _ := ret[0].(string)
@@ -62,13 +62,13 @@ func (m *MockStoreContext) Service() string {
 }
 
 // Service indicates an expected call of Service.
-func (mr *MockStoreContextMockRecorder) Service() *gomock.Call {
+func (mr *MockContextMockRecorder) Service() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockStoreContext)(nil).Service))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockContext)(nil).Service))
 }
 
 // Url mocks base method.
-func (m *MockStoreContext) Url() string {
+func (m *MockContext) Url() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Url")
 	ret0, _ := ret[0].(string)
@@ -76,48 +76,48 @@ func (m *MockStoreContext) Url() string {
 }
 
 // Url indicates an expected call of Url.
-func (mr *MockStoreContextMockRecorder) Url() *gomock.Call {
+func (mr *MockContextMockRecorder) Url() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockStoreContext)(nil).Url))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockContext)(nil).Url))
 }
 
-// MockStoreConnection is a mock of StoreConnection interface.
-type MockStoreConnection[T StoreConnectionTypes] struct {
+// MockConnection is a mock of Connection interface.
+type MockConnection[T StoreConnectionTypes] struct {
 	ctrl     *gomock.Controller
-	recorder *MockStoreConnectionMockRecorder[T]
+	recorder *MockConnectionMockRecorder[T]
 }
 
-// MockStoreConnectionMockRecorder is the mock recorder for MockStoreConnection.
-type MockStoreConnectionMockRecorder[T StoreConnectionTypes] struct {
-	mock *MockStoreConnection[T]
+// MockConnectionMockRecorder is the mock recorder for MockConnection.
+type MockConnectionMockRecorder[T StoreConnectionTypes] struct {
+	mock *MockConnection[T]
 }
 
-// NewMockStoreConnection creates a new mock instance.
-func NewMockStoreConnection[T StoreConnectionTypes](ctrl *gomock.Controller) *MockStoreConnection[T] {
-	mock := &MockStoreConnection[T]{ctrl: ctrl}
-	mock.recorder = &MockStoreConnectionMockRecorder[T]{mock}
+// NewMockConnection creates a new mock instance.
+func NewMockConnection[T StoreConnectionTypes](ctrl *gomock.Controller) *MockConnection[T] {
+	mock := &MockConnection[T]{ctrl: ctrl}
+	mock.recorder = &MockConnectionMockRecorder[T]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockStoreConnection[T]) EXPECT() *MockStoreConnectionMockRecorder[T] {
+func (m *MockConnection[T]) EXPECT() *MockConnectionMockRecorder[T] {
 	return m.recorder
 }
 
 // Close mocks base method.
-func (m *MockStoreConnection[T]) Close() {
+func (m *MockConnection[T]) Close() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Close")
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockStoreConnectionMockRecorder[T]) Close() *gomock.Call {
+func (mr *MockConnectionMockRecorder[T]) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockStoreConnection[T])(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockConnection[T])(nil).Close))
 }
 
 // Connect mocks base method.
-func (m *MockStoreConnection[T]) Connect() (T, error) {
+func (m *MockConnection[T]) Connect() (T, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect")
 	ret0, _ := ret[0].(T)
@@ -126,50 +126,50 @@ func (m *MockStoreConnection[T]) Connect() (T, error) {
 }
 
 // Connect indicates an expected call of Connect.
-func (mr *MockStoreConnectionMockRecorder[T]) Connect() *gomock.Call {
+func (mr *MockConnectionMockRecorder[T]) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockStoreConnection[T])(nil).Connect))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockConnection[T])(nil).Connect))
 }
 
 // Context mocks base method.
-func (m *MockStoreConnection[T]) Context() StoreContext {
+func (m *MockConnection[T]) Context() Context {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Context")
-	ret0, _ := ret[0].(StoreContext)
+	ret0, _ := ret[0].(Context)
 	return ret0
 }
 
 // Context indicates an expected call of Context.
-func (mr *MockStoreConnectionMockRecorder[T]) Context() *gomock.Call {
+func (mr *MockConnectionMockRecorder[T]) Context() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockStoreConnection[T])(nil).Context))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockConnection[T])(nil).Context))
 }
 
-// MockStoreTransactionHandler is a mock of StoreTransactionHandler interface.
-type MockStoreTransactionHandler[T StoreConnectionTypes] struct {
+// MockTransactionHandler is a mock of TransactionHandler interface.
+type MockTransactionHandler[T StoreConnectionTypes] struct {
 	ctrl     *gomock.Controller
-	recorder *MockStoreTransactionHandlerMockRecorder[T]
+	recorder *MockTransactionHandlerMockRecorder[T]
 }
 
-// MockStoreTransactionHandlerMockRecorder is the mock recorder for MockStoreTransactionHandler.
-type MockStoreTransactionHandlerMockRecorder[T StoreConnectionTypes] struct {
-	mock *MockStoreTransactionHandler[T]
+// MockTransactionHandlerMockRecorder is the mock recorder for MockTransactionHandler.
+type MockTransactionHandlerMockRecorder[T StoreConnectionTypes] struct {
+	mock *MockTransactionHandler[T]
 }
 
-// NewMockStoreTransactionHandler creates a new mock instance.
-func NewMockStoreTransactionHandler[T StoreConnectionTypes](ctrl *gomock.Controller) *MockStoreTransactionHandler[T] {
-	mock := &MockStoreTransactionHandler[T]{ctrl: ctrl}
-	mock.recorder = &MockStoreTransactionHandlerMockRecorder[T]{mock}
+// NewMockTransactionHandler creates a new mock instance.
+func NewMockTransactionHandler[T StoreConnectionTypes](ctrl *gomock.Controller) *MockTransactionHandler[T] {
+	mock := &MockTransactionHandler[T]{ctrl: ctrl}
+	mock.recorder = &MockTransactionHandlerMockRecorder[T]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockStoreTransactionHandler[T]) EXPECT() *MockStoreTransactionHandlerMockRecorder[T] {
+func (m *MockTransactionHandler[T]) EXPECT() *MockTransactionHandlerMockRecorder[T] {
 	return m.recorder
 }
 
 // HandleTransaction mocks base method.
-func (m *MockStoreTransactionHandler[T]) HandleTransaction(ctx context.Context, fn StoreTransactionHandlerFn[T]) error {
+func (m *MockTransactionHandler[T]) HandleTransaction(ctx context.Context, fn TransactionHandlerFn[T]) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HandleTransaction", ctx, fn)
 	ret0, _ := ret[0].(error)
@@ -177,7 +177,7 @@ func (m *MockStoreTransactionHandler[T]) HandleTransaction(ctx context.Context, 
 }
 
 // HandleTransaction indicates an expected call of HandleTransaction.
-func (mr *MockStoreTransactionHandlerMockRecorder[T]) HandleTransaction(ctx, fn any) *gomock.Call {
+func (mr *MockTransactionHandlerMockRecorder[T]) HandleTransaction(ctx, fn any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransaction", reflect.TypeOf((*MockStoreTransactionHandler[T])(nil).HandleTransaction), ctx, fn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransaction", reflect.TypeOf((*MockTransactionHandler[T])(nil).HandleTransaction), ctx, fn)
 }

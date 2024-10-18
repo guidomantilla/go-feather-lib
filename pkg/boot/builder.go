@@ -22,11 +22,11 @@ type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environ
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
-type StoreContextBuilderFunc func(appCtx *ApplicationContext) datasource.StoreContext
+type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource.Context
 
-type StoreConnectionBuilderFunc func(appCtx *ApplicationContext) datasource.StoreConnection[*gorm.DB]
+type DatasourceConnectionBuilderFunc func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB]
 
-type StoreTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.StoreTransactionHandler[*gorm.DB]
+type DatasourceTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB]
 
 type PasswordGeneratorBuilderFunc func(appCtx *ApplicationContext) security.PasswordGenerator
 
@@ -51,22 +51,22 @@ type HttpServerBuilderFunc func(appCtx *ApplicationContext) (*gin.Engine, *gin.R
 type GrpcServerBuilderFunc func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any)
 
 type BeanBuilder struct {
-	Environment             EnvironmentBuilderFunc
-	Config                  ConfigLoaderFunc
-	StoreContext            StoreContextBuilderFunc
-	StoreConnection         StoreConnectionBuilderFunc
-	StoreTransactionHandler StoreTransactionHandlerBuilderFunc
-	PasswordEncoder         PasswordEncoderBuilderFunc
-	PasswordGenerator       PasswordGeneratorBuilderFunc
-	PasswordManager         PasswordManagerBuilderFunc
-	PrincipalManager        PrincipalManagerBuilderFunc
-	TokenManager            TokenManagerBuilderFunc
-	AuthenticationService   AuthenticationServiceBuilderFunc
-	AuthorizationService    AuthorizationServiceBuilderFunc
-	AuthenticationEndpoint  AuthenticationEndpointBuilderFunc
-	AuthorizationFilter     AuthorizationFilterBuilderFunc
-	HttpServer              HttpServerBuilderFunc
-	GrpcServer              GrpcServerBuilderFunc
+	Environment                  EnvironmentBuilderFunc
+	Config                       ConfigLoaderFunc
+	DatasourceContext            DatasourceContextBuilderFunc
+	DatasourceConnection         DatasourceConnectionBuilderFunc
+	DatasourceTransactionHandler DatasourceTransactionHandlerBuilderFunc
+	PasswordEncoder              PasswordEncoderBuilderFunc
+	PasswordGenerator            PasswordGeneratorBuilderFunc
+	PasswordManager              PasswordManagerBuilderFunc
+	PrincipalManager             PrincipalManagerBuilderFunc
+	TokenManager                 TokenManagerBuilderFunc
+	AuthenticationService        AuthenticationServiceBuilderFunc
+	AuthorizationService         AuthorizationServiceBuilderFunc
+	AuthenticationEndpoint       AuthenticationEndpointBuilderFunc
+	AuthorizationFilter          AuthorizationFilterBuilderFunc
+	HttpServer                   HttpServerBuilderFunc
+	GrpcServer                   GrpcServerBuilderFunc
 }
 
 func NewBeanBuilder(ctx context.Context) *BeanBuilder {
@@ -78,24 +78,24 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 	return &BeanBuilder{
 
 		Environment: func(appCtx *ApplicationContext) environment.Environment {
-			return environment.NewEnvironment(environment.WithSSL(), environment.With(appCtx.CmdArgs))
+			return environment.New(environment.WithSSL(), environment.With(appCtx.CmdArgs))
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
 		},
-		StoreContext: func(appCtx *ApplicationContext) datasource.StoreContext {
+		DatasourceContext: func(appCtx *ApplicationContext) datasource.Context {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource.NewOrmContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
+				return datasource.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		StoreConnection: func(appCtx *ApplicationContext) datasource.StoreConnection[*gorm.DB] {
+		DatasourceConnection: func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB] {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
@@ -106,19 +106,19 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
-				return datasource.NewOrmConnection(appCtx.StoreContext, mysql.Open(appCtx.StoreContext.Url()), config)
+				return datasource.NewConnection(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
 			return nil
 		},
-		StoreTransactionHandler: func(appCtx *ApplicationContext) datasource.StoreTransactionHandler[*gorm.DB] {
+		DatasourceTransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB] {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return datasource.NewOrmTransactionHandler(appCtx.StoreConnection)
+				return datasource.NewOrmTransactionHandler(appCtx.DatasourceConnection)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")
@@ -139,7 +139,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			}
 
 			if appCtx.DatabaseConfig != nil {
-				return security.NewGormPrincipalManager(appCtx.StoreTransactionHandler, appCtx.PasswordManager)
+				return security.NewGormPrincipalManager(appCtx.DatasourceTransactionHandler, appCtx.PasswordManager)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config is nil")

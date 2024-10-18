@@ -9,11 +9,5 @@ import (
 )
 
 func Process(ctx context.Context, environment environment.Environment, cfg *Config) error {
-
-	internalConfig := &envconfig.Config{Target: cfg, Lookuper: &EnvironmentLookup{environment: environment}}
-	if err := envconfig.ProcessWith(ctx, internalConfig); err != nil {
-		return err
-	}
-
-	return nil
+	return envconfig.ProcessWith(ctx, &envconfig.Config{Target: cfg, Lookuper: &EnvironmentLookup{environment: environment}})
 }

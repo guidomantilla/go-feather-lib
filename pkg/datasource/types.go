@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	_ StoreContext                      = (*OrmContext)(nil)
-	_ StoreConnection[*gorm.DB]         = (*OrmConnection)(nil)
-	_ StoreTransactionHandler[*gorm.DB] = (*OrmTransactionHandler)(nil)
-	_ StoreContext                      = (*MockStoreContext)(nil)
-	_ StoreConnection[*gorm.DB]         = (*MockStoreConnection[*gorm.DB])(nil)
-	_ StoreTransactionHandler[*gorm.DB] = (*MockStoreTransactionHandler[*gorm.DB])(nil)
+	_ Context                      = (*context_)(nil)
+	_ Connection[*gorm.DB]         = (*connection)(nil)
+	_ TransactionHandler[*gorm.DB] = (*transactionHandler)(nil)
+	_ Context                      = (*MockContext)(nil)
+	_ Connection[*gorm.DB]         = (*MockConnection[*gorm.DB])(nil)
+	_ TransactionHandler[*gorm.DB] = (*MockTransactionHandler[*gorm.DB])(nil)
 )
 
-type StoreContext interface {
+type Context interface {
 	Url() string
 	Server() string
 	Service() string
@@ -29,18 +29,18 @@ type StoreConnectionTypes interface {
 
 //type StoreConnectionTypes = *gorm.DB
 
-type StoreConnection[T StoreConnectionTypes] interface {
+type Connection[T StoreConnectionTypes] interface {
 	Connect() (T, error)
 	Close()
-	Context() StoreContext
+	Context() Context
 }
 
 //
 
-type StoreTransactionCtxKey struct{}
+type TransactionCtxKey struct{}
 
-type StoreTransactionHandlerFn[T StoreConnectionTypes] func(ctx context.Context, tx T) error
+type TransactionHandlerFn[T StoreConnectionTypes] func(ctx context.Context, tx T) error
 
-type StoreTransactionHandler[T StoreConnectionTypes] interface {
-	HandleTransaction(ctx context.Context, fn StoreTransactionHandlerFn[T]) error
+type TransactionHandler[T StoreConnectionTypes] interface {
+	HandleTransaction(ctx context.Context, fn TransactionHandlerFn[T]) error
 }

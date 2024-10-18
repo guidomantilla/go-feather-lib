@@ -19,7 +19,7 @@ func Run(name string, version string, fn func(application Application) error) {
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	app.Attach(server.BuildDefaultServer())
+	app.Attach(server.BuildBaseServer())
 	if err := fn(app); err != nil {
 		log.Fatal(err.Error())
 	}
