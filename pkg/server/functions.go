@@ -11,7 +11,7 @@ import (
 
 func BuildBaseServer() (string, Server) {
 	return "base-server", NewBaseServer()
-}
+} 
 
 func BuildCronServer(cron *cron.Cron) (string, Server) {
 	return "cron-server", NewCronServer(cron)
