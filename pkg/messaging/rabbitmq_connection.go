@@ -13,9 +13,9 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQConnectionOption[T ConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
+type RabbitMQConnectionOptions[T ConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
 
-func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
+func WithRabbitMQAMQPDialer() RabbitMQConnectionOptions[*amqp.Connection] {
 	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
 		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
 			return amqp.Dial(url)
@@ -23,7 +23,7 @@ func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
 	}
 }
 
-func WithRabbitMQDialerTLS(amqps *tls.Config) RabbitMQConnectionOption[*amqp.Connection] {
+func WithRabbitMQAMQPDialerTLS(amqps *tls.Config) RabbitMQConnectionOptions[*amqp.Connection] {
 	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
 		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
 			return amqp.DialTLS(url, amqps)
@@ -31,7 +31,7 @@ func WithRabbitMQDialerTLS(amqps *tls.Config) RabbitMQConnectionOption[*amqp.Con
 	}
 }
 
-func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
+func WithRabbitMQStreamsDialer() RabbitMQConnectionOptions[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
 		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
 			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
@@ -39,7 +39,7 @@ func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
 	}
 }
 
-func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOption[*stream.Environment] {
+func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOptions[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
 		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
 			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url).SetTLSConfig(streams))
@@ -47,7 +47,7 @@ func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOption[
 	}
 }
 
-func WithMessagingConnectionDialer[T ConnectionTypes](dialer ConnectionDialer[T]) RabbitMQConnectionOption[T] {
+func WithMessagingConnectionDialer[T ConnectionTypes](dialer ConnectionDialer[T]) RabbitMQConnectionOptions[T] {
 	return func(rabbitMQConnection *RabbitMQConnection[T]) {
 		rabbitMQConnection.connectionDialer = dialer
 	}
@@ -60,7 +60,7 @@ type RabbitMQConnection[T ConnectionTypes] struct {
 	mu               sync.RWMutex
 }
 
-func NewRabbitMQConnection[T ConnectionTypes](context Context, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
+func NewRabbitMQConnection[T ConnectionTypes](context Context, options ...RabbitMQConnectionOptions[T]) *RabbitMQConnection[T] {
 
 	if context == nil {
 		log.Fatal("starting up - error setting up rabbitmq connection: context is nil")
