@@ -244,6 +244,18 @@ func (mr *MockConsumerMockRecorder) Context() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockConsumer)(nil).Context))
 }
 
+// set mocks base method.
+func (m *MockConsumer) set(property string, value any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "set", property, value)
+}
+
+// set indicates an expected call of set.
+func (mr *MockConsumerMockRecorder) set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockConsumer)(nil).set), property, value)
+}
+
 // MockProducer is a mock of Producer interface.
 type MockProducer[T PublishingTypes] struct {
 	ctrl     *gomock.Controller

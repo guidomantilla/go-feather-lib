@@ -173,3 +173,7 @@ func (streams *RabbitMQStreamsConsumer) Close() {
 func (streams *RabbitMQStreamsConsumer) Context() Context {
 	return streams.connection.Context()
 }
+
+func (streams *RabbitMQStreamsConsumer) set(property string, value any) {
+
+}

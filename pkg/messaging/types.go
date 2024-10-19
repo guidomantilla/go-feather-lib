@@ -62,6 +62,7 @@ type Consumer interface {
 	Context() Context
 	Consume(ctx context.Context) (Event, error)
 	Close()
+	set(property string, value any)
 }
 
 type PublishingTypes interface {

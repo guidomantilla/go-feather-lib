@@ -10,57 +10,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
-
-type RabbitMQConsumerOption func(*RabbitMQConsumer)
-
-func WithAutoAck(autoAck bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.autoAck = autoAck
-	}
-}
-
-func WithNoLocal(noLocal bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.noLocal = noLocal
-	}
-}
-
-func WithDurable(durable bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.durable = durable
-	}
-}
-
-func WithAutoDelete(autoDelete bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.autoDelete = autoDelete
-	}
-}
-
-func WithExclusive(exclusive bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.exclusive = exclusive
-	}
-}
-
-func WithNoWait(noWait bool) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.noWait = noWait
-	}
-}
-
-func WithArgs(args amqp.Table) RabbitMQConsumerOption {
-	return func(queue *RabbitMQConsumer) {
-		queue.args = args
-	}
-}
-
-func WithRabbitMQListener(listener Listener[*amqp.Delivery]) RabbitMQConsumerOption {
-	return func(consumer *RabbitMQConsumer) {
-		consumer.listener = listener
-	}
-}
 
 type RabbitMQConsumer struct {
 	connection Connection[*amqp.Connection]
@@ -79,7 +30,7 @@ type RabbitMQConsumer struct {
 	mu         sync.RWMutex
 }
 
-func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, options ...RabbitMQConsumerOption) *RabbitMQConsumer {
+func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, options ...RabbitMQConsumerOptions) *RabbitMQConsumer {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq consumer: connection is nil")
@@ -192,4 +143,33 @@ func (consumer *RabbitMQConsumer) Close() {
 
 func (consumer *RabbitMQConsumer) Context() Context {
 	return consumer.connection.Context()
+}
+
+func (consumer *RabbitMQConsumer) set(property string, value any) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
+	}
+
+	switch property {
+	case "listener":
+		if value != nil {
+			consumer.listener = value.(Listener[*amqp.Delivery])
+		}
+	case "autoAck":
+		consumer.autoAck = value.(bool)
+	case "noLocal":
+		consumer.noLocal = value.(bool)
+	case "durable":
+		consumer.durable = value.(bool)
+	case "autoDelete":
+		consumer.autoDelete = value.(bool)
+	case "exclusive":
+		consumer.exclusive = value.(bool)
+	case "noWait":
+		consumer.noWait = value.(bool)
+	case "args":
+		if value != nil {
+			consumer.args = value.(amqp.Table)
+		}
+	}
 }
