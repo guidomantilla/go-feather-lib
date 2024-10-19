@@ -14,61 +14,61 @@ const (
 )
 
 var (
-	_ MessagingContext                         = (*DefaultMessagingContext)(nil)
-	_ MessagingConnection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
-	_ MessagingConnection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
-	_ MessagingListener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
-	_ MessagingListener[*samqp.Message]        = (*RabbitMQStreamsListener)(nil)
-	_ MessagingConsumer                        = (*RabbitMQConsumer)(nil)
-	_ MessagingConsumer                        = (*RabbitMQStreamsConsumer)(nil)
-	_ MessagingContext                         = (*MockMessagingContext)(nil)
-	_ MessagingConnection[*amqp.Connection]    = (*MockMessagingConnection[*amqp.Connection])(nil)
-	_ MessagingConnection[*stream.Environment] = (*MockMessagingConnection[*stream.Environment])(nil)
-	_ MessagingListener[*amqp.Delivery]        = (*MockMessagingListener[*amqp.Delivery])(nil)
-	_ MessagingListener[*samqp.Message]        = (*MockMessagingListener[*samqp.Message])(nil)
+	_ Context                         = (*DefaultMessagingContext)(nil)
+	_ Connection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
+	_ Connection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
+	_ Listener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
+	_ Listener[*samqp.Message]        = (*RabbitMQStreamsListener)(nil)
+	_ Consumer                        = (*RabbitMQConsumer)(nil)
+	_ Consumer                        = (*RabbitMQStreamsConsumer)(nil)
+	_ Context                         = (*MockContext)(nil)
+	_ Connection[*amqp.Connection]    = (*MockConnection[*amqp.Connection])(nil)
+	_ Connection[*stream.Environment] = (*MockConnection[*stream.Environment])(nil)
+	_ Listener[*amqp.Delivery]        = (*MockListener[*amqp.Delivery])(nil)
+	_ Listener[*samqp.Message]        = (*MockListener[*samqp.Message])(nil)
 )
 
-type MessagingContext interface {
+type Context interface {
 	Url() string
 	Server() string
 }
 
-type MessagingConnectionTypes interface {
+type ConnectionTypes interface {
 	*amqp.Connection | *stream.Environment
 	IsClosed() bool
 	Close() error
 }
 
-type MessagingConnectionDialer[T MessagingConnectionTypes] func(url string) (T, error)
+type ConnectionDialer[T ConnectionTypes] func(url string) (T, error)
 
-type MessagingConnection[T MessagingConnectionTypes] interface {
-	MessagingContext() MessagingContext
+type Connection[T ConnectionTypes] interface {
+	Context() Context
 	Connect() (T, error)
 	Close()
 }
 
-type MessagingListenerTypes interface {
+type ListenerTypes interface {
 	*amqp.Delivery | *samqp.Message
 }
 
-type MessagingListener[T MessagingListenerTypes] interface {
+type Listener[T ListenerTypes] interface {
 	OnMessage(ctx context.Context, message T) error
 }
 
-type MessagingEvent = chan string
+type Event = chan string
 
-type MessagingConsumer interface {
-	MessagingContext() MessagingContext
-	Consume(ctx context.Context) (MessagingEvent, error)
+type Consumer interface {
+	Context() Context
+	Consume(ctx context.Context) (Event, error)
 	Close()
 }
 
-type MessagingPublishingTypes interface {
+type PublishingTypes interface {
 	*amqp.Publishing | *samqp.AMQP10
 }
 
-type MessagingProducer[T MessagingPublishingTypes] interface {
-	MessagingContext() MessagingContext
+type Producer[T PublishingTypes] interface {
+	Context() Context
 	Produce(ctx context.Context, message T) error
 	Close()
 }

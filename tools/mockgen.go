@@ -12,4 +12,6 @@ package tools
 //go:generate mockgen -package=security 	-destination ../pkg/security/principal_manager_mocks.go -source ../pkg/security/principal_manager_types.go
 //go:generate mockgen -package=security 	-destination ../pkg/security/token_manager_mocks.go 	-source ../pkg/security/token_manager_types.go
 
+//go:generate mockgen -package=messaging 	-destination ../pkg/messaging/mocks.go 					-source ../pkg/messaging/types.go
+
 //go:generate mockgen -package=server 		-destination ../pkg/server/mocks.go 					-source ../pkg/server/types.go

@@ -11,11 +11,11 @@ import (
 
 type RabbitMQServer struct {
 	ctx          context.Context
-	consumers    []messaging.MessagingConsumer
+	consumers    []messaging.Consumer
 	closeChannel chan struct{}
 }
 
-func NewRabbitMQServer(consumers ...messaging.MessagingConsumer) *RabbitMQServer {
+func NewRabbitMQServer(consumers ...messaging.Consumer) *RabbitMQServer {
 	assert.NotEmpty(consumers, "starting up - error setting up rabbitmq server: consumers is empty")
 
 	return &RabbitMQServer{
@@ -28,10 +28,10 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "rabbitmq server - error starting up: context is nil")
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].MessagingContext().Server()))
+	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].Context().Server()))
 
 	for _, consumer := range server.consumers {
-		go func(ctx context.Context, consumer messaging.MessagingConsumer, closeChannel chan struct{}) {
+		go func(ctx context.Context, consumer messaging.Consumer, closeChannel chan struct{}) {
 			for {
 				select {
 				case <-closeChannel:

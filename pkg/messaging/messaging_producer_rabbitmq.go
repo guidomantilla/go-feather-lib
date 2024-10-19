@@ -33,19 +33,19 @@ func WithImmediate(immediate bool) RabbitMQProducerOption {
 }
 
 type RabbitMQProducer struct {
-	messagingConnection MessagingConnection[*amqp.Connection]
-	channel             *amqp.Channel
-	name                string
-	exchange            string
-	mandatory           bool
-	immediate           bool
-	mu                  sync.RWMutex
+	connection Connection[*amqp.Connection]
+	channel    *amqp.Channel
+	name       string
+	exchange   string
+	mandatory  bool
+	immediate  bool
+	mu         sync.RWMutex
 }
 
-func NewRabbitMQProducer(messagingConnection MessagingConnection[*amqp.Connection], name string, options ...RabbitMQProducerOption) *RabbitMQProducer {
+func NewRabbitMQProducer(connection Connection[*amqp.Connection], name string, options ...RabbitMQProducerOption) *RabbitMQProducer {
 
-	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitmq producer: messagingConnection is nil")
+	if connection == nil {
+		log.Fatal("starting up - error setting up rabbitmq producer: connection is nil")
 	}
 
 	if strings.TrimSpace(name) == "" {
@@ -53,11 +53,11 @@ func NewRabbitMQProducer(messagingConnection MessagingConnection[*amqp.Connectio
 	}
 
 	producer := &RabbitMQProducer{
-		messagingConnection: messagingConnection,
-		name:                name,
-		exchange:            "",
-		mandatory:           false,
-		immediate:           false,
+		connection: connection,
+		name:       name,
+		exchange:   "",
+		mandatory:  false,
+		immediate:  false,
 	}
 
 	for _, option := range options {
@@ -73,7 +73,7 @@ func (producer *RabbitMQProducer) Produce(ctx context.Context, message *amqp.Pub
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = producer.messagingConnection.Connect(); err != nil {
+	if connection, err = producer.connection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq producer - failed connection to queue %s: %s", producer.name, err.Error()))
 		return err
 	}
@@ -104,10 +104,10 @@ func (producer *RabbitMQProducer) Close() {
 		}
 	}
 	producer.channel = nil
-	producer.messagingConnection.Close()
+	producer.connection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq producer - closed connection to queue %s", producer.name))
 }
 
-func (producer *RabbitMQProducer) MessagingContext() MessagingContext {
-	return producer.messagingConnection.MessagingContext()
+func (producer *RabbitMQProducer) Context() Context {
+	return producer.connection.Context()
 }

@@ -13,11 +13,11 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQConnectionOption[T MessagingConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
+type RabbitMQConnectionOption[T ConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
 
 func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
 	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
-		rabbitMQConnection.messagingConnectionDialer = func(url string) (*amqp.Connection, error) {
+		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
 			return amqp.Dial(url)
 		}
 	}
@@ -25,7 +25,7 @@ func WithRabbitMQDialer() RabbitMQConnectionOption[*amqp.Connection] {
 
 func WithRabbitMQDialerTLS(amqps *tls.Config) RabbitMQConnectionOption[*amqp.Connection] {
 	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
-		rabbitMQConnection.messagingConnectionDialer = func(url string) (*amqp.Connection, error) {
+		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
 			return amqp.DialTLS(url, amqps)
 		}
 	}
@@ -33,7 +33,7 @@ func WithRabbitMQDialerTLS(amqps *tls.Config) RabbitMQConnectionOption[*amqp.Con
 
 func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
-		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
+		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
 			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
 		}
 	}
@@ -41,29 +41,29 @@ func WithRabbitMQStreamsDialer() RabbitMQConnectionOption[*stream.Environment] {
 
 func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOption[*stream.Environment] {
 	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
-		rabbitMQConnection.messagingConnectionDialer = func(url string) (*stream.Environment, error) {
+		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
 			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url).SetTLSConfig(streams))
 		}
 	}
 }
 
-func WithMessagingConnectionDialer[T MessagingConnectionTypes](dialer MessagingConnectionDialer[T]) RabbitMQConnectionOption[T] {
+func WithMessagingConnectionDialer[T ConnectionTypes](dialer ConnectionDialer[T]) RabbitMQConnectionOption[T] {
 	return func(rabbitMQConnection *RabbitMQConnection[T]) {
-		rabbitMQConnection.messagingConnectionDialer = dialer
+		rabbitMQConnection.connectionDialer = dialer
 	}
 }
 
-type RabbitMQConnection[T MessagingConnectionTypes] struct {
-	messagingContext          MessagingContext
-	messagingConnectionDialer MessagingConnectionDialer[T]
-	connection                T
-	mu                        sync.RWMutex
+type RabbitMQConnection[T ConnectionTypes] struct {
+	context          Context
+	connectionDialer ConnectionDialer[T]
+	connection       T
+	mu               sync.RWMutex
 }
 
-func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext MessagingContext, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
+func NewRabbitMQConnection[T ConnectionTypes](context Context, options ...RabbitMQConnectionOption[T]) *RabbitMQConnection[T] {
 
-	if messagingContext == nil {
-		log.Fatal("starting up - error setting up rabbitmq connection: messagingContext is nil")
+	if context == nil {
+		log.Fatal("starting up - error setting up rabbitmq connection: context is nil")
 	}
 
 	if len(options) == 0 {
@@ -71,7 +71,7 @@ func NewRabbitMQConnection[T MessagingConnectionTypes](messagingContext Messagin
 	}
 
 	connection := &RabbitMQConnection[T]{
-		messagingContext: messagingContext,
+		context: context,
 	}
 
 	for _, option := range options {
@@ -87,7 +87,7 @@ func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 	defer connection.mu.Unlock()
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
-		log.Debug(fmt.Sprintf("rabbitmq connection - already connected to %s", connection.messagingContext.Server()))
+		log.Debug(fmt.Sprintf("rabbitmq connection - already connected to %s", connection.context.Server()))
 		return connection.connection, nil
 	}
 
@@ -98,7 +98,7 @@ func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 	)
 
 	if err != nil {
-		log.Error(fmt.Sprintf("rabbitmq connection - failed connection to %s", connection.messagingContext.Server()))
+		log.Error(fmt.Sprintf("rabbitmq connection - failed connection to %s", connection.context.Server()))
 		return nil, err
 	}
 
@@ -108,11 +108,11 @@ func (connection *RabbitMQConnection[T]) Connect() (T, error) {
 func (connection *RabbitMQConnection[T]) connect() error {
 
 	var err error
-	if connection.connection, err = connection.messagingConnectionDialer(connection.messagingContext.Url()); err != nil {
+	if connection.connection, err = connection.connectionDialer(connection.context.Url()); err != nil {
 		return err
 	}
 
-	log.Info(fmt.Sprintf("rabbitmq connection - connected to %s", connection.messagingContext.Server()))
+	log.Info(fmt.Sprintf("rabbitmq connection - connected to %s", connection.context.Server()))
 
 	return nil
 }
@@ -123,13 +123,13 @@ func (connection *RabbitMQConnection[T]) Close() {
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		log.Debug("rabbitmq connection - closing connection")
 		if err := connection.connection.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.messagingContext.Server(), err.Error()))
+			log.Error(fmt.Sprintf("rabbitmq connection - failed to close connection to %s: %s", connection.context.Server(), err.Error()))
 		}
 	}
 	connection.connection = nil
-	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.messagingContext.Server()))
+	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.context.Server()))
 }
 
-func (connection *RabbitMQConnection[T]) MessagingContext() MessagingContext {
-	return connection.messagingContext
+func (connection *RabbitMQConnection[T]) Context() Context {
+	return connection.context
 }

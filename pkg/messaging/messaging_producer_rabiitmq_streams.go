@@ -22,18 +22,18 @@ func WithProducerOptions(options *stream.ProducerOptions) RabbitMQStreamsProduce
 }
 
 type RabbitMQStreamsProducer struct {
-	messagingConnection MessagingConnection[*stream.Environment]
-	environment         *stream.Environment
-	name                string
-	streamOptions       *stream.StreamOptions
-	producerOptions     *stream.ProducerOptions
-	mu                  sync.RWMutex
+	connection      Connection[*stream.Environment]
+	environment     *stream.Environment
+	name            string
+	streamOptions   *stream.StreamOptions
+	producerOptions *stream.ProducerOptions
+	mu              sync.RWMutex
 }
 
-func NewRabbitMQStreamsProducer(messagingConnection MessagingConnection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
+func NewRabbitMQStreamsProducer(connection Connection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
 
-	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitmq streams producer: messagingConnection is nil")
+	if connection == nil {
+		log.Fatal("starting up - error setting up rabbitmq streams producer: connection is nil")
 	}
 
 	if strings.TrimSpace(name) == "" {
@@ -41,10 +41,10 @@ func NewRabbitMQStreamsProducer(messagingConnection MessagingConnection[*stream.
 	}
 
 	producer := &RabbitMQStreamsProducer{
-		messagingConnection: messagingConnection,
-		name:                name,
-		streamOptions:       stream.NewStreamOptions(),
-		producerOptions:     stream.NewProducerOptions(),
+		connection:      connection,
+		name:            name,
+		streamOptions:   stream.NewStreamOptions(),
+		producerOptions: stream.NewProducerOptions(),
 	}
 
 	for _, option := range options {
@@ -59,7 +59,7 @@ func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *sa
 	defer streams.mu.Unlock()
 
 	var err error
-	if streams.environment, err = streams.messagingConnection.Connect(); err != nil {
+	if streams.environment, err = streams.connection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return err
 	}
@@ -102,10 +102,10 @@ func (streams *RabbitMQStreamsProducer) Close() {
 		}
 	}
 	streams.environment = nil
-	streams.messagingConnection.Close()
+	streams.connection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *RabbitMQStreamsProducer) MessagingContext() MessagingContext {
-	return streams.messagingConnection.MessagingContext()
+func (streams *RabbitMQStreamsProducer) Context() Context {
+	return streams.connection.Context()
 }

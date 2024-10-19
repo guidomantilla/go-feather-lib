@@ -28,7 +28,7 @@ func WithConsumerOptions(options *stream.ConsumerOptions) RabbitMQStreamsConsume
 	}
 }
 
-func WithRabbitMQStreamsListener(listener MessagingListener[*amqp.Message]) RabbitMQStreamsConsumerOption {
+func WithRabbitMQStreamsListener(listener Listener[*amqp.Message]) RabbitMQStreamsConsumerOption {
 	return func(consumer *RabbitMQStreamsConsumer) {
 		consumer.listener = listener
 		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
@@ -41,21 +41,21 @@ func WithRabbitMQStreamsListener(listener MessagingListener[*amqp.Message]) Rabb
 }
 
 type RabbitMQStreamsConsumer struct {
-	messagingConnection MessagingConnection[*stream.Environment]
-	listener            MessagingListener[*amqp.Message]
-	environment         *stream.Environment
-	name                string
-	consumer            string
-	streamOptions       *stream.StreamOptions
-	consumerOptions     *stream.ConsumerOptions
-	messagesHandler     stream.MessagesHandler
-	mu                  sync.RWMutex
+	connection      Connection[*stream.Environment]
+	listener        Listener[*amqp.Message]
+	environment     *stream.Environment
+	name            string
+	consumer        string
+	streamOptions   *stream.StreamOptions
+	consumerOptions *stream.ConsumerOptions
+	messagesHandler stream.MessagesHandler
+	mu              sync.RWMutex
 }
 
-func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.Environment], name string, options ...RabbitMQStreamsConsumerOption) *RabbitMQStreamsConsumer {
+func NewRabbitMQStreamsConsumer(connection Connection[*stream.Environment], name string, options ...RabbitMQStreamsConsumerOption) *RabbitMQStreamsConsumer {
 
-	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitmq streams consumer: messagingConnection is nil")
+	if connection == nil {
+		log.Fatal("starting up - error setting up rabbitmq streams consumer: connection is nil")
 	}
 
 	if strings.TrimSpace(name) == "" {
@@ -63,12 +63,12 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	}
 	listener := NewRabbitMQStreamsListener()
 	consumer := &RabbitMQStreamsConsumer{
-		messagingConnection: messagingConnection,
-		name:                name,
-		consumer:            "consumer-" + name,
-		streamOptions:       stream.NewStreamOptions(),
-		consumerOptions:     stream.NewConsumerOptions().SetConsumerName("consumer-" + name),
-		listener:            listener,
+		connection:      connection,
+		name:            name,
+		consumer:        "consumer-" + name,
+		streamOptions:   stream.NewStreamOptions(),
+		consumerOptions: stream.NewConsumerOptions().SetConsumerName("consumer-" + name),
+		listener:        listener,
 		messagesHandler: func(consumerContext stream.ConsumerContext, message *amqp.Message) {
 			go func(consumerContext stream.ConsumerContext, message *amqp.Message) {
 				log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
@@ -91,12 +91,12 @@ func NewRabbitMQStreamsConsumer(messagingConnection MessagingConnection[*stream.
 	return consumer
 }
 
-func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
+func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (Event, error) {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
 	var err error
-	if streams.environment, err = streams.messagingConnection.Connect(); err != nil {
+	if streams.environment, err = streams.connection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
@@ -166,10 +166,10 @@ func (streams *RabbitMQStreamsConsumer) Close() {
 		}
 	}
 	streams.environment = nil
-	streams.messagingConnection.Close()
+	streams.connection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
 }
 
-func (streams *RabbitMQStreamsConsumer) MessagingContext() MessagingContext {
-	return streams.messagingConnection.MessagingContext()
+func (streams *RabbitMQStreamsConsumer) Context() Context {
+	return streams.connection.Context()
 }

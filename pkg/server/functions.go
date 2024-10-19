@@ -25,6 +25,6 @@ func BuildGrpcServer(address string, server *grpc.Server) (string, Server) {
 	return "grpc-server", NewGrpcServer(address, server)
 }
 
-func BuildRabbitMQServer(consumers ...messaging.MessagingConsumer) (string, Server) {
+func BuildRabbitMQServer(consumers ...messaging.Consumer) (string, Server) {
 	return "rabbitmq-server", NewRabbitMQServer(consumers...)
 }

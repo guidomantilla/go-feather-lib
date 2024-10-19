@@ -56,33 +56,33 @@ func WithArgs(args amqp.Table) RabbitMQConsumerOption {
 	}
 }
 
-func WithRabbitMQListener(listener MessagingListener[*amqp.Delivery]) RabbitMQConsumerOption {
+func WithRabbitMQListener(listener Listener[*amqp.Delivery]) RabbitMQConsumerOption {
 	return func(consumer *RabbitMQConsumer) {
 		consumer.listener = listener
 	}
 }
 
 type RabbitMQConsumer struct {
-	messagingConnection MessagingConnection[*amqp.Connection]
-	listener            MessagingListener[*amqp.Delivery]
-	channel             *amqp.Channel
-	queue               amqp.Queue
-	name                string
-	consumer            string
-	autoAck             bool
-	noLocal             bool
-	durable             bool
-	autoDelete          bool
-	exclusive           bool
-	noWait              bool
-	args                amqp.Table
-	mu                  sync.RWMutex
+	connection Connection[*amqp.Connection]
+	listener   Listener[*amqp.Delivery]
+	channel    *amqp.Channel
+	queue      amqp.Queue
+	name       string
+	consumer   string
+	autoAck    bool
+	noLocal    bool
+	durable    bool
+	autoDelete bool
+	exclusive  bool
+	noWait     bool
+	args       amqp.Table
+	mu         sync.RWMutex
 }
 
-func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connection], name string, options ...RabbitMQConsumerOption) *RabbitMQConsumer {
+func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, options ...RabbitMQConsumerOption) *RabbitMQConsumer {
 
-	if messagingConnection == nil {
-		log.Fatal("starting up - error setting up rabbitmq consumer: messagingConnection is nil")
+	if connection == nil {
+		log.Fatal("starting up - error setting up rabbitmq consumer: connection is nil")
 	}
 
 	if strings.TrimSpace(name) == "" {
@@ -90,17 +90,17 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 	}
 
 	consumer := &RabbitMQConsumer{
-		messagingConnection: messagingConnection,
-		listener:            NewRabbitMQListener(),
-		name:                name,
-		consumer:            "consumer-" + name,
-		autoAck:             false,
-		noLocal:             false,
-		durable:             false,
-		autoDelete:          false,
-		exclusive:           false,
-		noWait:              false,
-		args:                nil,
+		connection: connection,
+		listener:   NewRabbitMQListener(),
+		name:       name,
+		consumer:   "consumer-" + name,
+		autoAck:    false,
+		noLocal:    false,
+		durable:    false,
+		autoDelete: false,
+		exclusive:  false,
+		noWait:     false,
+		args:       nil,
 	}
 
 	for _, option := range options {
@@ -111,14 +111,14 @@ func NewRabbitMQConsumer(messagingConnection MessagingConnection[*amqp.Connectio
 	return consumer
 }
 
-func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, error) {
+func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (Event, error) {
 
 	consumer.mu.Lock()
 	defer consumer.mu.Unlock()
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = consumer.messagingConnection.Connect(); err != nil {
+	if connection, err = consumer.connection.Connect(); err != nil {
 		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (MessagingEvent, 
 	}
 
 	closeChannel := make(chan string)
-	closeHandler := func(ctx context.Context, listener MessagingListener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {
+	closeHandler := func(ctx context.Context, listener Listener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {
 		var err error
 		for message := range deliveries {
 			go func(ctx context.Context, message amqp.Delivery) {
@@ -186,10 +186,10 @@ func (consumer *RabbitMQConsumer) Close() {
 		}
 	}
 	consumer.channel = nil
-	consumer.messagingConnection.Close()
+	consumer.connection.Close()
 	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
 }
 
-func (consumer *RabbitMQConsumer) MessagingContext() MessagingContext {
-	return consumer.messagingConnection.MessagingContext()
+func (consumer *RabbitMQConsumer) Context() Context {
+	return consumer.connection.Context()
 }
