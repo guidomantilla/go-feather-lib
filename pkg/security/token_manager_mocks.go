@@ -67,3 +67,15 @@ func (mr *MockTokenManagerMockRecorder) Validate(tokenString any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockTokenManager)(nil).Validate), tokenString)
 }
+
+// set mocks base method.
+func (m *MockTokenManager) set(property string, value any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "set", property, value)
+}
+
+// set indicates an expected call of set.
+func (mr *MockTokenManagerMockRecorder) set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockTokenManager)(nil).set), property, value)
+}

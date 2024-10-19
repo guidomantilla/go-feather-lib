@@ -8,6 +8,7 @@ import (
 	"github.com/xorcare/pointer"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 type Claims struct {
@@ -133,4 +134,31 @@ func (manager *JwtTokenManager) Validate(tokenString string) (*Principal, error)
 	}
 
 	return principal, nil
+}
+
+func (manager *JwtTokenManager) set(property string, value any) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
+	}
+
+	switch property {
+	case "issuer":
+		manager.issuer = utils.ToString(value)
+	case "timeout":
+		if value.(time.Duration) > 0 {
+			manager.timeout = value.(time.Duration)
+		}
+	case "signingMethod":
+		if value.(jwt.SigningMethod) != nil {
+			manager.signingMethod = value.(jwt.SigningMethod)
+		}
+	case "signingKey":
+		if value != nil {
+			manager.signingKey = value
+		}
+	case "verifyingKey":
+		if value != nil {
+			manager.verifyingKey = value
+		}
+	}
 }

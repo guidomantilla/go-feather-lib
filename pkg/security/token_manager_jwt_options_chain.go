@@ -17,7 +17,7 @@ func JwtTokenManagerOptionsChainBuilder() *JwtTokenManagerOptionsChain {
 }
 
 func (options *JwtTokenManagerOptionsChain) Build() JwtTokenManagerOptions {
-	return func(tokenManager *JwtTokenManager) {
+	return func(tokenManager TokenManager) {
 		for _, option := range options.chain {
 			option(tokenManager)
 		}
