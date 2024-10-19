@@ -1,21 +1,21 @@
 package messaging
 
-var contextOption = NewContextOption()
+var contextOptions = NewContextOption()
 
-func NewContextOption() ContextOption {
+func NewContextOption() ContextOptions {
 	return func(context Context) {
 	}
 }
 
-type ContextOption func(context Context)
+type ContextOptions func(context Context)
 
-func (option ContextOption) WithService(service string) ContextOption {
+func (option ContextOptions) WithService(service string) ContextOptions {
 	return func(context Context) {
 		context.set("service", service)
 	}
 }
 
-func (option ContextOption) WithVhost(vhost string) ContextOption {
+func (option ContextOptions) WithVhost(vhost string) ContextOptions {
 	return func(context Context) {
 		context.set("vhost", vhost)
 	}

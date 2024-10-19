@@ -14,7 +14,7 @@ type context_ struct {
 	vhost   string
 }
 
-func NewContext(url string, username string, password string, server string, options ...ContextOption) Context {
+func NewContext(url string, username string, password string, server string, options ...ContextOptions) Context {
 	assert.NotEmpty(url, "starting up - error setting up messaging context: url is empty")
 	assert.NotEmpty(username, "starting up - error setting up messaging context: username is empty")
 	assert.NotEmpty(password, "starting up - error setting up messaging context: password is empty")

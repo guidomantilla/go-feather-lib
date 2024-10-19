@@ -1,16 +1,16 @@
 package messaging
 
-type ContextOptionChain struct {
-	chain []ContextOption
+type ContextOptionsChain struct {
+	chain []ContextOptions
 }
 
-func NewContextOptionChain() *ContextOptionChain {
-	return &ContextOptionChain{
-		chain: make([]ContextOption, 0),
+func NewContextOptionChain() *ContextOptionsChain {
+	return &ContextOptionsChain{
+		chain: make([]ContextOptions, 0),
 	}
 }
 
-func (options *ContextOptionChain) Build() ContextOption {
+func (options *ContextOptionsChain) Build() ContextOptions {
 	return func(context Context) {
 		for _, option := range options.chain {
 			option(context)
@@ -18,12 +18,12 @@ func (options *ContextOptionChain) Build() ContextOption {
 	}
 }
 
-func (options *ContextOptionChain) WithService(service string) *ContextOptionChain {
-	options.chain = append(options.chain, contextOption.WithService(service))
+func (options *ContextOptionsChain) WithService(service string) *ContextOptionsChain {
+	options.chain = append(options.chain, contextOptions.WithService(service))
 	return options
 }
 
-func (options *ContextOptionChain) WithVhost(vhost string) *ContextOptionChain {
-	options.chain = append(options.chain, contextOption.WithVhost(vhost))
+func (options *ContextOptionsChain) WithVhost(vhost string) *ContextOptionsChain {
+	options.chain = append(options.chain, contextOptions.WithVhost(vhost))
 	return options
 }

@@ -27,19 +27,19 @@ func main() {
 		clientKey := environment.Value(environment.SslClientKey).AsString()
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-		messagingContext := messaging.NewDefaultMessagingContext("rabbitmq-stream+tls://:username::password@:server:vhost",
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.WithVhost("/"))
+		messagingContext := messaging.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.NewContextOptionChain().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the environment and the consumer
 
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.StreamsDialerTLS(tlsConfig))
 			consumer := messaging.NewRabbitMQStreamsConsumer(connection, name)
 
 			application.Attach(server.BuildRabbitMQServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the environment and the publisher
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQStreamsDialerTLS(tlsConfig))
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.StreamsDialerTLS(tlsConfig))
 			producer := messaging.NewRabbitMQStreamsProducer(connection, name)
 			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
 				log.Fatal("Error producing message: %v", err)

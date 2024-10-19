@@ -28,19 +28,19 @@ func main() {
 		clientKey := environment.Value(environment.SslClientKey).AsString()
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-		messagingContext := messaging.NewDefaultMessagingContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", messaging.WithVhost("/"))
+		messagingContext := messaging.NewContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", messaging.NewContextOptionChain().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the consumer
 
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialerTLS(tlsConfig))
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.AMQPDialerTLS(tlsConfig))
 			consumer := messaging.NewRabbitMQConsumer(connection, name)
 
 			application.Attach(server.BuildRabbitMQServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the publisher
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialerTLS(tlsConfig))
+			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.AMQPDialerTLS(tlsConfig))
 			producer := messaging.NewRabbitMQProducer(connection, name)
 
 			if err := producer.Produce(context.Background(), &amqp.Publishing{

@@ -1,57 +1,14 @@
 package messaging
 
 import (
-	"crypto/tls"
 	"fmt"
 	"sync"
 	"time"
 
 	retry "github.com/avast/retry-go/v4"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
-
-type RabbitMQConnectionOptions[T ConnectionTypes] func(rabbitMQConnection *RabbitMQConnection[T])
-
-func WithRabbitMQAMQPDialer() RabbitMQConnectionOptions[*amqp.Connection] {
-	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
-		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
-			return amqp.Dial(url)
-		}
-	}
-}
-
-func WithRabbitMQAMQPDialerTLS(amqps *tls.Config) RabbitMQConnectionOptions[*amqp.Connection] {
-	return func(rabbitMQConnection *RabbitMQConnection[*amqp.Connection]) {
-		rabbitMQConnection.connectionDialer = func(url string) (*amqp.Connection, error) {
-			return amqp.DialTLS(url, amqps)
-		}
-	}
-}
-
-func WithRabbitMQStreamsDialer() RabbitMQConnectionOptions[*stream.Environment] {
-	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
-		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
-			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url))
-		}
-	}
-}
-
-func WithRabbitMQStreamsDialerTLS(streams *tls.Config) RabbitMQConnectionOptions[*stream.Environment] {
-	return func(rabbitMQConnection *RabbitMQConnection[*stream.Environment]) {
-		rabbitMQConnection.connectionDialer = func(url string) (*stream.Environment, error) {
-			return stream.NewEnvironment(stream.NewEnvironmentOptions().SetUri(url).SetTLSConfig(streams))
-		}
-	}
-}
-
-func WithMessagingConnectionDialer[T ConnectionTypes](dialer ConnectionDialer[T]) RabbitMQConnectionOptions[T] {
-	return func(rabbitMQConnection *RabbitMQConnection[T]) {
-		rabbitMQConnection.connectionDialer = dialer
-	}
-}
 
 type RabbitMQConnection[T ConnectionTypes] struct {
 	context          Context
@@ -60,22 +17,19 @@ type RabbitMQConnection[T ConnectionTypes] struct {
 	mu               sync.RWMutex
 }
 
-func NewRabbitMQConnection[T ConnectionTypes](context Context, options ...RabbitMQConnectionOptions[T]) *RabbitMQConnection[T] {
+func NewRabbitMQConnection[T ConnectionTypes](context Context, connectionDialer ConnectionDialer[T]) *RabbitMQConnection[T] {
 
 	if context == nil {
 		log.Fatal("starting up - error setting up rabbitmq connection: context is nil")
 	}
 
-	if len(options) == 0 {
-		log.Fatal("starting up - error setting up rabbitmq connection: options is empty")
+	if connectionDialer == nil {
+		log.Fatal("starting up - error setting up rabbitmq connection: connectionDialer is nil")
 	}
 
 	connection := &RabbitMQConnection[T]{
-		context: context,
-	}
-
-	for _, option := range options {
-		option(connection)
+		context:          context,
+		connectionDialer: connectionDialer,
 	}
 
 	return connection
