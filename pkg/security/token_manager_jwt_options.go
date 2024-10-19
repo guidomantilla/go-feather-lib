@@ -7,16 +7,16 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-var jwtTokenManagerOption = NewJwtTokenManagerOption()
+var jwtTokenManagerOptions = NewJwtTokenManagerOptions()
 
-func NewJwtTokenManagerOption() JwtTokenManagerOption {
+func NewJwtTokenManagerOptions() JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 	}
 }
 
-type JwtTokenManagerOption func(tokenManager *JwtTokenManager)
+type JwtTokenManagerOptions func(tokenManager *JwtTokenManager)
 
-func (option JwtTokenManagerOption) WithIssuer(issuer string) JwtTokenManagerOption {
+func (option JwtTokenManagerOptions) WithIssuer(issuer string) JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 		if strings.TrimSpace(issuer) != "" {
 			tokenManager.issuer = issuer
@@ -24,7 +24,7 @@ func (option JwtTokenManagerOption) WithIssuer(issuer string) JwtTokenManagerOpt
 	}
 }
 
-func (option JwtTokenManagerOption) WithTimeout(timeout time.Duration) JwtTokenManagerOption {
+func (option JwtTokenManagerOptions) WithTimeout(timeout time.Duration) JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 		if timeout > 0 {
 			tokenManager.timeout = timeout
@@ -32,7 +32,7 @@ func (option JwtTokenManagerOption) WithTimeout(timeout time.Duration) JwtTokenM
 	}
 }
 
-func (option JwtTokenManagerOption) WithSigningMethod(signingMethod jwt.SigningMethod) JwtTokenManagerOption {
+func (option JwtTokenManagerOptions) WithSigningMethod(signingMethod jwt.SigningMethod) JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 		if signingMethod != nil {
 			tokenManager.signingMethod = signingMethod
@@ -40,7 +40,7 @@ func (option JwtTokenManagerOption) WithSigningMethod(signingMethod jwt.SigningM
 	}
 }
 
-func (option JwtTokenManagerOption) WithSigningKey(signingKey any) JwtTokenManagerOption {
+func (option JwtTokenManagerOptions) WithSigningKey(signingKey any) JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 		if signingKey != nil {
 			tokenManager.signingKey = signingKey
@@ -48,7 +48,7 @@ func (option JwtTokenManagerOption) WithSigningKey(signingKey any) JwtTokenManag
 	}
 }
 
-func (option JwtTokenManagerOption) WithVerifyingKey(verifyingKey any) JwtTokenManagerOption {
+func (option JwtTokenManagerOptions) WithVerifyingKey(verifyingKey any) JwtTokenManagerOptions {
 	return func(tokenManager *JwtTokenManager) {
 		if verifyingKey != nil {
 			tokenManager.verifyingKey = verifyingKey

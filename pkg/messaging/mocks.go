@@ -67,6 +67,18 @@ func (mr *MockContextMockRecorder) Url() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockContext)(nil).Url))
 }
 
+// set mocks base method.
+func (m *MockContext) set(property, value string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "set", property, value)
+}
+
+// set indicates an expected call of set.
+func (mr *MockContextMockRecorder) set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockContext)(nil).set), property, value)
+}
+
 // MockConnection is a mock of Connection interface.
 type MockConnection[T ConnectionTypes] struct {
 	ctrl     *gomock.Controller

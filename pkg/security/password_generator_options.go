@@ -1,15 +1,15 @@
 package security
 
-var passwordGeneratorOption = NewPasswordGeneratorOption()
+var passwordGeneratorOptions = NewPasswordGeneratorOptions()
 
-func NewPasswordGeneratorOption() PasswordGeneratorOption {
+func NewPasswordGeneratorOptions() PasswordGeneratorOptions {
 	return func(generator *passwordGenerator) {
 	}
 }
 
-type PasswordGeneratorOption func(generator *passwordGenerator)
+type PasswordGeneratorOptions func(generator *passwordGenerator)
 
-func (option PasswordGeneratorOption) WithPasswordLength(length int) PasswordGeneratorOption {
+func (option PasswordGeneratorOptions) WithPasswordLength(length int) PasswordGeneratorOptions {
 	return func(generator *passwordGenerator) {
 		if length >= 16 {
 			generator.passwordLength = length
@@ -17,7 +17,7 @@ func (option PasswordGeneratorOption) WithPasswordLength(length int) PasswordGen
 	}
 }
 
-func (option PasswordGeneratorOption) WithMinSpecialChar(minSpecialChar int) PasswordGeneratorOption {
+func (option PasswordGeneratorOptions) WithMinSpecialChar(minSpecialChar int) PasswordGeneratorOptions {
 	return func(generator *passwordGenerator) {
 		if minSpecialChar >= 2 {
 			generator.minSpecialChar = minSpecialChar
@@ -25,7 +25,7 @@ func (option PasswordGeneratorOption) WithMinSpecialChar(minSpecialChar int) Pas
 	}
 }
 
-func (option PasswordGeneratorOption) WithMinNum(minNum int) PasswordGeneratorOption {
+func (option PasswordGeneratorOptions) WithMinNum(minNum int) PasswordGeneratorOptions {
 	return func(generator *passwordGenerator) {
 		if minNum >= 2 {
 			generator.minNum = minNum
@@ -33,7 +33,7 @@ func (option PasswordGeneratorOption) WithMinNum(minNum int) PasswordGeneratorOp
 	}
 }
 
-func (option PasswordGeneratorOption) WithMinUpperCase(minUpperCase int) PasswordGeneratorOption {
+func (option PasswordGeneratorOptions) WithMinUpperCase(minUpperCase int) PasswordGeneratorOptions {
 	return func(generator *passwordGenerator) {
 		if minUpperCase >= 2 {
 			generator.minUpperCase = minUpperCase

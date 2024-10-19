@@ -23,7 +23,7 @@ type passwordGenerator struct {
 	minUpperCase   int
 }
 
-func NewPasswordGenerator(options ...PasswordGeneratorOption) PasswordGenerator {
+func NewPasswordGenerator(options ...PasswordGeneratorOptions) PasswordGenerator {
 
 	generator := &passwordGenerator{
 		passwordLength: 16,

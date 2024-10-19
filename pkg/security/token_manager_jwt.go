@@ -23,7 +23,7 @@ type JwtTokenManager struct {
 	signingMethod jwt.SigningMethod
 }
 
-func NewJwtTokenManager(options ...JwtTokenManagerOption) *JwtTokenManager {
+func NewJwtTokenManager(options ...JwtTokenManagerOptions) *JwtTokenManager {
 
 	tokenManager := &JwtTokenManager{
 		issuer:        "",

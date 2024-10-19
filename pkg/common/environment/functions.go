@@ -16,13 +16,12 @@ func instance() Environment {
 	return value.(Environment)
 }
 
-func Load(args ...[]string) Environment {
-	withArgs := make([]Option, 0)
-	withArgs = append(withArgs, WithSSL(), WithOs())
-	for _, arg := range args {
-		withArgs = append(withArgs, WithCmd(arg))
+func Load(cmdArgs ...[]string) Environment {
+	builder := OptionsChainBuilder().WithSSL().WithOs()
+	if len(cmdArgs) >= 1 {
+		builder.WithCmd(cmdArgs[0])
 	}
-	env := New(withArgs...)
+	env := New(builder.Build())
 	singleton.Store(env)
 	return env
 }

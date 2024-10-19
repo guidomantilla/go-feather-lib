@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	_ Context                         = (*DefaultMessagingContext)(nil)
+	_ Context                         = (*context_)(nil)
 	_ Connection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
 	_ Connection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
 	_ Listener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
@@ -31,6 +31,7 @@ var (
 type Context interface {
 	Url() string
 	Server() string
+	set(property string, value string)
 }
 
 type ConnectionTypes interface {

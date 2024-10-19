@@ -78,7 +78,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 	return &BeanBuilder{
 
 		Environment: func(appCtx *ApplicationContext) environment.Environment {
-			return environment.New(environment.WithSSL(), environment.With(appCtx.CmdArgs))
+			return environment.New(environment.OptionsChainBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
