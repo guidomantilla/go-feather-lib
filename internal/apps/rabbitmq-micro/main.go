@@ -36,7 +36,7 @@ func main() {
 			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.WithRabbitMQDialerTLS(tlsConfig))
 			consumer := messaging.NewRabbitMQConsumer(connection, name)
 
-			application.Attach("RabbitMQServer", server.BuildRabbitMQServer(consumer))
+			application.Attach(server.BuildRabbitMQServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the publisher
