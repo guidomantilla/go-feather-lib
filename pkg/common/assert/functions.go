@@ -3,11 +3,12 @@ package assert
 import (
 	"log"
 	"reflect"
-	"strings"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 func NotEmpty(object any, message string) {
-	if isEmpty(object) {
+	if utils.IsEmpty(object) {
 		log.Fatal(message)
 	}
 }
@@ -37,34 +38,6 @@ func nil(object any) bool {
 }
 
 //
-
-func isEmpty(object any) bool {
-	objValue := reflect.ValueOf(object)
-	if !objValue.IsValid() {
-		return true
-	}
-
-	switch objValue.Kind() {
-	// collection types are empty when they have no element
-	case reflect.Chan, reflect.Map, reflect.Slice, reflect.Array:
-		return objValue.Len() == 0
-	// pointers are empty if nil or if the value they point to is empty
-	case reflect.Ptr:
-		if objValue.IsNil() {
-			return true
-		}
-		deref := objValue.Elem().Interface()
-		return isEmpty(deref)
-	case reflect.String:
-		value := objValue.String()
-		return strings.TrimSpace(value) == ""
-	// for all other types, compare against the zero value
-	// array types are empty when they match their zero-initialized state
-	default:
-		zero := reflect.Zero(objValue.Type())
-		return reflect.DeepEqual(object, zero.Interface())
-	}
-}
 
 func isNil(object any) bool {
 	value := reflect.ValueOf(object)

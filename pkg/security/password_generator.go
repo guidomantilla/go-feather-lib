@@ -5,6 +5,8 @@ import (
 	"math/big"
 	math "math/rand"
 	"strings"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 const (
@@ -106,4 +108,29 @@ func (generator *passwordGenerator) Validate(rawPassword string) error {
 	}
 
 	return nil
+}
+
+func (generator *passwordGenerator) set(property string, value int) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) || value <= 0 {
+		return
+	}
+
+	switch property {
+	case "passwordLength":
+		if value >= 16 {
+			generator.passwordLength = value
+		}
+	case "minSpecialChar":
+		if value >= 2 {
+			generator.minSpecialChar = value
+		}
+	case "minNum":
+		if value >= 2 {
+			generator.minNum = value
+		}
+	case "minUpperCase":
+		if value >= 2 {
+			generator.minUpperCase = value
+		}
+	}
 }

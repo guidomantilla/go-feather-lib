@@ -134,6 +134,18 @@ func (mr *MockPasswordGeneratorMockRecorder) Validate(rawPassword any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockPasswordGenerator)(nil).Validate), rawPassword)
 }
 
+// set mocks base method.
+func (m *MockPasswordGenerator) set(property string, value int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "set", property, value)
+}
+
+// set indicates an expected call of set.
+func (mr *MockPasswordGeneratorMockRecorder) set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockPasswordGenerator)(nil).set), property, value)
+}
+
 // MockPasswordManager is a mock of PasswordManager interface.
 type MockPasswordManager struct {
 	ctrl     *gomock.Controller
@@ -228,4 +240,16 @@ func (m *MockPasswordManager) Validate(rawPassword string) error {
 func (mr *MockPasswordManagerMockRecorder) Validate(rawPassword any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockPasswordManager)(nil).Validate), rawPassword)
+}
+
+// set mocks base method.
+func (m *MockPasswordManager) set(property string, value int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "set", property, value)
+}
+
+// set indicates an expected call of set.
+func (mr *MockPasswordManagerMockRecorder) set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockPasswordManager)(nil).set), property, value)
 }

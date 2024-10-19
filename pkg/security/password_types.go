@@ -28,6 +28,7 @@ type PasswordEncoder interface {
 type PasswordGenerator interface {
 	Generate() string
 	Validate(rawPassword string) error
+	set(property string, value int)
 }
 
 //

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 type context_ struct {
@@ -61,11 +62,14 @@ func (context *context_) Server() string {
 }
 
 func (context *context_) set(property string, value string) {
-	if property == "service" && strings.TrimSpace(value) != "" {
-		context.service = value
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
 	}
 
-	if property == "vhost" && strings.TrimSpace(value) != "" {
-		context.vhost = value
+	switch property {
+	case "service":
+		context.service = strings.TrimSpace(value)
+	case "vhost":
+		context.vhost = strings.TrimSpace(value)
 	}
 }

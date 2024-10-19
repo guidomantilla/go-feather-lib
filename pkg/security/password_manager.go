@@ -1,6 +1,8 @@
 package security
 
-import "github.com/guidomantilla/go-feather-lib/pkg/common/assert"
+import (
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
+)
 
 type passwordManager struct {
 	passwordEncoder   PasswordEncoder
@@ -62,4 +64,8 @@ func (manager *passwordManager) Validate(rawPassword string) error {
 	}
 
 	return nil
+}
+
+func (manager *passwordManager) set(property string, value int) {
+	manager.passwordGenerator.set(property, value)
 }

@@ -11,7 +11,7 @@ func PasswordGeneratorOptionsChainBuilder() *PasswordGeneratorOptionsChain {
 }
 
 func (options *PasswordGeneratorOptionsChain) Build() PasswordGeneratorOptions {
-	return func(generator *passwordGenerator) {
+	return func(generator PasswordGenerator) {
 		for _, option := range options.chain {
 			option(generator)
 		}
