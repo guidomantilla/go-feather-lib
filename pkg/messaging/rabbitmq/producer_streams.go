@@ -3,26 +3,18 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type RabbitMQStreamsProducerOption func(*RabbitMQStreamsProducer)
-
-func WithProducerOptions(options *stream.ProducerOptions) RabbitMQStreamsProducerOption {
-	return func(producer *RabbitMQStreamsProducer) {
-		producer.producerOptions = options
-	}
-}
-
-type RabbitMQStreamsProducer struct {
+type StreamsProducer struct {
 	connection      messaging.Connection[*stream.Environment]
 	environment     *stream.Environment
 	name            string
@@ -31,17 +23,11 @@ type RabbitMQStreamsProducer struct {
 	mu              sync.RWMutex
 }
 
-func NewRabbitMQStreamsProducer(connection messaging.Connection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
+func NewStreamsProducer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsProducerOptions) *StreamsProducer {
+	assert.NotNil(connection, "starting up - error setting up rabbitmq streams producer: connection is nil")
+	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams producer: name is empty")
 
-	if connection == nil {
-		log.Fatal("starting up - error setting up rabbitmq streams producer: connection is nil")
-	}
-
-	if strings.TrimSpace(name) == "" {
-		log.Fatal("starting up - error setting up rabbitmq streams producer: name is empty")
-	}
-
-	producer := &RabbitMQStreamsProducer{
+	producer := &StreamsProducer{
 		connection:      connection,
 		name:            name,
 		streamOptions:   stream.NewStreamOptions(),
@@ -55,7 +41,7 @@ func NewRabbitMQStreamsProducer(connection messaging.Connection[*stream.Environm
 	return producer
 }
 
-func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {
+func (streams *StreamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -93,7 +79,7 @@ func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *sa
 	return nil
 }
 
-func (streams *RabbitMQStreamsProducer) Close() {
+func (streams *StreamsProducer) Close() {
 	time.Sleep(messaging.Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
@@ -107,6 +93,6 @@ func (streams *RabbitMQStreamsProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *RabbitMQStreamsProducer) Context() messaging.Context {
+func (streams *StreamsProducer) Context() messaging.Context {
 	return streams.connection.Context()
 }

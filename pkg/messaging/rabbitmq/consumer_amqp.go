@@ -32,8 +32,8 @@ type AmqpConsumer struct {
 }
 
 func NewAmqpConsumer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {
-	assert.NotNil(connection, "starting up - error setting up rabbitmq consumer: connection is nil")
-	assert.NotEmpty(name, "starting up - error setting up rabbitmq consumer: name is empty")
+	assert.NotNil(connection, "starting up - error setting up rabbitmq amqp consumer: connection is nil")
+	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp consumer: name is empty")
 
 	consumer := &AmqpConsumer{
 		connection: connection,
