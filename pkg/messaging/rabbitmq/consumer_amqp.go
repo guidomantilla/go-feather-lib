@@ -3,15 +3,15 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
-	"strings"
 	"sync"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type AmqpConsumer struct {
@@ -32,14 +32,8 @@ type AmqpConsumer struct {
 }
 
 func NewAmqpConsumer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {
-
-	if connection == nil {
-		log.Fatal("starting up - error setting up rabbitmq consumer: connection is nil")
-	}
-
-	if strings.TrimSpace(name) == "" {
-		log.Fatal("starting up - error setting up rabbitmq consumer: name is empty")
-	}
+	assert.NotNil(connection, "starting up - error setting up rabbitmq consumer: connection is nil")
+	assert.NotEmpty(name, "starting up - error setting up rabbitmq consumer: name is empty")
 
 	consumer := &AmqpConsumer{
 		connection: connection,

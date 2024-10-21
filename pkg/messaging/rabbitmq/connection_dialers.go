@@ -2,10 +2,11 @@ package rabbitmq
 
 import (
 	"crypto/tls"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 func AMQPDialer() messaging.ConnectionDialer[*amqp.Connection] {

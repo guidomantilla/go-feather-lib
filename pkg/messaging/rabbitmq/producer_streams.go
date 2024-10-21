@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 	"sync"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type RabbitMQStreamsProducerOption func(*RabbitMQStreamsProducer)

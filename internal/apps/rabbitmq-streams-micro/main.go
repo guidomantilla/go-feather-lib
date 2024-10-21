@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 	"os"
 
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
@@ -11,6 +10,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 

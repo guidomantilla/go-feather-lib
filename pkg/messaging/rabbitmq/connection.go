@@ -2,13 +2,14 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"sync"
 	"time"
 
 	retry "github.com/avast/retry-go/v4"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type Connection[T messaging.ConnectionTypes] struct {
@@ -19,14 +20,8 @@ type Connection[T messaging.ConnectionTypes] struct {
 }
 
 func NewConnection[T messaging.ConnectionTypes](context messaging.Context, connectionDialer messaging.ConnectionDialer[T]) *Connection[T] {
-
-	if context == nil {
-		log.Fatal("starting up - error setting up rabbitmq connection: context is nil")
-	}
-
-	if connectionDialer == nil {
-		log.Fatal("starting up - error setting up rabbitmq connection: connectionDialer is nil")
-	}
+	assert.NotNil(context, "starting up - error setting up rabbitmq connection: context is nil")
+	assert.NotNil(connectionDialer, "starting up - error setting up rabbitmq connection: connectionDialer is nil")
 
 	connection := &Connection[T]{
 		context:          context,

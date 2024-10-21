@@ -3,27 +3,36 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
+
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type StreamsConsumerOption func(*StreamsConsumer)
+var streamsConsumerOptions = NewStreamsConsumerOptions()
 
-func WithStreamOptions(options *stream.StreamOptions) StreamsConsumerOption {
+func NewStreamsConsumerOptions() StreamsConsumerOptions {
 	return func(consumer *StreamsConsumer) {
-		consumer.streamOptions = options
 	}
 }
 
-func WithConsumerOptions(options *stream.ConsumerOptions) StreamsConsumerOption {
+type StreamsConsumerOptions func(*StreamsConsumer)
+
+func (options StreamsConsumerOptions) WithStreamOptions(soptions *stream.StreamOptions) StreamsConsumerOptions {
 	return func(consumer *StreamsConsumer) {
-		consumer.consumerOptions = options
+		consumer.streamOptions = soptions
 	}
 }
 
-func WithRabbitMQStreamsListener(listener messaging.Listener[*amqp.Message]) StreamsConsumerOption {
+func (options StreamsConsumerOptions) WithConsumerOptions(coptions *stream.ConsumerOptions) StreamsConsumerOptions {
+	return func(consumer *StreamsConsumer) {
+		consumer.consumerOptions = coptions
+	}
+}
+
+func (options StreamsConsumerOptions) WithStreamsListener(listener messaging.Listener[*amqp.Message]) StreamsConsumerOptions {
 	return func(consumer *StreamsConsumer) {
 		consumer.listener = listener
 		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {

@@ -1,8 +1,9 @@
 package rabbitmq
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type AmqpConsumerOptionsChain struct {

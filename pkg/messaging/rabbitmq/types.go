@@ -1,10 +1,11 @@
 package rabbitmq
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	amqp "github.com/rabbitmq/amqp091-go"
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 var (

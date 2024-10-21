@@ -1,11 +1,11 @@
 package rabbitmq
 
 import (
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type context_ struct {

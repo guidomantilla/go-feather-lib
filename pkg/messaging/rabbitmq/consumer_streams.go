@@ -4,15 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type StreamsConsumer struct {
@@ -27,15 +27,10 @@ type StreamsConsumer struct {
 	mu              sync.RWMutex
 }
 
-func NewStreamsConsumer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsConsumerOption) *StreamsConsumer {
+func NewStreamsConsumer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsConsumerOptions) *StreamsConsumer {
+	assert.NotNil(connection, "starting up - error setting up rabbitmq streams consumer: connection is nil")
+	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams consumer: name is empty")
 
-	if connection == nil {
-		log.Fatal("starting up - error setting up rabbitmq streams consumer: connection is nil")
-	}
-
-	if strings.TrimSpace(name) == "" {
-		log.Fatal("starting up - error setting up rabbitmq streams consumer: name is empty")
-	}
 	listener := NewStreamsListener()
 	consumer := &StreamsConsumer{
 		connection:      connection,
