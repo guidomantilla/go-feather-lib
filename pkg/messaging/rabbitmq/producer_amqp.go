@@ -13,27 +13,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type RabbitMQProducerOption func(*RabbitMQProducer)
-
-func WithExchange(exchange string) RabbitMQProducerOption {
-	return func(producer *RabbitMQProducer) {
-		producer.exchange = exchange
-	}
-}
-
-func WithMandatory(mandatory bool) RabbitMQProducerOption {
-	return func(producer *RabbitMQProducer) {
-		producer.mandatory = mandatory
-	}
-}
-
-func WithImmediate(immediate bool) RabbitMQProducerOption {
-	return func(producer *RabbitMQProducer) {
-		producer.immediate = immediate
-	}
-}
-
-type RabbitMQProducer struct {
+type AmqpProducer struct {
 	connection messaging.Connection[*amqp.Connection]
 	channel    *amqp.Channel
 	name       string
@@ -43,7 +23,7 @@ type RabbitMQProducer struct {
 	mu         sync.RWMutex
 }
 
-func NewRabbitMQProducer(connection messaging.Connection[*amqp.Connection], name string, options ...RabbitMQProducerOption) *RabbitMQProducer {
+func NewAmqpProducer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpProducerOptions) *AmqpProducer {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq producer: connection is nil")
@@ -53,7 +33,7 @@ func NewRabbitMQProducer(connection messaging.Connection[*amqp.Connection], name
 		log.Fatal("starting up - error setting up rabbitmq producer: name is empty")
 	}
 
-	producer := &RabbitMQProducer{
+	producer := &AmqpProducer{
 		connection: connection,
 		name:       name,
 		exchange:   "",
@@ -68,7 +48,7 @@ func NewRabbitMQProducer(connection messaging.Connection[*amqp.Connection], name
 	return producer
 }
 
-func (producer *RabbitMQProducer) Produce(ctx context.Context, message *amqp.Publishing) error {
+func (producer *AmqpProducer) Produce(ctx context.Context, message *amqp.Publishing) error {
 	producer.mu.Lock()
 	defer producer.mu.Unlock()
 
@@ -95,7 +75,7 @@ func (producer *RabbitMQProducer) Produce(ctx context.Context, message *amqp.Pub
 	return nil
 }
 
-func (producer *RabbitMQProducer) Close() {
+func (producer *AmqpProducer) Close() {
 	time.Sleep(messaging.Delay)
 
 	if producer.channel != nil && !producer.channel.IsClosed() {
@@ -109,6 +89,6 @@ func (producer *RabbitMQProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq producer - closed connection to queue %s", producer.name))
 }
 
-func (producer *RabbitMQProducer) Context() messaging.Context {
+func (producer *AmqpProducer) Context() messaging.Context {
 	return producer.connection.Context()
 }

@@ -41,7 +41,7 @@ func main() {
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the publisher
 			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.AMQPDialerTLS(tlsConfig))
-			producer := rabbitmq.NewRabbitMQProducer(connection, name)
+			producer := rabbitmq.NewAmqpProducer(connection, name)
 
 			if err := producer.Produce(context.Background(), &amqp.Publishing{
 				Headers:         nil,
