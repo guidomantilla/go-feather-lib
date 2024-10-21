@@ -53,6 +53,18 @@ func (mr *MockContextMockRecorder) Server() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockContext)(nil).Server))
 }
 
+// Set mocks base method.
+func (m *MockContext) Set(property, value string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Set", property, value)
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockContextMockRecorder) Set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockContext)(nil).Set), property, value)
+}
+
 // Url mocks base method.
 func (m *MockContext) Url() string {
 	m.ctrl.T.Helper()
@@ -65,18 +77,6 @@ func (m *MockContext) Url() string {
 func (mr *MockContextMockRecorder) Url() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockContext)(nil).Url))
-}
-
-// set mocks base method.
-func (m *MockContext) set(property, value string) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "set", property, value)
-}
-
-// set indicates an expected call of set.
-func (mr *MockContextMockRecorder) set(property, value any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockContext)(nil).set), property, value)
 }
 
 // MockConnection is a mock of Connection interface.
@@ -244,16 +244,16 @@ func (mr *MockConsumerMockRecorder) Context() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockConsumer)(nil).Context))
 }
 
-// set mocks base method.
-func (m *MockConsumer) set(property string, value any) {
+// Set mocks base method.
+func (m *MockConsumer) Set(property string, value any) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "set", property, value)
+	m.ctrl.Call(m, "Set", property, value)
 }
 
-// set indicates an expected call of set.
-func (mr *MockConsumerMockRecorder) set(property, value any) *gomock.Call {
+// Set indicates an expected call of Set.
+func (mr *MockConsumerMockRecorder) Set(property, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "set", reflect.TypeOf((*MockConsumer)(nil).set), property, value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockConsumer)(nil).Set), property, value)
 }
 
 // MockProducer is a mock of Producer interface.

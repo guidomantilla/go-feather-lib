@@ -1,4 +1,4 @@
-package messaging
+package rabbitmq
 
 import (
 	"context"
@@ -11,14 +11,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQStreamsListener struct {
+type StreamsListener struct {
 }
 
-func NewRabbitMQStreamsListener() *RabbitMQStreamsListener {
-	return &RabbitMQStreamsListener{}
+func NewStreamsListener() *StreamsListener {
+	return &StreamsListener{}
 }
 
-func (listener *RabbitMQStreamsListener) OnMessage(ctx context.Context, message *amqp.Message) error {
+func (listener *StreamsListener) OnMessage(ctx context.Context, message *amqp.Message) error {
 
 	var consumerContext stream.ConsumerContext
 	anyContext := ctx.Value(stream.ConsumerContext{})

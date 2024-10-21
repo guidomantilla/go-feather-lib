@@ -1,6 +1,7 @@
-package messaging
+package rabbitmq
 
 import (
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
@@ -14,7 +15,7 @@ type context_ struct {
 	vhost   string
 }
 
-func NewContext(url string, username string, password string, server string, options ...ContextOptions) Context {
+func NewContext(url string, username string, password string, server string, options ...ContextOptions) messaging.Context {
 	assert.NotEmpty(url, "starting up - error setting up messaging context: url is empty")
 	assert.NotEmpty(username, "starting up - error setting up messaging context: username is empty")
 	assert.NotEmpty(password, "starting up - error setting up messaging context: password is empty")
@@ -61,7 +62,7 @@ func (context *context_) Server() string {
 	return context.server
 }
 
-func (context *context_) set(property string, value string) {
+func (context *context_) Set(property string, value string) {
 	if utils.IsEmpty(property) || utils.IsEmpty(value) {
 		return
 	}

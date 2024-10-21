@@ -1,9 +1,10 @@
-package messaging
+package rabbitmq
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 	"sync"
 	"time"
@@ -14,35 +15,9 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQStreamsConsumerOption func(*RabbitMQStreamsConsumer)
-
-func WithStreamOptions(options *stream.StreamOptions) RabbitMQStreamsConsumerOption {
-	return func(consumer *RabbitMQStreamsConsumer) {
-		consumer.streamOptions = options
-	}
-}
-
-func WithConsumerOptions(options *stream.ConsumerOptions) RabbitMQStreamsConsumerOption {
-	return func(consumer *RabbitMQStreamsConsumer) {
-		consumer.consumerOptions = options
-	}
-}
-
-func WithRabbitMQStreamsListener(listener Listener[*amqp.Message]) RabbitMQStreamsConsumerOption {
-	return func(consumer *RabbitMQStreamsConsumer) {
-		consumer.listener = listener
-		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
-			if err := listener.OnMessage(context.Background(), message); err != nil {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
-			}
-		}
-	}
-}
-
-type RabbitMQStreamsConsumer struct {
-	connection      Connection[*stream.Environment]
-	listener        Listener[*amqp.Message]
+type StreamsConsumer struct {
+	connection      messaging.Connection[*stream.Environment]
+	listener        messaging.Listener[*amqp.Message]
 	environment     *stream.Environment
 	name            string
 	consumer        string
@@ -52,7 +27,7 @@ type RabbitMQStreamsConsumer struct {
 	mu              sync.RWMutex
 }
 
-func NewRabbitMQStreamsConsumer(connection Connection[*stream.Environment], name string, options ...RabbitMQStreamsConsumerOption) *RabbitMQStreamsConsumer {
+func NewStreamsConsumer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsConsumerOption) *StreamsConsumer {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq streams consumer: connection is nil")
@@ -61,8 +36,8 @@ func NewRabbitMQStreamsConsumer(connection Connection[*stream.Environment], name
 	if strings.TrimSpace(name) == "" {
 		log.Fatal("starting up - error setting up rabbitmq streams consumer: name is empty")
 	}
-	listener := NewRabbitMQStreamsListener()
-	consumer := &RabbitMQStreamsConsumer{
+	listener := NewStreamsListener()
+	consumer := &StreamsConsumer{
 		connection:      connection,
 		name:            name,
 		consumer:        "consumer-" + name,
@@ -91,7 +66,7 @@ func NewRabbitMQStreamsConsumer(connection Connection[*stream.Environment], name
 	return consumer
 }
 
-func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (Event, error) {
+func (streams *StreamsConsumer) Consume(ctx context.Context) (messaging.Event, error) {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -156,8 +131,8 @@ func (streams *RabbitMQStreamsConsumer) Consume(ctx context.Context) (Event, err
 	return closeChannel, nil
 }
 
-func (streams *RabbitMQStreamsConsumer) Close() {
-	time.Sleep(Delay)
+func (streams *StreamsConsumer) Close() {
+	time.Sleep(messaging.Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams consumer - closing connection")
@@ -170,10 +145,10 @@ func (streams *RabbitMQStreamsConsumer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
 }
 
-func (streams *RabbitMQStreamsConsumer) Context() Context {
+func (streams *StreamsConsumer) Context() messaging.Context {
 	return streams.connection.Context()
 }
 
-func (streams *RabbitMQStreamsConsumer) set(property string, value any) {
+func (streams *StreamsConsumer) Set(property string, value any) {
 
 }

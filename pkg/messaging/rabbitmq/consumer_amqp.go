@@ -1,8 +1,9 @@
-package messaging
+package rabbitmq
 
 import (
 	"context"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 	"sync"
 	"time"
@@ -13,9 +14,9 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
-type RabbitMQConsumer struct {
-	connection Connection[*amqp.Connection]
-	listener   Listener[*amqp.Delivery]
+type AmqpConsumer struct {
+	connection messaging.Connection[*amqp.Connection]
+	listener   messaging.Listener[*amqp.Delivery]
 	channel    *amqp.Channel
 	queue      amqp.Queue
 	name       string
@@ -30,7 +31,7 @@ type RabbitMQConsumer struct {
 	mu         sync.RWMutex
 }
 
-func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, options ...RabbitMQConsumerOptions) *RabbitMQConsumer {
+func NewAmqpConsumer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq consumer: connection is nil")
@@ -40,9 +41,9 @@ func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, o
 		log.Fatal("starting up - error setting up rabbitmq consumer: name is empty")
 	}
 
-	consumer := &RabbitMQConsumer{
+	consumer := &AmqpConsumer{
 		connection: connection,
-		listener:   NewRabbitMQListener(),
+		listener:   NewAmqpListener(),
 		name:       name,
 		consumer:   "consumer-" + name,
 		autoAck:    false,
@@ -62,7 +63,7 @@ func NewRabbitMQConsumer(connection Connection[*amqp.Connection], name string, o
 	return consumer
 }
 
-func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (Event, error) {
+func (consumer *AmqpConsumer) Consume(ctx context.Context) (messaging.Event, error) {
 
 	consumer.mu.Lock()
 	defer consumer.mu.Unlock()
@@ -95,7 +96,7 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (Event, error) {
 	}
 
 	closeChannel := make(chan string)
-	closeHandler := func(ctx context.Context, listener Listener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {
+	closeHandler := func(ctx context.Context, listener messaging.Listener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {
 		var err error
 		for message := range deliveries {
 			go func(ctx context.Context, message amqp.Delivery) {
@@ -127,8 +128,8 @@ func (consumer *RabbitMQConsumer) Consume(ctx context.Context) (Event, error) {
 	return closeChannel, nil
 }
 
-func (consumer *RabbitMQConsumer) Close() {
-	time.Sleep(Delay)
+func (consumer *AmqpConsumer) Close() {
+	time.Sleep(messaging.Delay)
 
 	if consumer.channel != nil && !consumer.channel.IsClosed() {
 		log.Debug("rabbitmq consumer - closing connection")
@@ -141,11 +142,11 @@ func (consumer *RabbitMQConsumer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
 }
 
-func (consumer *RabbitMQConsumer) Context() Context {
+func (consumer *AmqpConsumer) Context() messaging.Context {
 	return consumer.connection.Context()
 }
 
-func (consumer *RabbitMQConsumer) set(property string, value any) {
+func (consumer *AmqpConsumer) Set(property string, value any) {
 	if utils.IsEmpty(property) || utils.IsEmpty(value) {
 		return
 	}
@@ -153,7 +154,7 @@ func (consumer *RabbitMQConsumer) set(property string, value any) {
 	switch property {
 	case "listener":
 		if value != nil {
-			consumer.listener = value.(Listener[*amqp.Delivery])
+			consumer.listener = value.(messaging.Listener[*amqp.Delivery])
 		}
 	case "autoAck":
 		consumer.autoAck = value.(bool)

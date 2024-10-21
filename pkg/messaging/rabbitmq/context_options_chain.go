@@ -1,4 +1,6 @@
-package messaging
+package rabbitmq
+
+import "github.com/guidomantilla/go-feather-lib/pkg/messaging"
 
 type ContextOptionsChain struct {
 	chain []ContextOptions
@@ -11,7 +13,7 @@ func NewContextOptionChain() *ContextOptionsChain {
 }
 
 func (options *ContextOptionsChain) Build() ContextOptions {
-	return func(context Context) {
+	return func(context messaging.Context) {
 		for _, option := range options.chain {
 			option(context)
 		}

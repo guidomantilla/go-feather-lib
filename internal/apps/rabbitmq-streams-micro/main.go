@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 	"os"
 
 	samqp "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
@@ -10,7 +11,6 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 
@@ -27,20 +27,20 @@ func main() {
 		clientKey := environment.Value(environment.SslClientKey).AsString()
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-		messagingContext := messaging.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", messaging.NewContextOptionChain().WithVhost("/").Build())
+		messagingContext := rabbitmq.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", rabbitmq.NewContextOptionChain().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the environment and the consumer
 
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.StreamsDialerTLS(tlsConfig))
-			consumer := messaging.NewRabbitMQStreamsConsumer(connection, name)
+			connection := rabbitmq.NewRabbitMQConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
+			consumer := rabbitmq.NewRabbitMQStreamsConsumer(connection, name)
 
 			application.Attach(server.BuildRabbitMQServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the environment and the publisher
-			connection := messaging.NewRabbitMQConnection(messagingContext, messaging.StreamsDialerTLS(tlsConfig))
-			producer := messaging.NewRabbitMQStreamsProducer(connection, name)
+			connection := rabbitmq.NewRabbitMQConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
+			producer := rabbitmq.NewRabbitMQStreamsProducer(connection, name)
 			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
 				log.Fatal("Error producing message: %v", err)
 			}

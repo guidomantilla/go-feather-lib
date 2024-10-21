@@ -1,4 +1,4 @@
-package messaging
+package rabbitmq
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type RabbitMQListener struct {
+type AmqpListener struct {
 }
 
-func NewRabbitMQListener() *RabbitMQListener {
-	return &RabbitMQListener{}
+func NewAmqpListener() *AmqpListener {
+	return &AmqpListener{}
 }
 
-func (listener *RabbitMQListener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
+func (listener *AmqpListener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
 
 	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
 	time.Sleep(5 * time.Second)

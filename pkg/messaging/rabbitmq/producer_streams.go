@@ -1,8 +1,9 @@
-package messaging
+package rabbitmq
 
 import (
 	"context"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 	"strings"
 	"sync"
 	"time"
@@ -22,7 +23,7 @@ func WithProducerOptions(options *stream.ProducerOptions) RabbitMQStreamsProduce
 }
 
 type RabbitMQStreamsProducer struct {
-	connection      Connection[*stream.Environment]
+	connection      messaging.Connection[*stream.Environment]
 	environment     *stream.Environment
 	name            string
 	streamOptions   *stream.StreamOptions
@@ -30,7 +31,7 @@ type RabbitMQStreamsProducer struct {
 	mu              sync.RWMutex
 }
 
-func NewRabbitMQStreamsProducer(connection Connection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
+func NewRabbitMQStreamsProducer(connection messaging.Connection[*stream.Environment], name string, options ...RabbitMQStreamsProducerOption) *RabbitMQStreamsProducer {
 
 	if connection == nil {
 		log.Fatal("starting up - error setting up rabbitmq streams producer: connection is nil")
@@ -93,7 +94,7 @@ func (streams *RabbitMQStreamsProducer) Produce(ctx context.Context, message *sa
 }
 
 func (streams *RabbitMQStreamsProducer) Close() {
-	time.Sleep(Delay)
+	time.Sleep(messaging.Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams producer - closing connection")
@@ -106,6 +107,6 @@ func (streams *RabbitMQStreamsProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *RabbitMQStreamsProducer) Context() Context {
+func (streams *RabbitMQStreamsProducer) Context() messaging.Context {
 	return streams.connection.Context()
 }

@@ -14,13 +14,6 @@ const (
 )
 
 var (
-	_ Context                         = (*context_)(nil)
-	_ Connection[*amqp.Connection]    = (*RabbitMQConnection[*amqp.Connection])(nil)
-	_ Connection[*stream.Environment] = (*RabbitMQConnection[*stream.Environment])(nil)
-	_ Listener[*amqp.Delivery]        = (*RabbitMQListener)(nil)
-	_ Listener[*samqp.Message]        = (*RabbitMQStreamsListener)(nil)
-	_ Consumer                        = (*RabbitMQConsumer)(nil)
-	_ Consumer                        = (*RabbitMQStreamsConsumer)(nil)
 	_ Context                         = (*MockContext)(nil)
 	_ Connection[*amqp.Connection]    = (*MockConnection[*amqp.Connection])(nil)
 	_ Connection[*stream.Environment] = (*MockConnection[*stream.Environment])(nil)
@@ -31,7 +24,7 @@ var (
 type Context interface {
 	Url() string
 	Server() string
-	set(property string, value string)
+	Set(property string, value string)
 }
 
 type ConnectionTypes interface {
@@ -62,7 +55,7 @@ type Consumer interface {
 	Context() Context
 	Consume(ctx context.Context) (Event, error)
 	Close()
-	set(property string, value any)
+	Set(property string, value any)
 }
 
 type PublishingTypes interface {
