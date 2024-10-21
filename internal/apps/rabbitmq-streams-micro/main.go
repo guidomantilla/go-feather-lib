@@ -32,14 +32,14 @@ func main() {
 
 		{ // Keep an 1:1 relationship between the environment and the consumer
 
-			connection := rabbitmq.NewRabbitMQConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
-			consumer := rabbitmq.NewRabbitMQStreamsConsumer(connection, name)
+			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
+			consumer := rabbitmq.NewStreamsConsumer(connection, name)
 
 			application.Attach(server.BuildRabbitMQServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the environment and the publisher
-			connection := rabbitmq.NewRabbitMQConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
+			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
 			producer := rabbitmq.NewRabbitMQStreamsProducer(connection, name)
 			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
 				log.Fatal("Error producing message: %v", err)
