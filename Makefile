@@ -29,17 +29,21 @@ lint:
 	golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 ./pkg/... ./internal/...
 
 test:
-	go test -covermode count -coverprofile coverage.out.tmp.01 ./pkg/...
-	cat coverage.out.tmp.01 | grep -v "mocks.go" > coverage.out
-	rm coverage.out.tmp.01
+	go test -covermode atomic -coverprofile .reports/coverage.out.tmp.01 ./pkg/...
+	cat .reports/coverage.out.tmp.01 | grep -v "mocks.go" > .reports/coverage.out && rm .reports/coverage.out.tmp.01
 
 coverage: test
-	go tool cover -func=coverage.out
-	go tool cover -html=coverage.out -o .reports/coverage.html
-	rm coverage.out
+	go tool cover -func=.reports/coverage.out
+	go tool cover -html=.reports/coverage.out -o .reports/coverage.html && rm .reports/coverage.out
 
 graph:
-	godepgraph -s . | dot -Tpng -o godepgraph.png
+	godepgraph -s ./pkg/datasource | dot -Tpng -o ./pkg/datasource/datasource.png
+	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
+	godepgraph -s ./pkg/integration/messaging | dot -Tpng -o ./pkg/integration/messaging/messaging.png
+	godepgraph -s ./pkg/messaging | dot -Tpng -o ./pkg/messaging/messaging.png
+	godepgraph -s ./pkg/messaging/rabbitmq | dot -Tpng -o ./pkg/messaging/rabbitmq/rabbitmq.png
+	godepgraph -s ./pkg/security | dot -Tpng -o ./pkg/security/security.png
+	godepgraph -s ./pkg/server | dot -Tpng -o ./pkg/server/server.png
 
 sonarqube: coverage
 	sonar-scanner
