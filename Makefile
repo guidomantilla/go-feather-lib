@@ -31,10 +31,12 @@ lint:
 test:
 	go test -covermode count -coverprofile coverage.out.tmp.01 ./pkg/...
 	cat coverage.out.tmp.01 | grep -v "mocks.go" > coverage.out
+	rm coverage.out.tmp.01
 
 coverage: test
 	go tool cover -func=coverage.out
-	go tool cover -html=coverage.out -o coverage.html
+	go tool cover -html=coverage.out -o .reports/coverage.html
+	rm coverage.out
 
 graph:
 	godepgraph -s . | dot -Tpng -o godepgraph.png
