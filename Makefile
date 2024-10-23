@@ -9,15 +9,26 @@ certificates:
 	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
 	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
 
-validate: generate sort-import format vet lint coverage
+validate: generate graph check coverage
 	go mod tidy
 
 generate:
 	go generate ./pkg/... ./tools/...
 
+graph:
+	godepgraph -s ./pkg/datasource | dot -Tpng -o ./pkg/datasource/datasource.png
+	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
+	godepgraph -s ./pkg/integration/messaging | dot -Tpng -o ./pkg/integration/messaging/messaging.png
+	godepgraph -s ./pkg/messaging | dot -Tpng -o ./pkg/messaging/messaging.png
+	godepgraph -s ./pkg/messaging/rabbitmq | dot -Tpng -o ./pkg/messaging/rabbitmq/rabbitmq.png
+	godepgraph -s ./pkg/security | dot -Tpng -o ./pkg/security/security.png
+	godepgraph -s ./pkg/server | dot -Tpng -o ./pkg/server/server.png
+
 sort-import:
 	goimports-reviser -rm-unused -set-alias -format -recursive pkg
 	goimports-reviser -rm-unused -set-alias -format -recursive internal
+
+check: format vet lint
 
 format:
 	go fmt ./pkg/...
@@ -36,14 +47,6 @@ coverage: test
 	go tool cover -func=.reports/coverage.out
 	go tool cover -html=.reports/coverage.out -o .reports/coverage.html && rm .reports/coverage.out
 
-graph:
-	godepgraph -s ./pkg/datasource | dot -Tpng -o ./pkg/datasource/datasource.png
-	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
-	godepgraph -s ./pkg/integration/messaging | dot -Tpng -o ./pkg/integration/messaging/messaging.png
-	godepgraph -s ./pkg/messaging | dot -Tpng -o ./pkg/messaging/messaging.png
-	godepgraph -s ./pkg/messaging/rabbitmq | dot -Tpng -o ./pkg/messaging/rabbitmq/rabbitmq.png
-	godepgraph -s ./pkg/security | dot -Tpng -o ./pkg/security/security.png
-	godepgraph -s ./pkg/server | dot -Tpng -o ./pkg/server/server.png
 
 sonarqube: coverage
 	sonar-scanner
