@@ -17,18 +17,18 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.21.x"
-      - name: Install Dependencies && Tools
+          go-version: "1.23.x"
+      - name: Install
         run: make install
-      - name: Generate Code
+      - name: Generate
         run: make generate
-      - name: Sort Imports
+      - name: Imports
         run: make sort-import
-      - name: Format Code
+      - name: Format
         run: make format
-      - name: Vet Code
+      - name: Vet
         run: make vet
-      - name: Lint Code
+      - name: Lint
         run: make lint
       - name: Test
         run: make test
