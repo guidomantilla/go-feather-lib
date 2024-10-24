@@ -9,8 +9,16 @@ certificates:
 	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
 	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
 
-validate: generate graph check coverage
+validate: fetch-dependencies generate graph sort-import check coverage
 	go mod tidy
+
+fetch-dependencies:
+	go mod download
+
+install: fetch-dependencies
+	go install github.com/incu6us/goimports-reviser/v3@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install go.uber.org/mock/mockgen@latest
 
 generate:
 	go generate ./pkg/... ./tools/...
@@ -46,10 +54,6 @@ test:
 coverage: test
 	go tool cover -func=.reports/coverage.out
 	go tool cover -html=.reports/coverage.out -o .reports/coverage.html && rm .reports/coverage.out
-
-
-sonarqube: coverage
-	sonar-scanner
 
 update-dependencies:
 	go get -u ./...

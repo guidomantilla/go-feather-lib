@@ -8,6 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  Validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21.x"
+      - name: Install Dependencies && Tools
+        run: make install
+      - name: Generate Code
+        run: make generate
+      - name: Sort Imports
+        run: make sort-import
+      - name: Format Code
+        run: make format
+      - name: Vet Code
+        run: make vet
+      - name: Lint Code
+        run: make lint
+      - name: Test
+        run: make test
+
   SonarCloud:
     name: SonarCloud
     runs-on: ubuntu-latest
