@@ -13,8 +13,8 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
-	"github.com/guidomantilla/go-feather-lib/pkg/rest"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 

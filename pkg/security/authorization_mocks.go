@@ -21,6 +21,7 @@ import (
 type MockAuthorizationFilter struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthorizationFilterMockRecorder
+	isgomock struct{}
 }
 
 // MockAuthorizationFilterMockRecorder is the mock recorder for MockAuthorizationFilter.
@@ -56,6 +57,7 @@ func (mr *MockAuthorizationFilterMockRecorder) Authorize(ctx any) *gomock.Call {
 type MockAuthorizationService struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthorizationServiceMockRecorder
+	isgomock struct{}
 }
 
 // MockAuthorizationServiceMockRecorder is the mock recorder for MockAuthorizationService.

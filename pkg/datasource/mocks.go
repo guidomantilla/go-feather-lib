@@ -20,6 +20,7 @@ import (
 type MockContext struct {
 	ctrl     *gomock.Controller
 	recorder *MockContextMockRecorder
+	isgomock struct{}
 }
 
 // MockContextMockRecorder is the mock recorder for MockContext.
@@ -85,6 +86,7 @@ func (mr *MockContextMockRecorder) Url() *gomock.Call {
 type MockConnection[T StoreConnectionTypes] struct {
 	ctrl     *gomock.Controller
 	recorder *MockConnectionMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockConnectionMockRecorder is the mock recorder for MockConnection.
@@ -149,6 +151,7 @@ func (mr *MockConnectionMockRecorder[T]) Context() *gomock.Call {
 type MockTransactionHandler[T StoreConnectionTypes] struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionHandlerMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockTransactionHandlerMockRecorder is the mock recorder for MockTransactionHandler.

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
-	"github.com/guidomantilla/go-feather-lib/pkg/rest"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 )
 
 type DefaultAuthorizationFilter struct {

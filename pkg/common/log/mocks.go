@@ -20,6 +20,7 @@ import (
 type MockLogger[T any] struct {
 	ctrl     *gomock.Controller
 	recorder *MockLoggerMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockLoggerMockRecorder is the mock recorder for MockLogger.

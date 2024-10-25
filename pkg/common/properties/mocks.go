@@ -19,6 +19,7 @@ import (
 type MockProperties struct {
 	ctrl     *gomock.Controller
 	recorder *MockPropertiesMockRecorder
+	isgomock struct{}
 }
 
 // MockPropertiesMockRecorder is the mock recorder for MockProperties.
@@ -82,6 +83,7 @@ func (mr *MockPropertiesMockRecorder) Get(property any) *gomock.Call {
 type MockPropertiesSource struct {
 	ctrl     *gomock.Controller
 	recorder *MockPropertiesSourceMockRecorder
+	isgomock struct{}
 }
 
 // MockPropertiesSourceMockRecorder is the mock recorder for MockPropertiesSource.

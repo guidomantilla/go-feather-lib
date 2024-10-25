@@ -20,6 +20,7 @@ import (
 type MockContext struct {
 	ctrl     *gomock.Controller
 	recorder *MockContextMockRecorder
+	isgomock struct{}
 }
 
 // MockContextMockRecorder is the mock recorder for MockContext.
@@ -83,6 +84,7 @@ func (mr *MockContextMockRecorder) Url() *gomock.Call {
 type MockConnection[T ConnectionTypes] struct {
 	ctrl     *gomock.Controller
 	recorder *MockConnectionMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockConnectionMockRecorder is the mock recorder for MockConnection.
@@ -147,6 +149,7 @@ func (mr *MockConnectionMockRecorder[T]) Context() *gomock.Call {
 type MockListener[T ListenerTypes] struct {
 	ctrl     *gomock.Controller
 	recorder *MockListenerMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockListenerMockRecorder is the mock recorder for MockListener.
@@ -184,6 +187,7 @@ func (mr *MockListenerMockRecorder[T]) OnMessage(ctx, message any) *gomock.Call 
 type MockConsumer struct {
 	ctrl     *gomock.Controller
 	recorder *MockConsumerMockRecorder
+	isgomock struct{}
 }
 
 // MockConsumerMockRecorder is the mock recorder for MockConsumer.
@@ -260,6 +264,7 @@ func (mr *MockConsumerMockRecorder) Set(property, value any) *gomock.Call {
 type MockProducer[T PublishingTypes] struct {
 	ctrl     *gomock.Controller
 	recorder *MockProducerMockRecorder[T]
+	isgomock struct{}
 }
 
 // MockProducerMockRecorder is the mock recorder for MockProducer.

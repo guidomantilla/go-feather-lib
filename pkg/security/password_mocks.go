@@ -19,6 +19,7 @@ import (
 type MockPasswordEncoder struct {
 	ctrl     *gomock.Controller
 	recorder *MockPasswordEncoderMockRecorder
+	isgomock struct{}
 }
 
 // MockPasswordEncoderMockRecorder is the mock recorder for MockPasswordEncoder.
@@ -87,6 +88,7 @@ func (mr *MockPasswordEncoderMockRecorder) UpgradeEncoding(encodedPassword any) 
 type MockPasswordGenerator struct {
 	ctrl     *gomock.Controller
 	recorder *MockPasswordGeneratorMockRecorder
+	isgomock struct{}
 }
 
 // MockPasswordGeneratorMockRecorder is the mock recorder for MockPasswordGenerator.
@@ -150,6 +152,7 @@ func (mr *MockPasswordGeneratorMockRecorder) set(property, value any) *gomock.Ca
 type MockPasswordManager struct {
 	ctrl     *gomock.Controller
 	recorder *MockPasswordManagerMockRecorder
+	isgomock struct{}
 }
 
 // MockPasswordManagerMockRecorder is the mock recorder for MockPasswordManager.

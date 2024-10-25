@@ -21,6 +21,7 @@ import (
 type MockAuthenticationEndpoint struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthenticationEndpointMockRecorder
+	isgomock struct{}
 }
 
 // MockAuthenticationEndpointMockRecorder is the mock recorder for MockAuthenticationEndpoint.
@@ -56,6 +57,7 @@ func (mr *MockAuthenticationEndpointMockRecorder) Authenticate(ctx any) *gomock.
 type MockAuthenticationService struct {
 	ctrl     *gomock.Controller
 	recorder *MockAuthenticationServiceMockRecorder
+	isgomock struct{}
 }
 
 // MockAuthenticationServiceMockRecorder is the mock recorder for MockAuthenticationService.
