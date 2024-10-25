@@ -38,8 +38,8 @@ lint:
 	golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 ./pkg/... ./internal/...
 
 test:
-	go test -covermode atomic -coverprofile .reports/coverage.out.tmp.01 ./pkg/...
-	cat .reports/coverage.out.tmp.01 | grep -v "mocks.go" > .reports/coverage.out && rm .reports/coverage.out.tmp.01
+	go test -covermode atomic -coverprofile .reports/coverage.out.tmp ./pkg/...
+	cat .reports/coverage.out.tmp | grep -v "mocks.go" > .reports/coverage.out && rm .reports/coverage.out.tmp
 	gocov .reports/coverage.out && cp -R coverage .reports && rm -R coverage
 
 coverage: test
