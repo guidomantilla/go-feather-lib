@@ -26,12 +26,12 @@ jobs:
       - name: Generate
         run: make generate
       - name: Imports
-        run: make sort-import
+        run: make imports
       - name: Format
         run: make format
       - name: Vet
         run: make vet
       - name: Lint
         run: make lint
-      - name: Coverage
-        run: make coverage
+      - name: Test
+        run: make test
