@@ -9,6 +9,8 @@ certificates:
 	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
 	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
 
+pre-commit: check
+
 check: fetch-dependencies generate graph imports format vet lint test
 
 validate: check coverage
