@@ -7,7 +7,6 @@ install: fetch-dependencies
 	go install go.uber.org/mock/mockgen@latest
 	go install github.com/vladopajic/go-test-coverage/v2@latest
 	npm install @jacksontian/gocov -g
-	pip install pre-commit && pre-commit autoupdate
 
 fetch-dependencies:
 	go mod download
@@ -52,17 +51,12 @@ validate: check coverage
 
 ##
 
+prepare: install
+	go install github.com/cweill/gotests/gotests@latest
+
 update-dependencies:
 	go get -u ./...
 	go get -t -u ./...
-	go mod tidy
-
-prepare:
-	go install github.com/incu6us/goimports-reviser/v3@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	go install go.uber.org/mock/mockgen@latest
-	go install github.com/cweill/gotests/gotests@latest
-	go mod download
 	go mod tidy
 
 certificates:
