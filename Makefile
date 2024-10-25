@@ -1,27 +1,15 @@
 .PHONY: phony
 phony-goal: ; @echo $@
 
-certificates:
-	openssl genrsa -passout pass:1111 -des3 -out ca.key 4096
-	openssl req -passin pass:1111 -new -x509 -days 3650 -key ca.key -out ca.crt -subj "/CN=$(SERVER_CN)"
-	openssl genrsa -passout pass:1111 -des3 -out server.key 4096
-	openssl req -passin pass:1111 -new -key server.key -out server.csr -subj "/CN=$(SERVER_CN)" -config $(OPENSSLCNF)
-	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
-	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
-
-check: fetch-dependencies generate graph imports format vet lint test
-
-validate: check coverage
-
-fetch-dependencies:
-	go mod download
-
 install: fetch-dependencies
 	go install github.com/incu6us/goimports-reviser/v3@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install go.uber.org/mock/mockgen@latest
 	go install github.com/vladopajic/go-test-coverage/v2@latest
 	npm install @jacksontian/gocov -g
+
+fetch-dependencies:
+	go mod download
 
 generate:
 	go generate ./pkg/... ./tools/...
@@ -57,15 +45,24 @@ test:
 coverage: test
 	go-test-coverage --config=.testcoverage.yml
 
+check: fetch-dependencies generate graph imports format vet lint test clean
+
+validate: check coverage
+
+##
+
+prepare: install
+	go install github.com/cweill/gotests/gotests@latest
+
 update-dependencies:
 	go get -u ./...
 	go get -t -u ./...
 	go mod tidy
 
-prepare:
-	go install github.com/incu6us/goimports-reviser/v3@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	go install go.uber.org/mock/mockgen@latest
-	go install github.com/cweill/gotests/gotests@latest
-	go mod download
-	go mod tidy
+certificates:
+	openssl genrsa -passout pass:1111 -des3 -out ca.key 4096
+	openssl req -passin pass:1111 -new -x509 -days 3650 -key ca.key -out ca.crt -subj "/CN=$(SERVER_CN)"
+	openssl genrsa -passout pass:1111 -des3 -out server.key 4096
+	openssl req -passin pass:1111 -new -key server.key -out server.csr -subj "/CN=$(SERVER_CN)" -config $(OPENSSLCNF)
+	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
+	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
