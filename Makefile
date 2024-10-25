@@ -9,8 +9,9 @@ certificates:
 	openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt -extensions v3_req -extfile $(OPENSSLCNF)
 	openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
 
-validate: fetch-dependencies generate graph imports format vet lint test
-	go mod tidy
+check: fetch-dependencies generate graph imports format vet lint test
+
+validate: check coverage
 
 fetch-dependencies:
 	go mod download
@@ -37,6 +38,7 @@ graph:
 imports:
 	goimports-reviser -rm-unused -set-alias -format -recursive pkg
 	goimports-reviser -rm-unused -set-alias -format -recursive internal
+	go mod tidy
 
 format:
 	go fmt ./pkg/...
