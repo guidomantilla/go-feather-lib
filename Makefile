@@ -55,8 +55,7 @@ prepare: install
 	go install github.com/cweill/gotests/gotests@latest
 
 update-dependencies:
-	go get -u ./...
-	go get -t -u ./...
+	go get -u ./... && go get -t -u ./...
 	go mod tidy
 
 certificates:

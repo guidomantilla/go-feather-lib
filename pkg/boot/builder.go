@@ -10,6 +10,7 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"
+	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
