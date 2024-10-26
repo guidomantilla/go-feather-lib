@@ -1,8 +1,9 @@
 package main
 
 import (
-	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"os"
+
+	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 )
 
 func main() {

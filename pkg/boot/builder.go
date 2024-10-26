@@ -5,19 +5,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/glebarez/sqlite"
-	_ "github.com/godoes/gorm-oracle"
 	slogGorm "github.com/orandin/slog-gorm"
 	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
-	"gorm.io/driver/mysql"
-	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
-	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
+	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 
@@ -25,11 +21,13 @@ type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environ
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
-type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource.Context
+type DatasourceOpenFunc func(appCtx *ApplicationContext) dgorm.OpenFn
 
-type DatasourceConnectionBuilderFunc func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB]
+type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) dgorm.Context
 
-type DatasourceTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB]
+type DatasourceConnectionBuilderFunc func(appCtx *ApplicationContext) dgorm.Connection
+
+type DatasourceTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) dgorm.TransactionHandler
 
 type PasswordGeneratorBuilderFunc func(appCtx *ApplicationContext) security.PasswordGenerator
 
@@ -56,6 +54,7 @@ type GrpcServerBuilderFunc func(appCtx *ApplicationContext) (*grpc.ServiceDesc, 
 type BeanBuilder struct {
 	Environment                  EnvironmentBuilderFunc
 	Config                       ConfigLoaderFunc
+	DatasourceOpenFn             DatasourceOpenFunc
 	DatasourceContext            DatasourceContextBuilderFunc
 	DatasourceConnection         DatasourceConnectionBuilderFunc
 	DatasourceTransactionHandler DatasourceTransactionHandlerBuilderFunc
@@ -86,46 +85,48 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
 		},
-		DatasourceContext: func(appCtx *ApplicationContext) datasource.Context {
-			if !appCtx.Enablers.DatabaseEnabled {
-				return nil
-			}
-
-			if appCtx.DatabaseConfig != nil {
-				return datasource.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
-			}
-
-			log.Fatal("starting up - error setting up configuration: database config is nil")
+		DatasourceOpenFn: func(appCtx *ApplicationContext) dgorm.OpenFn {
+			log.Warn("starting up - warning setting up configuration: datasource OpenFn function not implemented")
 			return nil
 		},
-		DatasourceConnection: func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB] {
+		DatasourceContext: func(appCtx *ApplicationContext) dgorm.Context {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
-			if appCtx.DatabaseConfig != nil {
+			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {
+				return dgorm.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
+			}
+
+			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
+			return nil
+		},
+		DatasourceConnection: func(appCtx *ApplicationContext) dgorm.Connection {
+			if !appCtx.Enablers.DatabaseEnabled {
+				return nil
+			}
+
+			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {
 				config := &gorm.Config{
 					SkipDefaultTransaction: true,
 					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
-				//TODO: create a factory function for enabling different database types not only: mysql.Open
-				//sqlite.Open("file::memory:?cache=shared")
-				return datasource.NewConnection(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)
+				return dgorm.NewConnection(appCtx.DatasourceContext, appCtx.DatasourceOpenFn, config)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config is nil")
+			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
 			return nil
 		},
-		DatasourceTransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB] {
+		DatasourceTransactionHandler: func(appCtx *ApplicationContext) dgorm.TransactionHandler {
 			if !appCtx.Enablers.DatabaseEnabled {
 				return nil
 			}
 
-			if appCtx.DatabaseConfig != nil {
-				return datasource.NewOrmTransactionHandler(appCtx.DatasourceConnection)
+			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {
+				return dgorm.NewOrmTransactionHandler(appCtx.DatasourceConnection)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config is nil")
+			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
 			return nil
 		},
 		PasswordEncoder: func(appCtx *ApplicationContext) security.PasswordEncoder {

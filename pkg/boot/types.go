@@ -12,7 +12,7 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	log "github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
+	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 
@@ -62,9 +62,10 @@ type ApplicationContext struct {
 	SecurityConfig               *SecurityConfig
 	DatabaseConfig               *DatabaseConfig
 	Environment                  environment.Environment
-	DatasourceContext            datasource.Context
-	DatasourceConnection         datasource.Connection[*gorm.DB]
-	DatasourceTransactionHandler datasource.TransactionHandler[*gorm.DB]
+	DatasourceOpenFn             dgorm.OpenFn
+	DatasourceContext            dgorm.Context
+	DatasourceConnection         dgorm.Connection
+	DatasourceTransactionHandler dgorm.TransactionHandler
 	PasswordEncoder              security.PasswordEncoder
 	PasswordGenerator            security.PasswordGenerator
 	PasswordManager              security.PasswordManager
@@ -130,6 +131,7 @@ func NewApplicationContext(appName string, version string, args []string, enable
 
 	if ctx.Enablers.DatabaseEnabled {
 		log.Debug("starting up - setting up db connectivity")
+		ctx.DatasourceOpenFn = builder.DatasourceOpenFn(ctx)                         //nolint:staticcheck
 		ctx.DatasourceContext = builder.DatasourceContext(ctx)                       //nolint:staticcheck
 		ctx.DatasourceConnection = builder.DatasourceConnection(ctx)                 //nolint:staticcheck
 		ctx.DatasourceTransactionHandler = builder.DatasourceTransactionHandler(ctx) //nolint:staticcheck

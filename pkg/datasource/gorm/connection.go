@@ -1,4 +1,4 @@
-package datasource
+package gorm
 
 import (
 	"fmt"
@@ -11,22 +11,22 @@ import (
 )
 
 type connection struct {
-	context   Context
-	database  *gorm.DB
-	dialector gorm.Dialector
-	opts      []gorm.Option
+	context  Context
+	database *gorm.DB
+	openFn   OpenFn
+	opts     []gorm.Option
 }
 
-func NewConnection(context Context, dialector gorm.Dialector, opts ...gorm.Option) Connection[*gorm.DB] {
+func NewConnection(context Context, openFn OpenFn, opts ...gorm.Option) *connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
-	assert.NotNil(dialector, "starting up - error setting up datasource connection: dialector is nil")
+	assert.NotNil(openFn, "starting up - error setting up datasource connection: open is nil")
 	//assert.NotEmpty(opts, "starting up - error setting up datasource connection: opts is empty")
 
 	return &connection{
-		context:   context,
-		database:  nil,
-		dialector: dialector,
-		opts:      opts,
+		context:  context,
+		database: nil,
+		openFn:   openFn,
+		opts:     opts,
 	}
 }
 
@@ -52,7 +52,7 @@ func (datasource *connection) Connect() (*gorm.DB, error) {
 func (datasource *connection) connect() error {
 
 	var err error
-	if datasource.database, err = gorm.Open(datasource.dialector, datasource.opts...); err != nil {
+	if datasource.database, err = gorm.Open(datasource.openFn(datasource.context.Url()), datasource.opts...); err != nil {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}

@@ -10,15 +10,15 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/config"
-	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
+	gorm2 "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
 )
 
 type GormPrincipalManager struct {
-	transactionHandler datasource.TransactionHandler[*gorm.DB]
+	transactionHandler gorm2.TransactionHandler
 	passwordManager    PasswordManager
 }
 
-func NewGormPrincipalManager(transactionHandler datasource.TransactionHandler[*gorm.DB], passwordManager PasswordManager) *GormPrincipalManager {
+func NewGormPrincipalManager(transactionHandler gorm2.TransactionHandler, passwordManager PasswordManager) *GormPrincipalManager {
 	assert.NotNil(transactionHandler, "starting up - error setting up principalManager: transactionHandler is nil")
 	assert.NotNil(passwordManager, "starting up - error setting up principalManager: passwordManager is nil")
 

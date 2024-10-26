@@ -20,13 +20,13 @@
         <div class='fl pad1y space-right2'>
             <span class="strong">0.00% </span>
             <span class="quiet">Branches</span>
-            <span class='fraction'>0/60</span>
+            <span class='fraction'>0/62</span>
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">61.17% </span>
+            <span class="strong">60.87% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>126/206</span>
+            <span class='fraction'>126/207</span>
         </div>
     </div>
 
@@ -245,6 +245,7 @@
 <a name='L204'></a><a href='#L204'>204</a>
 <a name='L205'></a><a href='#L205'>205</a>
 <a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -319,7 +320,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -338,14 +338,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -353,6 +345,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -459,19 +461,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/glebarez/sqlite"
-	_ "github.com/godoes/gorm-oracle"
 	slogGorm "github.com/orandin/slog-gorm"
 	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
-	"gorm.io/driver/mysql"
-	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
-	"github.com/guidomantilla/go-feather-lib/pkg/datasource"
+	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
 )
 
@@ -479,11 +477,13 @@ type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environ
 
 type ConfigLoaderFunc func(appCtx *ApplicationContext)
 
-type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) datasource.Context
+type DatasourceOpenFunc func(appCtx *ApplicationContext) dgorm.OpenFn
 
-type DatasourceConnectionBuilderFunc func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB]
+type DatasourceContextBuilderFunc func(appCtx *ApplicationContext) dgorm.Context
 
-type DatasourceTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB]
+type DatasourceConnectionBuilderFunc func(appCtx *ApplicationContext) dgorm.Connection
+
+type DatasourceTransactionHandlerBuilderFunc func(appCtx *ApplicationContext) dgorm.TransactionHandler
 
 type PasswordGeneratorBuilderFunc func(appCtx *ApplicationContext) security.PasswordGenerator
 
@@ -510,6 +510,7 @@ type GrpcServerBuilderFunc func(appCtx *ApplicationContext) (*grpc.ServiceDesc, 
 type BeanBuilder struct {
 	Environment                  EnvironmentBuilderFunc
 	Config                       ConfigLoaderFunc
+	DatasourceOpenFn             DatasourceOpenFunc
 	DatasourceContext            DatasourceContextBuilderFunc
 	DatasourceConnection         DatasourceConnectionBuilderFunc
 	DatasourceTransactionHandler DatasourceTransactionHandlerBuilderFunc
@@ -540,46 +541,48 @@ type BeanBuilder struct {
 <span class="cstat-no" title="not covered" >		Config: func(appCtx *ApplicationContext) {</span>
 <span class="cstat-no" title="not covered" >			log.Warn("starting up - warning setting up configuration: config function not implemented")</span>
 <span class="cstat-no" title="not covered" >		},</span>
-<span class="cstat-no" title="not covered" >		DatasourceContext: func(appCtx *ApplicationContext) datasource.Context {</span>
+<span class="cstat-no" title="not covered" >		DatasourceOpenFn: func(appCtx *ApplicationContext) dgorm.OpenFn {</span>
+<span class="cstat-no" title="not covered" >			log.Warn("starting up - warning setting up configuration: datasource OpenFn function not implemented")</span>
+<span class="cstat-no" title="not covered" >			return nil</span>
+<span class="cstat-no" title="not covered" >		},</span>
+<span class="cstat-no" title="not covered" >		DatasourceContext: func(appCtx *ApplicationContext) dgorm.Context {</span>
 <span class="cstat-no" title="not covered" >			if !appCtx.Enablers.DatabaseEnabled {</span>
 <span class="cstat-no" title="not covered" >				return nil</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil {</span>
-<span class="cstat-no" title="not covered" >				return datasource.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)</span>
+<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {</span>
+<span class="cstat-no" title="not covered" >				return dgorm.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config is nil")</span>
+<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")</span>
 <span class="cstat-no" title="not covered" >			return nil</span>
 		},
-<span class="cstat-no" title="not covered" >		DatasourceConnection: func(appCtx *ApplicationContext) datasource.Connection[*gorm.DB] {</span>
+<span class="cstat-no" title="not covered" >		DatasourceConnection: func(appCtx *ApplicationContext) dgorm.Connection {</span>
 <span class="cstat-no" title="not covered" >			if !appCtx.Enablers.DatabaseEnabled {</span>
 <span class="cstat-no" title="not covered" >				return nil</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil {</span>
+<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {</span>
 <span class="cstat-no" title="not covered" >				config := &gorm.Config{</span>
 <span class="cstat-no" title="not covered" >					SkipDefaultTransaction: true,</span>
 <span class="cstat-no" title="not covered" >					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),</span>
 <span class="cstat-no" title="not covered" >				}</span>
-<span class="cstat-no" title="not covered" >				//TODO: create a factory function for enabling different database types not only: mysql.Open</span>
-<span class="cstat-no" title="not covered" >				//sqlite.Open("file::memory:?cache=shared")</span>
-<span class="cstat-no" title="not covered" >				return datasource.NewConnection(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)</span>
+<span class="cstat-no" title="not covered" >				return dgorm.NewConnection(appCtx.DatasourceContext, appCtx.DatasourceOpenFn, config)</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config is nil")</span>
+<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")</span>
 <span class="cstat-no" title="not covered" >			return nil</span>
 		},
-<span class="cstat-no" title="not covered" >		DatasourceTransactionHandler: func(appCtx *ApplicationContext) datasource.TransactionHandler[*gorm.DB] {</span>
+<span class="cstat-no" title="not covered" >		DatasourceTransactionHandler: func(appCtx *ApplicationContext) dgorm.TransactionHandler {</span>
 <span class="cstat-no" title="not covered" >			if !appCtx.Enablers.DatabaseEnabled {</span>
 <span class="cstat-no" title="not covered" >				return nil</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil {</span>
-<span class="cstat-no" title="not covered" >				return datasource.NewOrmTransactionHandler(appCtx.DatasourceConnection)</span>
+<span class="cstat-no" title="not covered" >			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {</span>
+<span class="cstat-no" title="not covered" >				return dgorm.NewOrmTransactionHandler(appCtx.DatasourceConnection)</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
-<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config is nil")</span>
+<span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")</span>
 <span class="cstat-no" title="not covered" >			return nil</span>
 		},
 <span class="cstat-no" title="not covered" >		PasswordEncoder: func(appCtx *ApplicationContext) security.PasswordEncoder {</span>
@@ -661,7 +664,7 @@ type BeanBuilder struct {
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-26T19:37:50.059Z
+at 2024-10-26T21:17:06.086Z
 </div>
     <script src="../../../prettify.js"></script>
     <script>

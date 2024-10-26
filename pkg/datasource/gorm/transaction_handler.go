@@ -1,4 +1,4 @@
-package datasource
+package gorm
 
 import (
 	"context"
@@ -10,16 +10,16 @@ import (
 )
 
 type transactionHandler struct {
-	connection Connection[*gorm.DB]
+	connection Connection
 }
 
-func NewOrmTransactionHandler(connection Connection[*gorm.DB]) TransactionHandler[*gorm.DB] {
+func NewOrmTransactionHandler(connection Connection) TransactionHandler {
 	assert.NotNil(connection, "starting up - error setting up orm transaction handler: connection is nil")
 
 	return &transactionHandler{connection: connection}
 }
 
-func (handler *transactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFn[*gorm.DB]) error {
+func (handler *transactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFn) error {
 	assert.NotNil(ctx, "transaction handler - error handling transaction: context is nil")
 	assert.NotNil(fn, "transaction handler - error handling transaction: transaction handler function is nil")
 
