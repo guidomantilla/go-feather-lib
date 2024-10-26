@@ -24,9 +24,9 @@
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">47.37% </span>
+            <span class="strong">47.06% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>81/171</span>
+            <span class='fraction'>80/170</span>
         </div>
     </div>
 
@@ -209,10 +209,8 @@
 <a name='L168'></a><a href='#L168'>168</a>
 <a name='L169'></a><a href='#L169'>169</a>
 <a name='L170'></a><a href='#L170'>170</a>
-<a name='L171'></a><a href='#L171'>171</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -395,12 +393,11 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type AmqpConsumer struct {
-	connection messaging.Connection[*amqp.Connection]
-	listener   messaging.Listener[*amqp.Delivery]
+	connection Connection[*amqp.Connection]
+	listener   Listener[*amqp.Delivery]
 	channel    *amqp.Channel
 	queue      amqp.Queue
 	name       string
@@ -415,7 +412,7 @@ type AmqpConsumer struct {
 	mu         sync.RWMutex
 }
 
-<span class="cstat-no" title="not covered" >func NewAmqpConsumer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {</span>
+<span class="cstat-no" title="not covered" >func NewAmqpConsumer(connection Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {</span>
 <span class="cstat-no" title="not covered" >	assert.NotNil(connection, "starting up - error setting up rabbitmq amqp consumer: connection is nil")</span>
 <span class="cstat-no" title="not covered" >	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp consumer: name is empty")</span>
 <span class="cstat-no" title="not covered" ></span>
@@ -441,7 +438,7 @@ type AmqpConsumer struct {
 <span class="cstat-no" title="not covered" >	return consumer</span>
 }
 
-<span class="cstat-no" title="not covered" >func (consumer *AmqpConsumer) Consume(ctx context.Context) (messaging.Event, error) {</span>
+<span class="cstat-no" title="not covered" >func (consumer *AmqpConsumer) Consume(ctx context.Context) (Event, error) {</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	consumer.mu.Lock()</span>
 <span class="cstat-no" title="not covered" >	defer consumer.mu.Unlock()</span>
@@ -474,7 +471,7 @@ type AmqpConsumer struct {
 <span class="cstat-no" title="not covered" >	}</span>
 
 <span class="cstat-no" title="not covered" >	closeChannel := make(chan string)</span>
-<span class="cstat-no" title="not covered" >	closeHandler := func(ctx context.Context, listener messaging.Listener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {</span>
+<span class="cstat-no" title="not covered" >	closeHandler := func(ctx context.Context, listener Listener[*amqp.Delivery], channel *amqp.Channel, queue string, closeChannel chan string) {</span>
 <span class="cstat-no" title="not covered" >		var err error</span>
 <span class="cstat-no" title="not covered" >		for message := range deliveries {</span>
 <span class="cstat-no" title="not covered" >			go func(ctx context.Context, message amqp.Delivery) {</span>
@@ -507,7 +504,7 @@ type AmqpConsumer struct {
 }
 
 <span class="cstat-no" title="not covered" >func (consumer *AmqpConsumer) Close() {</span>
-<span class="cstat-no" title="not covered" >	time.Sleep(messaging.Delay)</span>
+<span class="cstat-no" title="not covered" >	time.Sleep(Delay)</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	if consumer.channel != nil && !consumer.channel.IsClosed() {</span>
 <span class="cstat-no" title="not covered" >		log.Debug("rabbitmq consumer - closing connection")</span>
@@ -520,7 +517,7 @@ type AmqpConsumer struct {
 <span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))</span>
 }
 
-<span class="cstat-no" title="not covered" >func (consumer *AmqpConsumer) Context() messaging.Context {</span>
+<span class="cstat-no" title="not covered" >func (consumer *AmqpConsumer) Context() Context {</span>
 <span class="cstat-no" title="not covered" >	return consumer.connection.Context()</span>
 <span class="cstat-no" title="not covered" >}</span>
 
@@ -532,7 +529,7 @@ type AmqpConsumer struct {
 <span class="cstat-no" title="not covered" >	switch property {</span>
 <span class="cstat-no" title="not covered" >	case "listener":</span>
 <span class="cstat-no" title="not covered" >		if value != nil {</span>
-<span class="cstat-no" title="not covered" >			consumer.listener = value.(messaging.Listener[*amqp.Delivery])</span>
+<span class="cstat-no" title="not covered" >			consumer.listener = value.(Listener[*amqp.Delivery])</span>
 <span class="cstat-no" title="not covered" >		}</span>
 <span class="cstat-no" title="not covered" >	case "autoAck":</span>
 <span class="cstat-no" title="not covered" >		consumer.autoAck = value.(bool)</span>
@@ -556,7 +553,7 @@ type AmqpConsumer struct {
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-26T17:08:27.026Z
+at 2024-10-26T19:37:50.050Z
 </div>
     <script src="../../../../prettify.js"></script>
     <script>

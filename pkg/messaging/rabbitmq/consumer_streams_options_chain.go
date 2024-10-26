@@ -3,8 +3,6 @@ package rabbitmq
 import (
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type StreamsConsumerOptionsChain struct {
@@ -35,7 +33,7 @@ func (options *StreamsConsumerOptionsChain) WithConsumerOptions(coptions *stream
 	return options
 }
 
-func (options *StreamsConsumerOptionsChain) WithStreamsListener(listener messaging.Listener[*amqp.Message]) *StreamsConsumerOptionsChain {
+func (options *StreamsConsumerOptionsChain) WithStreamsListener(listener Listener[*amqp.Message]) *StreamsConsumerOptionsChain {
 	options.chain = append(options.chain, streamsConsumerOptions.WithStreamsListener(listener))
 	return options
 }

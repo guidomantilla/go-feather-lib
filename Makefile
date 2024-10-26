@@ -18,7 +18,6 @@ graph:
 	godepgraph -s ./pkg/datasource | dot -Tpng -o ./pkg/datasource/datasource.png
 	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
 	godepgraph -s ./pkg/integration/messaging | dot -Tpng -o ./pkg/integration/messaging/messaging.png
-	godepgraph -s ./pkg/messaging | dot -Tpng -o ./pkg/messaging/messaging.png
 	godepgraph -s ./pkg/messaging/rabbitmq | dot -Tpng -o ./pkg/messaging/rabbitmq/rabbitmq.png
 	godepgraph -s ./pkg/security | dot -Tpng -o ./pkg/security/security.png
 	godepgraph -s ./pkg/server | dot -Tpng -o ./pkg/server/server.png
@@ -45,7 +44,7 @@ test:
 coverage: test
 	go-test-coverage --config=.testcoverage.yml
 
-check: fetch-dependencies generate graph imports format vet lint test clean
+check: fetch-dependencies generate graph imports format vet lint test
 
 validate: check coverage
 

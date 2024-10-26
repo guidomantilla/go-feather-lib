@@ -9,21 +9,20 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type Connection[T messaging.ConnectionTypes] struct {
-	context          messaging.Context
-	connectionDialer messaging.ConnectionDialer[T]
+type connection[T ConnectionTypes] struct {
+	context          Context
+	connectionDialer ConnectionDialer[T]
 	connection       T
 	mu               sync.RWMutex
 }
 
-func NewConnection[T messaging.ConnectionTypes](context messaging.Context, connectionDialer messaging.ConnectionDialer[T]) *Connection[T] {
+func NewConnection[T ConnectionTypes](context Context, connectionDialer ConnectionDialer[T]) *connection[T] {
 	assert.NotNil(context, "starting up - error setting up rabbitmq connection: context is nil")
 	assert.NotNil(connectionDialer, "starting up - error setting up rabbitmq connection: connectionDialer is nil")
 
-	connection := &Connection[T]{
+	connection := &connection[T]{
 		context:          context,
 		connectionDialer: connectionDialer,
 	}
@@ -31,7 +30,7 @@ func NewConnection[T messaging.ConnectionTypes](context messaging.Context, conne
 	return connection
 }
 
-func (connection *Connection[T]) Connect() (T, error) {
+func (connection *connection[T]) Connect() (T, error) {
 
 	connection.mu.Lock()
 	defer connection.mu.Unlock()
@@ -41,7 +40,7 @@ func (connection *Connection[T]) Connect() (T, error) {
 		return connection.connection, nil
 	}
 
-	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(messaging.Delay),
+	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(Delay),
 		retry.LastErrorOnly(true), retry.OnRetry(func(n uint, err error) {
 			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))
 		}),
@@ -55,7 +54,7 @@ func (connection *Connection[T]) Connect() (T, error) {
 	return connection.connection, nil
 }
 
-func (connection *Connection[T]) connect() error {
+func (connection *connection[T]) connect() error {
 
 	var err error
 	if connection.connection, err = connection.connectionDialer(connection.context.Url()); err != nil {
@@ -67,8 +66,8 @@ func (connection *Connection[T]) connect() error {
 	return nil
 }
 
-func (connection *Connection[T]) Close() {
-	time.Sleep(messaging.Delay)
+func (connection *connection[T]) Close() {
+	time.Sleep(Delay)
 
 	if connection.connection != nil && !connection.connection.IsClosed() {
 		log.Debug("rabbitmq connection - closing connection")
@@ -80,6 +79,6 @@ func (connection *Connection[T]) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.context.Server()))
 }
 
-func (connection *Connection[T]) Context() messaging.Context {
+func (connection *connection[T]) Context() Context {
 	return connection.context
 }

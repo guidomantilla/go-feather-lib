@@ -24,9 +24,9 @@
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">52.33% </span>
+            <span class="strong">51.76% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>45/86</span>
+            <span class='fraction'>44/85</span>
         </div>
     </div>
 
@@ -124,10 +124,8 @@
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
 <a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -223,21 +221,20 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
-type Connection[T messaging.ConnectionTypes] struct {
-	context          messaging.Context
-	connectionDialer messaging.ConnectionDialer[T]
+type connection[T ConnectionTypes] struct {
+	context          Context
+	connectionDialer ConnectionDialer[T]
 	connection       T
 	mu               sync.RWMutex
 }
 
-<span class="cstat-no" title="not covered" >func NewConnection[T messaging.ConnectionTypes](context messaging.Context, connectionDialer messaging.ConnectionDialer[T]) *Connection[T] {</span>
+<span class="cstat-no" title="not covered" >func NewConnection[T ConnectionTypes](context Context, connectionDialer ConnectionDialer[T]) *connection[T] {</span>
 <span class="cstat-no" title="not covered" >	assert.NotNil(context, "starting up - error setting up rabbitmq connection: context is nil")</span>
 <span class="cstat-no" title="not covered" >	assert.NotNil(connectionDialer, "starting up - error setting up rabbitmq connection: connectionDialer is nil")</span>
 <span class="cstat-no" title="not covered" ></span>
-<span class="cstat-no" title="not covered" >	connection := &Connection[T]{</span>
+<span class="cstat-no" title="not covered" >	connection := &connection[T]{</span>
 <span class="cstat-no" title="not covered" >		context:          context,</span>
 <span class="cstat-no" title="not covered" >		connectionDialer: connectionDialer,</span>
 <span class="cstat-no" title="not covered" >	}</span>
@@ -245,7 +242,7 @@ type Connection[T messaging.ConnectionTypes] struct {
 <span class="cstat-no" title="not covered" >	return connection</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (connection *Connection[T]) Connect() (T, error) {</span>
+<span class="cstat-no" title="not covered" >func (connection *connection[T]) Connect() (T, error) {</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	connection.mu.Lock()</span>
 <span class="cstat-no" title="not covered" >	defer connection.mu.Unlock()</span>
@@ -255,7 +252,7 @@ type Connection[T messaging.ConnectionTypes] struct {
 <span class="cstat-no" title="not covered" >		return connection.connection, nil</span>
 <span class="cstat-no" title="not covered" >	}</span>
 
-<span class="cstat-no" title="not covered" >	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(messaging.Delay),</span>
+<span class="cstat-no" title="not covered" >	err := retry.Do(connection.connect, retry.Attempts(5), retry.Delay(Delay),</span>
 <span class="cstat-no" title="not covered" >		retry.LastErrorOnly(true), retry.OnRetry(func(n uint, err error) {</span>
 <span class="cstat-no" title="not covered" >			log.Warn(fmt.Sprintf("rabbitmq connection - failed to connect: %s", err.Error()))</span>
 <span class="cstat-no" title="not covered" >		}),</span>
@@ -269,7 +266,7 @@ type Connection[T messaging.ConnectionTypes] struct {
 <span class="cstat-no" title="not covered" >	return connection.connection, nil</span>
 }
 
-<span class="cstat-no" title="not covered" >func (connection *Connection[T]) connect() error {</span>
+<span class="cstat-no" title="not covered" >func (connection *connection[T]) connect() error {</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	var err error</span>
 <span class="cstat-no" title="not covered" >	if connection.connection, err = connection.connectionDialer(connection.context.Url()); err != nil {</span>
@@ -281,8 +278,8 @@ type Connection[T messaging.ConnectionTypes] struct {
 <span class="cstat-no" title="not covered" >	return nil</span>
 }
 
-<span class="cstat-no" title="not covered" >func (connection *Connection[T]) Close() {</span>
-<span class="cstat-no" title="not covered" >	time.Sleep(messaging.Delay)</span>
+<span class="cstat-no" title="not covered" >func (connection *connection[T]) Close() {</span>
+<span class="cstat-no" title="not covered" >	time.Sleep(Delay)</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	if connection.connection != nil && !connection.connection.IsClosed() {</span>
 <span class="cstat-no" title="not covered" >		log.Debug("rabbitmq connection - closing connection")</span>
@@ -294,14 +291,14 @@ type Connection[T messaging.ConnectionTypes] struct {
 <span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("rabbitmq connection - closed connection to %s", connection.context.Server()))</span>
 }
 
-<span class="cstat-no" title="not covered" >func (connection *Connection[T]) Context() messaging.Context {</span>
+<span class="cstat-no" title="not covered" >func (connection *connection[T]) Context() Context {</span>
 <span class="cstat-no" title="not covered" >	return connection.context</span>
 <span class="cstat-no" title="not covered" >}</span>
 
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-26T17:08:27.027Z
+at 2024-10-26T19:37:50.050Z
 </div>
     <script src="../../../../prettify.js"></script>
     <script>

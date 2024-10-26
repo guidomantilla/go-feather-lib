@@ -11,11 +11,10 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type StreamsProducer struct {
-	connection      messaging.Connection[*stream.Environment]
+	connection      Connection[*stream.Environment]
 	environment     *stream.Environment
 	name            string
 	streamOptions   *stream.StreamOptions
@@ -23,7 +22,7 @@ type StreamsProducer struct {
 	mu              sync.RWMutex
 }
 
-func NewStreamsProducer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsProducerOptions) *StreamsProducer {
+func NewStreamsProducer(connection Connection[*stream.Environment], name string, options ...StreamsProducerOptions) *StreamsProducer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams producer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams producer: name is empty")
 
@@ -80,7 +79,7 @@ func (streams *StreamsProducer) Produce(ctx context.Context, message *samqp.AMQP
 }
 
 func (streams *StreamsProducer) Close() {
-	time.Sleep(messaging.Delay)
+	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams producer - closing connection")
@@ -93,6 +92,6 @@ func (streams *StreamsProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *StreamsProducer) Context() messaging.Context {
+func (streams *StreamsProducer) Context() Context {
 	return streams.connection.Context()
 }

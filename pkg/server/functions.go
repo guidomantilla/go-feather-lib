@@ -6,7 +6,7 @@ import (
 	cron "github.com/robfig/cron/v3"
 	"google.golang.org/grpc"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 )
 
 func BuildBaseServer() (string, Server) {
@@ -25,6 +25,6 @@ func BuildGrpcServer(address string, server *grpc.Server) (string, Server) {
 	return "grpc-server", NewGrpcServer(address, server)
 }
 
-func BuildRabbitMQServer(consumers ...messaging.Consumer) (string, Server) {
+func BuildRabbitMQServer(consumers ...rabbitmq.Consumer) (string, Server) {
 	return "rabbitmq-server", NewRabbitMQServer(consumers...)
 }

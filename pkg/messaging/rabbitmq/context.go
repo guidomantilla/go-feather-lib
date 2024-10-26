@@ -5,7 +5,6 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type context_ struct {
@@ -15,7 +14,7 @@ type context_ struct {
 	vhost   string
 }
 
-func NewContext(url string, username string, password string, server string, options ...ContextOptions) messaging.Context {
+func NewContext(url string, username string, password string, server string, options ...ContextOptions) Context {
 	assert.NotEmpty(url, "starting up - error setting up messaging context: url is empty")
 	assert.NotEmpty(username, "starting up - error setting up messaging context: username is empty")
 	assert.NotEmpty(password, "starting up - error setting up messaging context: password is empty")

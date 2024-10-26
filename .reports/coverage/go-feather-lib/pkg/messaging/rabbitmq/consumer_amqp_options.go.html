@@ -24,9 +24,9 @@
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">60.00% </span>
+            <span class="strong">58.73% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>39/65</span>
+            <span class='fraction'>37/63</span>
         </div>
     </div>
 
@@ -102,12 +102,8 @@
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -174,63 +170,61 @@
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 var amqpConsumerOptions = NewAmqpConsumerOptions()
 
 <span class="cstat-no" title="not covered" >func NewAmqpConsumerOptions() AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
-type AmqpConsumerOptions func(consumer messaging.Consumer)
+type AmqpConsumerOptions func(consumer Consumer)
 
-<span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithRabbitMQListener(listener messaging.Listener[*amqp.Delivery]) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithRabbitMQListener(listener Listener[*amqp.Delivery]) AmqpConsumerOptions {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("listener", listener)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithAutoAck(autoAck bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("autoAck", autoAck)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithNoLocal(noLocal bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("noLocal", noLocal)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithDurable(durable bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("durable", durable)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithAutoDelete(autoDelete bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("autoDelete", autoDelete)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithExclusive(exclusive bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("exclusive", exclusive)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithNoWait(noWait bool) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("noWait", noWait)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
 
 <span class="cstat-no" title="not covered" >func (options AmqpConsumerOptions) WithArgs(args amqp.Table) AmqpConsumerOptions {</span>
-<span class="cstat-no" title="not covered" >	return func(consumer messaging.Consumer) {</span>
+<span class="cstat-no" title="not covered" >	return func(consumer Consumer) {</span>
 <span class="cstat-no" title="not covered" >		consumer.Set("args", args)</span>
 <span class="cstat-no" title="not covered" >	}</span>
 }
@@ -238,7 +232,7 @@ type AmqpConsumerOptions func(consumer messaging.Consumer)
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-26T17:08:27.025Z
+at 2024-10-26T19:37:50.049Z
 </div>
     <script src="../../../../prettify.js"></script>
     <script>

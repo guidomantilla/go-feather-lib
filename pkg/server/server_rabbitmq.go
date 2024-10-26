@@ -6,16 +6,16 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
+	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 )
 
 type RabbitMQServer struct {
 	ctx          context.Context
-	consumers    []messaging.Consumer
+	consumers    []rabbitmq.Consumer
 	closeChannel chan struct{}
 }
 
-func NewRabbitMQServer(consumers ...messaging.Consumer) *RabbitMQServer {
+func NewRabbitMQServer(consumers ...rabbitmq.Consumer) *RabbitMQServer {
 	assert.NotEmpty(consumers, "starting up - error setting up rabbitmq server: consumers is empty")
 
 	return &RabbitMQServer{
@@ -31,7 +31,7 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].Context().Server()))
 
 	for _, consumer := range server.consumers {
-		go func(ctx context.Context, consumer messaging.Consumer, closeChannel chan struct{}) {
+		go func(ctx context.Context, consumer rabbitmq.Consumer, closeChannel chan struct{}) {
 			for {
 				select {
 				case <-closeChannel:

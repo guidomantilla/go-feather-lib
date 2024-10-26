@@ -10,11 +10,10 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type AmqpProducer struct {
-	connection messaging.Connection[*amqp.Connection]
+	connection Connection[*amqp.Connection]
 	channel    *amqp.Channel
 	name       string
 	exchange   string
@@ -23,7 +22,7 @@ type AmqpProducer struct {
 	mu         sync.RWMutex
 }
 
-func NewAmqpProducer(connection messaging.Connection[*amqp.Connection], name string, options ...AmqpProducerOptions) *AmqpProducer {
+func NewAmqpProducer(connection Connection[*amqp.Connection], name string, options ...AmqpProducerOptions) *AmqpProducer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq amqp producer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp producer: name is empty")
 
@@ -70,7 +69,7 @@ func (producer *AmqpProducer) Produce(ctx context.Context, message *amqp.Publish
 }
 
 func (producer *AmqpProducer) Close() {
-	time.Sleep(messaging.Delay)
+	time.Sleep(Delay)
 
 	if producer.channel != nil && !producer.channel.IsClosed() {
 		log.Debug("rabbitmq producer - closing connection")
@@ -83,6 +82,6 @@ func (producer *AmqpProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq producer - closed connection to queue %s", producer.name))
 }
 
-func (producer *AmqpProducer) Context() messaging.Context {
+func (producer *AmqpProducer) Context() Context {
 	return producer.connection.Context()
 }

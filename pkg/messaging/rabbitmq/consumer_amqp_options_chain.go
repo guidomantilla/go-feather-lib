@@ -2,8 +2,6 @@ package rabbitmq
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type AmqpConsumerOptionsChain struct {
@@ -17,14 +15,14 @@ func AmqpConsumerOptionsChainBuilder() *AmqpConsumerOptionsChain {
 }
 
 func (options *AmqpConsumerOptionsChain) Build() AmqpConsumerOptions {
-	return func(consumer messaging.Consumer) {
+	return func(consumer Consumer) {
 		for _, option := range options.chain {
 			option(consumer)
 		}
 	}
 }
 
-func (options *AmqpConsumerOptionsChain) WithRabbitMQListener(listener messaging.Listener[*amqp.Delivery]) *AmqpConsumerOptionsChain {
+func (options *AmqpConsumerOptionsChain) WithRabbitMQListener(listener Listener[*amqp.Delivery]) *AmqpConsumerOptionsChain {
 	options.chain = append(options.chain, amqpConsumerOptions.WithRabbitMQListener(listener))
 	return options
 }

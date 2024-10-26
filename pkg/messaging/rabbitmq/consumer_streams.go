@@ -12,12 +12,11 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging"
 )
 
 type StreamsConsumer struct {
-	connection      messaging.Connection[*stream.Environment]
-	listener        messaging.Listener[*amqp.Message]
+	connection      Connection[*stream.Environment]
+	listener        Listener[*amqp.Message]
 	environment     *stream.Environment
 	name            string
 	consumer        string
@@ -27,7 +26,7 @@ type StreamsConsumer struct {
 	mu              sync.RWMutex
 }
 
-func NewStreamsConsumer(connection messaging.Connection[*stream.Environment], name string, options ...StreamsConsumerOptions) *StreamsConsumer {
+func NewStreamsConsumer(connection Connection[*stream.Environment], name string, options ...StreamsConsumerOptions) *StreamsConsumer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams consumer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams consumer: name is empty")
 
@@ -61,7 +60,7 @@ func NewStreamsConsumer(connection messaging.Connection[*stream.Environment], na
 	return consumer
 }
 
-func (streams *StreamsConsumer) Consume(ctx context.Context) (messaging.Event, error) {
+func (streams *StreamsConsumer) Consume(ctx context.Context) (Event, error) {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -127,7 +126,7 @@ func (streams *StreamsConsumer) Consume(ctx context.Context) (messaging.Event, e
 }
 
 func (streams *StreamsConsumer) Close() {
-	time.Sleep(messaging.Delay)
+	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
 		log.Debug("rabbitmq streams consumer - closing connection")
@@ -140,7 +139,7 @@ func (streams *StreamsConsumer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
 }
 
-func (streams *StreamsConsumer) Context() messaging.Context {
+func (streams *StreamsConsumer) Context() Context {
 	return streams.connection.Context()
 }
 
