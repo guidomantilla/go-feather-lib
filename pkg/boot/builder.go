@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/glebarez/sqlite"
 	slogGorm "github.com/orandin/slog-gorm"
 	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
@@ -106,6 +107,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
 				}
 				//TODO: create a factory function for enabling different database types not only: mysql.Open
+				//sqlite.Open("file::memory:?cache=shared")
 				return datasource.NewConnection(appCtx.DatasourceContext, mysql.Open(appCtx.DatasourceContext.Url()), config)
 			}
 
