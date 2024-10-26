@@ -8,7 +8,7 @@ import (
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "TRACE")
-	cserver.Run("nats-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("base-micro", "1.0.0", func(application cserver.Application) error {
 
 		return nil
 	})

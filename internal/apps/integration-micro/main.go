@@ -15,7 +15,7 @@ import (
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "TRACE")
-	cserver.Run("nats-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("integration-micro", "1.0.0", func(application cserver.Application) error {
 
 		var err error
 		var headers messaging.Headers
