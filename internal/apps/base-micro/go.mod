@@ -1,4 +1,4 @@
-module go-feather-lib/internal/apps/play-micro
+module go-feather-lib/internal/apps/base-micro
 
 go 1.23.1
 
