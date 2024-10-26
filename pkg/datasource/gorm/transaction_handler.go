@@ -13,7 +13,7 @@ type transactionHandler struct {
 	connection Connection
 }
 
-func NewOrmTransactionHandler(connection Connection) TransactionHandler {
+func NewTransactionHandler(connection Connection) TransactionHandler {
 	assert.NotNil(connection, "starting up - error setting up orm transaction handler: connection is nil")
 
 	return &transactionHandler{connection: connection}

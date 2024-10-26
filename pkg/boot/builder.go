@@ -123,7 +123,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			}
 
 			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {
-				return dgorm.NewOrmTransactionHandler(appCtx.DatasourceConnection)
+				return dgorm.NewTransactionHandler(appCtx.DatasourceConnection)
 			}
 
 			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
