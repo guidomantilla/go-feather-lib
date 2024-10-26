@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/glebarez/sqlite"
+	_ "github.com/godoes/gorm-oracle"
 	slogGorm "github.com/orandin/slog-gorm"
 	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
