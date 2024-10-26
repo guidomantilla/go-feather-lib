@@ -16,7 +16,7 @@ func StreamsConsumerOptionsChainBuilder() *StreamsConsumerOptionsChain {
 }
 
 func (options *StreamsConsumerOptionsChain) Build() StreamsConsumerOptions {
-	return func(consumer *StreamsConsumer) {
+	return func(consumer *streamsConsumer) {
 		for _, option := range options.chain {
 			option(consumer)
 		}

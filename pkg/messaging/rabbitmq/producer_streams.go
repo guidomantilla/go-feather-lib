@@ -13,7 +13,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type StreamsProducer struct {
+type streamsProducer struct {
 	connection      Connection[*stream.Environment]
 	environment     *stream.Environment
 	name            string
@@ -22,11 +22,11 @@ type StreamsProducer struct {
 	mu              sync.RWMutex
 }
 
-func NewStreamsProducer(connection Connection[*stream.Environment], name string, options ...StreamsProducerOptions) *StreamsProducer {
+func NewStreamsProducer(connection Connection[*stream.Environment], name string, options ...streamsProducerOptions) *streamsProducer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams producer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams producer: name is empty")
 
-	producer := &StreamsProducer{
+	producer := &streamsProducer{
 		connection:      connection,
 		name:            name,
 		streamOptions:   stream.NewStreamOptions(),
@@ -40,7 +40,7 @@ func NewStreamsProducer(connection Connection[*stream.Environment], name string,
 	return producer
 }
 
-func (streams *StreamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {
+func (streams *streamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -78,7 +78,7 @@ func (streams *StreamsProducer) Produce(ctx context.Context, message *samqp.AMQP
 	return nil
 }
 
-func (streams *StreamsProducer) Close() {
+func (streams *streamsProducer) Close() {
 	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
@@ -92,6 +92,6 @@ func (streams *StreamsProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *StreamsProducer) Context() Context {
+func (streams *streamsProducer) Context() Context {
 	return streams.connection.Context()
 }

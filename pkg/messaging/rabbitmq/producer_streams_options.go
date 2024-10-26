@@ -2,23 +2,23 @@ package rabbitmq
 
 import "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
-var streamsProducerOptions = NewStreamsProducerOptions()
+var streamsProducerOptions_ = NewStreamsProducerOptions()
 
-func NewStreamsProducerOptions() StreamsProducerOptions {
-	return func(producer *StreamsProducer) {
+func NewStreamsProducerOptions() streamsProducerOptions {
+	return func(producer *streamsProducer) {
 	}
 }
 
-type StreamsProducerOptions func(*StreamsProducer)
+type streamsProducerOptions func(*streamsProducer)
 
-func (options StreamsProducerOptions) WithProducerOptions(poptions *stream.ProducerOptions) StreamsProducerOptions {
-	return func(producer *StreamsProducer) {
+func (options streamsProducerOptions) WithProducerOptions(poptions *stream.ProducerOptions) streamsProducerOptions {
+	return func(producer *streamsProducer) {
 		producer.producerOptions = poptions
 	}
 }
 
-func (options StreamsProducerOptions) WithStreamOptions(soptions *stream.StreamOptions) StreamsProducerOptions {
-	return func(producer *StreamsProducer) {
+func (options streamsProducerOptions) WithStreamOptions(soptions *stream.StreamOptions) streamsProducerOptions {
+	return func(producer *streamsProducer) {
 		producer.streamOptions = soptions
 	}
 }

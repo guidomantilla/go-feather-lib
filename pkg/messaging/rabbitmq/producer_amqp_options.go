@@ -1,28 +1,28 @@
 package rabbitmq
 
-var amqpProducerOptions = NewAmqpProducerOptions()
+var amqpProducerOptions_ = NewAmqpProducerOptions()
 
-func NewAmqpProducerOptions() AmqpProducerOptions {
-	return func(producer *AmqpProducer) {
+func NewAmqpProducerOptions() amqpProducerOptions {
+	return func(producer *amqpProducer) {
 	}
 }
 
-type AmqpProducerOptions func(*AmqpProducer)
+type amqpProducerOptions func(*amqpProducer)
 
-func (options AmqpProducerOptions) WithExchange(exchange string) AmqpProducerOptions {
-	return func(producer *AmqpProducer) {
+func (options amqpProducerOptions) WithExchange(exchange string) amqpProducerOptions {
+	return func(producer *amqpProducer) {
 		producer.exchange = exchange
 	}
 }
 
-func (options AmqpProducerOptions) WithMandatory(mandatory bool) AmqpProducerOptions {
-	return func(producer *AmqpProducer) {
+func (options amqpProducerOptions) WithMandatory(mandatory bool) amqpProducerOptions {
+	return func(producer *amqpProducer) {
 		producer.mandatory = mandatory
 	}
 }
 
-func (options AmqpProducerOptions) WithImmediate(immediate bool) AmqpProducerOptions {
-	return func(producer *AmqpProducer) {
+func (options amqpProducerOptions) WithImmediate(immediate bool) amqpProducerOptions {
+	return func(producer *amqpProducer) {
 		producer.immediate = immediate
 	}
 }

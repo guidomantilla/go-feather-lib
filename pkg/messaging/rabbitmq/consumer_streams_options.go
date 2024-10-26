@@ -13,26 +13,26 @@ import (
 var streamsConsumerOptions = NewStreamsConsumerOptions()
 
 func NewStreamsConsumerOptions() StreamsConsumerOptions {
-	return func(consumer *StreamsConsumer) {
+	return func(consumer *streamsConsumer) {
 	}
 }
 
-type StreamsConsumerOptions func(*StreamsConsumer)
+type StreamsConsumerOptions func(*streamsConsumer)
 
 func (options StreamsConsumerOptions) WithStreamOptions(soptions *stream.StreamOptions) StreamsConsumerOptions {
-	return func(consumer *StreamsConsumer) {
+	return func(consumer *streamsConsumer) {
 		consumer.streamOptions = soptions
 	}
 }
 
 func (options StreamsConsumerOptions) WithConsumerOptions(coptions *stream.ConsumerOptions) StreamsConsumerOptions {
-	return func(consumer *StreamsConsumer) {
+	return func(consumer *streamsConsumer) {
 		consumer.consumerOptions = coptions
 	}
 }
 
 func (options StreamsConsumerOptions) WithStreamsListener(listener Listener[*amqp.Message]) StreamsConsumerOptions {
-	return func(consumer *StreamsConsumer) {
+	return func(consumer *streamsConsumer) {
 		consumer.listener = listener
 		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
 			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))

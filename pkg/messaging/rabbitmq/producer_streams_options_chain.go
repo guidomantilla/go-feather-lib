@@ -2,30 +2,30 @@ package rabbitmq
 
 import "github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
-type StreamsProducerOptionsChain struct {
-	chain []StreamsProducerOptions
+type streamsProducerOptionsChain struct {
+	chain []streamsProducerOptions
 }
 
-func StreamsProducerOptionsChainBuilder() *StreamsProducerOptionsChain {
-	return &StreamsProducerOptionsChain{
-		chain: make([]StreamsProducerOptions, 0),
+func StreamsProducerOptionsChainBuilder() *streamsProducerOptionsChain {
+	return &streamsProducerOptionsChain{
+		chain: make([]streamsProducerOptions, 0),
 	}
 }
 
-func (options *StreamsProducerOptionsChain) Build() StreamsProducerOptions {
-	return func(producer *StreamsProducer) {
+func (options *streamsProducerOptionsChain) Build() streamsProducerOptions {
+	return func(producer *streamsProducer) {
 		for _, option := range options.chain {
 			option(producer)
 		}
 	}
 }
 
-func (options *StreamsProducerOptionsChain) WithProducerOptions(poptions *stream.ProducerOptions) *StreamsProducerOptionsChain {
-	options.chain = append(options.chain, streamsProducerOptions.WithProducerOptions(poptions))
+func (options *streamsProducerOptionsChain) WithProducerOptions(poptions *stream.ProducerOptions) *streamsProducerOptionsChain {
+	options.chain = append(options.chain, streamsProducerOptions_.WithProducerOptions(poptions))
 	return options
 }
 
-func (options *StreamsProducerOptionsChain) WithStreamOptions(soptions *stream.StreamOptions) *StreamsProducerOptionsChain {
-	options.chain = append(options.chain, streamsProducerOptions.WithStreamOptions(soptions))
+func (options *streamsProducerOptionsChain) WithStreamOptions(soptions *stream.StreamOptions) *streamsProducerOptionsChain {
+	options.chain = append(options.chain, streamsProducerOptions_.WithStreamOptions(soptions))
 	return options
 }
