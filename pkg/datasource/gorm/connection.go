@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"context"
 	"fmt"
 
 	retry "github.com/avast/retry-go/v4"
@@ -30,7 +31,7 @@ func NewConnection(context Context, openFn OpenFn, opts ...gorm.Option) *connect
 	}
 }
 
-func (datasource *connection) Connect() (*gorm.DB, error) {
+func (datasource *connection) Connect(_ context.Context) (*gorm.DB, error) {
 
 	if datasource.database == nil {
 
@@ -61,7 +62,7 @@ func (datasource *connection) connect() error {
 	return nil
 }
 
-func (datasource *connection) Close() {
+func (datasource *connection) Close(_ context.Context) {
 
 	if datasource.database != nil {
 		log.Debug("datasource connection - closing connection")
@@ -71,7 +72,7 @@ func (datasource *connection) Close() {
 		}
 	}
 	datasource.database = nil
-	log.Debug(fmt.Sprintf("datasource connection - closed connection to to %s/%s", datasource.context.Server(), datasource.context.Service()))
+	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s/%s", datasource.context.Server(), datasource.context.Service()))
 }
 
 func (datasource *connection) Context() Context {

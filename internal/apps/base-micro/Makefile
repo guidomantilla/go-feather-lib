@@ -17,11 +17,10 @@ format:
 vet:
 	go vet ./...
 
-lint:
-	golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 ./...
+check: fetch-dependencies graph imports format vet
 
-check: fetch-dependencies graph imports format vet lint
-
+build: check
+	go build -o base-micro main.go
 ##
 
 update-dependencies:

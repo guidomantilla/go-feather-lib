@@ -1,6 +1,7 @@
 package boot
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strings"
@@ -164,16 +165,16 @@ func NewApplicationContext(appName string, version string, args []string, enable
 	return ctx
 }
 
-func (ctx *ApplicationContext) Stop() {
+func (actx *ApplicationContext) Stop(ctx context.Context) {
 
 	var err error
 
-	if ctx.DatasourceConnection != nil && ctx.DatasourceContext != nil {
+	if actx.DatasourceConnection != nil && actx.DatasourceContext != nil {
 
 		var database *gorm.DB
 		log.Debug("shutting down - closing up db connection")
 
-		if database, err = ctx.DatasourceConnection.Connect(); err != nil {
+		if database, err = actx.DatasourceConnection.Connect(ctx); err != nil {
 			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}
@@ -192,5 +193,5 @@ func (ctx *ApplicationContext) Stop() {
 		log.Debug("shutting down - db connection closed")
 	}
 
-	log.Info(fmt.Sprintf("Application %s stopped", strings.Join([]string{ctx.AppName, ctx.AppVersion}, " - ")))
+	log.Info(fmt.Sprintf("Application %s stopped", strings.Join([]string{actx.AppName, actx.AppVersion}, " - ")))
 }

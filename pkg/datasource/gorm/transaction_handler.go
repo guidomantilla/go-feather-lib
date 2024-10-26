@@ -14,7 +14,7 @@ type transactionHandler struct {
 }
 
 func NewTransactionHandler(connection Connection) TransactionHandler {
-	assert.NotNil(connection, "starting up - error setting up orm transaction handler: connection is nil")
+	assert.NotNil(connection, "starting up - error setting up transaction handler: connection is nil")
 
 	return &transactionHandler{connection: connection}
 }
@@ -23,12 +23,15 @@ func (handler *transactionHandler) HandleTransaction(ctx context.Context, fn Tra
 	assert.NotNil(ctx, "transaction handler - error handling transaction: context is nil")
 	assert.NotNil(fn, "transaction handler - error handling transaction: transaction handler function is nil")
 
-	dbx, err := handler.connection.Connect()
+	dbx, err := handler.connection.Connect(ctx)
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
-	return dbx.Transaction(func(tx *gorm.DB) error {
+
+	callback := func(tx *gorm.DB) error {
 		return fn(ctx, tx)
-	})
+	}
+
+	return dbx.Transaction(callback)
 }

@@ -1,6 +1,7 @@
 package boot
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -17,7 +18,7 @@ import (
 
 type InitDelegateFunc func(ctx ApplicationContext) error
 
-func Init(appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder, fn InitDelegateFunc) error {
+func Init(ctx context.Context, appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder, fn InitDelegateFunc) error {
 
 	log.Info(fmt.Sprintf("Application %s", strings.Join([]string{appName, version}, " - ")))
 
@@ -49,33 +50,33 @@ func Init(appName string, version string, args []string, enablers *Enablers, bui
 		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),
 	)
 
-	ctx := NewApplicationContext(appName, version, args, enablers, builder)
-	defer ctx.Stop()
+	actx := NewApplicationContext(appName, version, args, enablers, builder)
+	defer actx.Stop(ctx)
 
-	if err := fn(*ctx); err != nil {
+	if err := fn(*actx); err != nil {
 		log.Fatal(fmt.Sprintf("starting up - error setting up the application: %s", err.Error()))
 	}
 
-	if ctx.Enablers.HttpServerEnabled {
-		if ctx.PublicRouter == nil || ctx.HttpConfig == nil || ctx.HttpConfig.Host == nil || ctx.HttpConfig.Port == nil {
+	if actx.Enablers.HttpServerEnabled {
+		if actx.PublicRouter == nil || actx.HttpConfig == nil || actx.HttpConfig.Host == nil || actx.HttpConfig.Port == nil {
 			log.Fatal("starting up - error setting up the application: http server is enabled but no public router or http config is provided")
 		}
 		httpServer := &http.Server{
-			Addr:              net.JoinHostPort(*ctx.HttpConfig.Host, *ctx.HttpConfig.Port),
-			Handler:           ctx.PublicRouter,
+			Addr:              net.JoinHostPort(*actx.HttpConfig.Host, *actx.HttpConfig.Port),
+			Handler:           actx.PublicRouter,
 			ReadHeaderTimeout: 60000,
 		}
 		app.Attach(server.BuildHttpServer(httpServer))
 	}
 
-	if ctx.Enablers.GrpcServerEnabled {
-		if ctx.GrpcServiceDesc == nil || ctx.GrpcServiceServer == nil || ctx.GrpcConfig == nil || ctx.GrpcConfig.Host == nil || ctx.GrpcConfig.Port == nil {
+	if actx.Enablers.GrpcServerEnabled {
+		if actx.GrpcServiceDesc == nil || actx.GrpcServiceServer == nil || actx.GrpcConfig == nil || actx.GrpcConfig.Host == nil || actx.GrpcConfig.Port == nil {
 			log.Fatal("starting up - error setting up the application: grpc server is enabled but no grpc service descriptor, grpc service server or grpc config is provided")
 		}
 		srv := grpc.NewServer()
-		srv.RegisterService(ctx.GrpcServiceDesc, ctx.GrpcServiceServer)
+		srv.RegisterService(actx.GrpcServiceDesc, actx.GrpcServiceServer)
 		reflection.Register(srv)
-		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*ctx.GrpcConfig.Host, *ctx.GrpcConfig.Port), srv))
+		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*actx.GrpcConfig.Host, *actx.GrpcConfig.Port), srv))
 	}
 
 	log.Info(fmt.Sprintf("Application %s started", strings.Join([]string{appName, version}, " - ")))

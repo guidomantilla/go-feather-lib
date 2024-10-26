@@ -15,6 +15,7 @@ require (
 	github.com/samber/slog-gin v1.13.5
 	github.com/sethvargo/go-envconfig v1.1.0
 	github.com/xorcare/pointer v1.2.2
+	go.mongodb.org/mongo-driver/v2 v2.0.0-beta2
 	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.28.0
 	google.golang.org/grpc v1.67.1
@@ -49,6 +50,10 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
+	github.com/xdg-go/scram v1.1.2 // indirect
+	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.opentelemetry.io/otel v1.31.0 // indirect
 	go.opentelemetry.io/otel/trace v1.31.0 // indirect
 	golang.org/x/arch v0.11.0 // indirect

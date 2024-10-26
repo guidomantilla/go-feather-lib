@@ -24,8 +24,8 @@ type Context interface {
 }
 
 type Connection interface {
-	Connect() (*gorm.DB, error)
-	Close()
+	Connect(ctx context.Context) (*gorm.DB, error)
+	Close(ctx context.Context)
 	Context() Context
 }
 

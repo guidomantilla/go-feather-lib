@@ -24,9 +24,9 @@
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">50.00% </span>
+            <span class="strong">50.59% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>42/84</span>
+            <span class='fraction'>43/85</span>
         </div>
     </div>
 
@@ -123,8 +123,10 @@
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -211,6 +213,7 @@
 </td><td class="text"><pre class="prettyprint lang-go">package boot
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -227,7 +230,7 @@ import (
 
 type InitDelegateFunc func(ctx ApplicationContext) error
 
-<span class="cstat-no" title="not covered" >func Init(appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder, fn InitDelegateFunc) error {</span>
+<span class="cstat-no" title="not covered" >func Init(ctx context.Context, appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder, fn InitDelegateFunc) error {</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	log.Info(fmt.Sprintf("Application %s", strings.Join([]string{appName, version}, " - ")))</span>
 <span class="cstat-no" title="not covered" ></span>
@@ -259,33 +262,33 @@ type InitDelegateFunc func(ctx ApplicationContext) error
 <span class="cstat-no" title="not covered" >		lifecycle.WithSignal(syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL),</span>
 <span class="cstat-no" title="not covered" >	)</span>
 <span class="cstat-no" title="not covered" ></span>
-<span class="cstat-no" title="not covered" >	ctx := NewApplicationContext(appName, version, args, enablers, builder)</span>
-<span class="cstat-no" title="not covered" >	defer ctx.Stop()</span>
+<span class="cstat-no" title="not covered" >	actx := NewApplicationContext(appName, version, args, enablers, builder)</span>
+<span class="cstat-no" title="not covered" >	defer actx.Stop(ctx)</span>
 <span class="cstat-no" title="not covered" ></span>
-<span class="cstat-no" title="not covered" >	if err := fn(*ctx); err != nil {</span>
+<span class="cstat-no" title="not covered" >	if err := fn(*actx); err != nil {</span>
 <span class="cstat-no" title="not covered" >		log.Fatal(fmt.Sprintf("starting up - error setting up the application: %s", err.Error()))</span>
 <span class="cstat-no" title="not covered" >	}</span>
 
-<span class="cstat-no" title="not covered" >	if ctx.Enablers.HttpServerEnabled {</span>
-<span class="cstat-no" title="not covered" >		if ctx.PublicRouter == nil || ctx.HttpConfig == nil || ctx.HttpConfig.Host == nil || ctx.HttpConfig.Port == nil {</span>
+<span class="cstat-no" title="not covered" >	if actx.Enablers.HttpServerEnabled {</span>
+<span class="cstat-no" title="not covered" >		if actx.PublicRouter == nil || actx.HttpConfig == nil || actx.HttpConfig.Host == nil || actx.HttpConfig.Port == nil {</span>
 <span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up the application: http server is enabled but no public router or http config is provided")</span>
 <span class="cstat-no" title="not covered" >		}</span>
 <span class="cstat-no" title="not covered" >		httpServer := &http.Server{</span>
-<span class="cstat-no" title="not covered" >			Addr:              net.JoinHostPort(*ctx.HttpConfig.Host, *ctx.HttpConfig.Port),</span>
-<span class="cstat-no" title="not covered" >			Handler:           ctx.PublicRouter,</span>
+<span class="cstat-no" title="not covered" >			Addr:              net.JoinHostPort(*actx.HttpConfig.Host, *actx.HttpConfig.Port),</span>
+<span class="cstat-no" title="not covered" >			Handler:           actx.PublicRouter,</span>
 <span class="cstat-no" title="not covered" >			ReadHeaderTimeout: 60000,</span>
 <span class="cstat-no" title="not covered" >		}</span>
 <span class="cstat-no" title="not covered" >		app.Attach(server.BuildHttpServer(httpServer))</span>
 	}
 
-<span class="cstat-no" title="not covered" >	if ctx.Enablers.GrpcServerEnabled {</span>
-<span class="cstat-no" title="not covered" >		if ctx.GrpcServiceDesc == nil || ctx.GrpcServiceServer == nil || ctx.GrpcConfig == nil || ctx.GrpcConfig.Host == nil || ctx.GrpcConfig.Port == nil {</span>
+<span class="cstat-no" title="not covered" >	if actx.Enablers.GrpcServerEnabled {</span>
+<span class="cstat-no" title="not covered" >		if actx.GrpcServiceDesc == nil || actx.GrpcServiceServer == nil || actx.GrpcConfig == nil || actx.GrpcConfig.Host == nil || actx.GrpcConfig.Port == nil {</span>
 <span class="cstat-no" title="not covered" >			log.Fatal("starting up - error setting up the application: grpc server is enabled but no grpc service descriptor, grpc service server or grpc config is provided")</span>
 <span class="cstat-no" title="not covered" >		}</span>
 <span class="cstat-no" title="not covered" >		srv := grpc.NewServer()</span>
-<span class="cstat-no" title="not covered" >		srv.RegisterService(ctx.GrpcServiceDesc, ctx.GrpcServiceServer)</span>
+<span class="cstat-no" title="not covered" >		srv.RegisterService(actx.GrpcServiceDesc, actx.GrpcServiceServer)</span>
 <span class="cstat-no" title="not covered" >		reflection.Register(srv)</span>
-<span class="cstat-no" title="not covered" >		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*ctx.GrpcConfig.Host, *ctx.GrpcConfig.Port), srv))</span>
+<span class="cstat-no" title="not covered" >		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*actx.GrpcConfig.Host, *actx.GrpcConfig.Port), srv))</span>
 	}
 
 <span class="cstat-no" title="not covered" >	log.Info(fmt.Sprintf("Application %s started", strings.Join([]string{appName, version}, " - ")))</span>
@@ -295,7 +298,7 @@ type InitDelegateFunc func(ctx ApplicationContext) error
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-26T21:17:06.085Z
+at 2024-10-26T23:58:39.381Z
 </div>
     <script src="../../../prettify.js"></script>
     <script>
