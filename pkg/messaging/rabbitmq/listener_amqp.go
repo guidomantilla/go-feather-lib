@@ -10,14 +10,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type AmqpListener struct {
+type amqpListener struct {
 }
 
-func NewAmqpListener() *AmqpListener {
-	return &AmqpListener{}
+func NewAmqpListener() *amqpListener {
+	return &amqpListener{}
 }
 
-func (listener *AmqpListener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
+func (listener *amqpListener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
 
 	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
 	time.Sleep(5 * time.Second)

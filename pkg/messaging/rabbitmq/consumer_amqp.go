@@ -13,7 +13,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
-type AmqpConsumer struct {
+type amqpConsumer struct {
 	connection Connection[*amqp.Connection]
 	listener   Listener[*amqp.Delivery]
 	channel    *amqp.Channel
@@ -30,11 +30,11 @@ type AmqpConsumer struct {
 	mu         sync.RWMutex
 }
 
-func NewAmqpConsumer(connection Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *AmqpConsumer {
+func NewAmqpConsumer(connection Connection[*amqp.Connection], name string, options ...AmqpConsumerOptions) *amqpConsumer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq amqp consumer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp consumer: name is empty")
 
-	consumer := &AmqpConsumer{
+	consumer := &amqpConsumer{
 		connection: connection,
 		listener:   NewAmqpListener(),
 		name:       name,
@@ -56,7 +56,7 @@ func NewAmqpConsumer(connection Connection[*amqp.Connection], name string, optio
 	return consumer
 }
 
-func (consumer *AmqpConsumer) Consume(ctx context.Context) (Event, error) {
+func (consumer *amqpConsumer) Consume(ctx context.Context) (Event, error) {
 
 	consumer.mu.Lock()
 	defer consumer.mu.Unlock()
@@ -121,7 +121,7 @@ func (consumer *AmqpConsumer) Consume(ctx context.Context) (Event, error) {
 	return closeChannel, nil
 }
 
-func (consumer *AmqpConsumer) Close() {
+func (consumer *amqpConsumer) Close() {
 	time.Sleep(Delay)
 
 	if consumer.channel != nil && !consumer.channel.IsClosed() {
@@ -135,11 +135,11 @@ func (consumer *AmqpConsumer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
 }
 
-func (consumer *AmqpConsumer) Context() Context {
+func (consumer *amqpConsumer) Context() Context {
 	return consumer.connection.Context()
 }
 
-func (consumer *AmqpConsumer) Set(property string, value any) {
+func (consumer *amqpConsumer) Set(property string, value any) {
 	if utils.IsEmpty(property) || utils.IsEmpty(value) {
 		return
 	}

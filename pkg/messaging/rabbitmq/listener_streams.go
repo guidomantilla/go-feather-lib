@@ -11,14 +11,14 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type StreamsListener struct {
+type streamsListener struct {
 }
 
-func NewStreamsListener() *StreamsListener {
-	return &StreamsListener{}
+func NewStreamsListener() *streamsListener {
+	return &streamsListener{}
 }
 
-func (listener *StreamsListener) OnMessage(ctx context.Context, message *amqp.Message) error {
+func (listener *streamsListener) OnMessage(ctx context.Context, message *amqp.Message) error {
 
 	var consumerContext stream.ConsumerContext
 	anyContext := ctx.Value(stream.ConsumerContext{})

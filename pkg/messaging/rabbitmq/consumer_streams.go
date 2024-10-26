@@ -14,7 +14,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type StreamsConsumer struct {
+type streamsConsumer struct {
 	connection      Connection[*stream.Environment]
 	listener        Listener[*amqp.Message]
 	environment     *stream.Environment
@@ -26,12 +26,12 @@ type StreamsConsumer struct {
 	mu              sync.RWMutex
 }
 
-func NewStreamsConsumer(connection Connection[*stream.Environment], name string, options ...StreamsConsumerOptions) *StreamsConsumer {
+func NewStreamsConsumer(connection Connection[*stream.Environment], name string, options ...StreamsConsumerOptions) *streamsConsumer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams consumer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams consumer: name is empty")
 
 	listener := NewStreamsListener()
-	consumer := &StreamsConsumer{
+	consumer := &streamsConsumer{
 		connection:      connection,
 		name:            name,
 		consumer:        "consumer-" + name,
@@ -60,7 +60,7 @@ func NewStreamsConsumer(connection Connection[*stream.Environment], name string,
 	return consumer
 }
 
-func (streams *StreamsConsumer) Consume(ctx context.Context) (Event, error) {
+func (streams *streamsConsumer) Consume(ctx context.Context) (Event, error) {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -125,7 +125,7 @@ func (streams *StreamsConsumer) Consume(ctx context.Context) (Event, error) {
 	return closeChannel, nil
 }
 
-func (streams *StreamsConsumer) Close() {
+func (streams *streamsConsumer) Close() {
 	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
@@ -139,10 +139,10 @@ func (streams *StreamsConsumer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
 }
 
-func (streams *StreamsConsumer) Context() Context {
+func (streams *streamsConsumer) Context() Context {
 	return streams.connection.Context()
 }
 
-func (streams *StreamsConsumer) Set(property string, value any) {
+func (streams *streamsConsumer) Set(property string, value any) {
 
 }
