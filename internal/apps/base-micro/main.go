@@ -2,12 +2,18 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/glebarez/sqlite"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
+	dmongo "github.com/guidomantilla/go-feather-lib/pkg/datasource/mongo"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"gorm.io/gorm"
 )
 
@@ -55,7 +61,6 @@ func case_gorm() error {
 	return nil
 }
 
-/*
 func case_mongo() error {
 
 	ctx := context.TODO()
@@ -116,4 +121,3 @@ func case_mongo() error {
 
 	return nil
 }
-*/

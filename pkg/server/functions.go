@@ -2,8 +2,6 @@ package server
 
 import (
 	"net/http"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
 )
 
 func BuildBaseServer() (string, Server) {
@@ -20,8 +18,4 @@ func BuildHttpServer(server *http.Server) (string, Server) {
 
 func BuildGrpcServer(address string, server GrpcServer) (string, Server) {
 	return "grpc-server", NewGrpcServer(address, server)
-}
-
-func BuildRabbitMQServer(consumers ...rabbitmq.Consumer) (string, Server) {
-	return "rabbitmq-server", NewRabbitMQServer(consumers...)
 }

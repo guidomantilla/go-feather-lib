@@ -1,37 +1,42 @@
-package server
+package rabbitmq
 
 import (
 	"context"
 	"fmt"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
+	"github.com/qmdx00/lifecycle"
 )
 
-type RabbitMQServer struct {
+func BuildConsumerServer(consumers ...Consumer) (string, lifecycle.Server) {
+	return "rabbitmq-server", NewConsumerServer(consumers...)
+}
+
+//
+
+type ConsumerServer struct {
 	ctx          context.Context
-	consumers    []rabbitmq.Consumer
+	consumers    []Consumer
 	closeChannel chan struct{}
 }
 
-func NewRabbitMQServer(consumers ...rabbitmq.Consumer) *RabbitMQServer {
+func NewConsumerServer(consumers ...Consumer) *ConsumerServer {
 	assert.NotEmpty(consumers, "starting up - error setting up rabbitmq server: consumers is empty")
 
-	return &RabbitMQServer{
+	return &ConsumerServer{
 		consumers:    consumers,
 		closeChannel: make(chan struct{}),
 	}
 }
 
-func (server *RabbitMQServer) Run(ctx context.Context) error {
+func (server *ConsumerServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "rabbitmq server - error starting up: context is nil")
 
 	server.ctx = ctx
 	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].Context().Server()))
 
 	for _, consumer := range server.consumers {
-		go func(ctx context.Context, consumer rabbitmq.Consumer, closeChannel chan struct{}) {
+		go func(ctx context.Context, consumer Consumer, closeChannel chan struct{}) {
 			for {
 				select {
 				case <-closeChannel:
@@ -53,7 +58,7 @@ func (server *RabbitMQServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *RabbitMQServer) Stop(_ context.Context) error {
+func (server *ConsumerServer) Stop(_ context.Context) error {
 	assert.NotNil(server.ctx, "rabbitmq server - error shutting down: context is nil")
 
 	log.Debug("server shutting down - stopping rabbitmq server")

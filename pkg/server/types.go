@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	_ Server = (*RabbitMQServer)(nil)
 	_ Server = (*cronServer)(nil)
 	_ Server = (*grpcServer)(nil)
 	_ Server = (*httpServer)(nil)
