@@ -60,3 +60,15 @@ func (options ConsumerOptions) WithArgs(args amqp.Table) ConsumerOptions {
 		consumer.Set("args", args)
 	}
 }
+
+func (options ConsumerOptions) WithClosingHandler(closingHandler ClosingHandler) ConsumerOptions {
+	return func(consumer Consumer) {
+		consumer.Set("closingHandler", closingHandler)
+	}
+}
+
+func (options ConsumerOptions) WithMessageProcessor(messageProcessor MessageProcessor) ConsumerOptions {
+	return func(consumer Consumer) {
+		consumer.Set("messageProcessor", messageProcessor)
+	}
+}

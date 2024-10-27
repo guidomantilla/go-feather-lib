@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"sync"
 	"time"
 
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
@@ -15,39 +15,36 @@ import (
 )
 
 type consumer struct {
-	connection      Connection
-	listener        Listener
-	environment     *stream.Environment
-	name            string
-	consumer        string
-	streamOptions   *stream.StreamOptions
-	consumerOptions *stream.ConsumerOptions
-	messagesHandler stream.MessagesHandler
-	mu              sync.RWMutex
+	connection       Connection
+	listener         Listener
+	environment      *stream.Environment
+	name             string
+	consumer         string
+	streamOptions    *stream.StreamOptions
+	consumerOptions  *stream.ConsumerOptions
+	messagesHandler  stream.MessagesHandler
+	closingHandler   ClosingHandler
+	messageProcessor MessageProcessor
+	mu               sync.RWMutex
 }
 
 func NewConsumer(connection Connection, name string, options ...ConsumerOptions) *consumer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams consumer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams consumer: name is empty")
 
-	listener := NewListener()
 	consumer := &consumer{
-		connection:      connection,
-		name:            name,
-		consumer:        "consumer-" + name,
-		streamOptions:   stream.NewStreamOptions(),
-		consumerOptions: stream.NewConsumerOptions().SetConsumerName("consumer-" + name),
-		listener:        listener,
-		messagesHandler: func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-			go func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
-				ctx := context.WithValue(context.Background(), stream.ConsumerContext{}, consumerContext)
-				if err := listener.OnMessage(ctx, message); err != nil {
-					log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
-					return
-				}
-			}(consumerContext, message)
-		},
+		connection:       connection,
+		name:             name,
+		consumer:         "consumer-" + name,
+		streamOptions:    stream.NewStreamOptions(),
+		consumerOptions:  stream.NewConsumerOptions().SetConsumerName("consumer-" + name),
+		listener:         NewListener(),
+		closingHandler:   closingHandler,
+		messageProcessor: messageProcessor,
+	}
+
+	consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
+		go messageProcessor(consumerContext, consumer.listener, message)
 	}
 
 	for _, option := range options {
@@ -104,24 +101,8 @@ func (streams *consumer) Consume(ctx context.Context) (Event, error) {
 		return nil, err
 	}
 
-	closeChannel := make(chan string)
-	closeHandler := func(consumer *stream.Consumer, stream string, closeChannel chan string) {
-		var err error
-		for range consumer.NotifyClose() {
-			if err := consumer.StoreOffset(); err != nil {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to store consumer offset from stream %s: %s", stream, err.Error()))
-				return
-			}
-			if err = consumer.Close(); err != nil {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to close consumer from stream %s: %s", stream, err.Error()))
-				return
-			}
-			close(closeChannel)
-		}
-		log.Debug(fmt.Sprintf("rabbitmq streams consumer - disconected from stream %s", stream))
-	}
-
-	go closeHandler(consumer, streams.name, closeChannel)
+	closeChannel := make(Event)
+	go closingHandler(consumer, streams.name, closeChannel)
 	return closeChannel, nil
 }
 

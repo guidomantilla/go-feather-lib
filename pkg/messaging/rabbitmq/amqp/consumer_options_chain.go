@@ -61,3 +61,13 @@ func (options *consumerOptionsChain) WithArgs(args amqp.Table) *consumerOptionsC
 	options.chain = append(options.chain, consumerOptions.WithArgs(args))
 	return options
 }
+
+func (options *consumerOptionsChain) WithClosingHandler(closingHandler ClosingHandler) *consumerOptionsChain {
+	options.chain = append(options.chain, consumerOptions.WithClosingHandler(closingHandler))
+	return options
+}
+
+func (options *consumerOptionsChain) WithMessageProcessor(messageProcessor MessageProcessor) *consumerOptionsChain {
+	options.chain = append(options.chain, consumerOptions.WithMessageProcessor(messageProcessor))
+	return options
+}

@@ -14,20 +14,22 @@ import (
 )
 
 type consumer struct {
-	connection Connection
-	listener   Listener
-	channel    *amqp.Channel
-	queue      amqp.Queue
-	name       string
-	consumer   string
-	autoAck    bool
-	noLocal    bool
-	durable    bool
-	autoDelete bool
-	exclusive  bool
-	noWait     bool
-	args       amqp.Table
-	mu         sync.RWMutex
+	connection       Connection
+	listener         Listener
+	channel          *amqp.Channel
+	queue            amqp.Queue
+	name             string
+	consumer         string
+	autoAck          bool
+	noLocal          bool
+	durable          bool
+	autoDelete       bool
+	exclusive        bool
+	noWait           bool
+	args             amqp.Table
+	closingHandler   ClosingHandler
+	messageProcessor MessageProcessor
+	mu               sync.RWMutex
 }
 
 func NewConsumer(connection Connection, name string, options ...ConsumerOptions) *consumer {
@@ -35,17 +37,19 @@ func NewConsumer(connection Connection, name string, options ...ConsumerOptions)
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp consumer: name is empty")
 
 	consumer := &consumer{
-		connection: connection,
-		listener:   NewListener(),
-		name:       name,
-		consumer:   "consumer-" + name,
-		autoAck:    false,
-		noLocal:    false,
-		durable:    false,
-		autoDelete: false,
-		exclusive:  false,
-		noWait:     false,
-		args:       nil,
+		connection:       connection,
+		listener:         NewListener(),
+		name:             name,
+		consumer:         "consumer-" + name,
+		autoAck:          false,
+		noLocal:          false,
+		durable:          false,
+		autoDelete:       false,
+		exclusive:        false,
+		noWait:           false,
+		args:             nil,
+		closingHandler:   closingHandler,
+		messageProcessor: messageProcessor,
 	}
 
 	for _, option := range options {
@@ -88,36 +92,8 @@ func (consumer *consumer) Consume(ctx context.Context) (Event, error) {
 		return nil, err
 	}
 
-	closeChannel := make(chan string)
-	closeHandler := func(ctx context.Context, listener Listener, channel *amqp.Channel, queue string, closeChannel chan string) {
-		var err error
-		for message := range deliveries {
-			go func(ctx context.Context, message amqp.Delivery) {
-				log.Debug(fmt.Sprintf("rabbitmq consumer - message received: %s", message.Body))
-				if err := listener.OnMessage(ctx, &message); err != nil {
-					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to process message: %s", err.Error()))
-					if err := message.Nack(false, true); err != nil {
-						log.Debug(fmt.Sprintf("rabbitmq consumer - failed to nack message: %s", err.Error()))
-					}
-					log.Debug(fmt.Sprintf("rabbitmq consumer - nack message: %s", err.Error()))
-					return
-				}
-				if err := message.Ack(false); err != nil {
-					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to ack message: %s", err.Error()))
-					return
-				}
-				log.Debug(fmt.Sprintf("rabbitmq consumer - ack message: %s", err.Error()))
-			}(ctx, message)
-		}
-		if err = channel.Close(); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq consumer - failed to close channel to queue %s: %s", queue, err.Error()))
-			return
-		}
-		close(closeChannel)
-		log.Debug(fmt.Sprintf("rabbitmq consumer - disconected from queue %s", queue))
-	}
-
-	go closeHandler(ctx, consumer.listener, consumer.channel, consumer.name, closeChannel)
+	closeChannel := make(Event)
+	go consumer.closingHandler(ctx, consumer.name, consumer.channel, deliveries, consumer.listener, closeChannel, consumer.messageProcessor)
 	return closeChannel, nil
 }
 
@@ -164,6 +140,14 @@ func (consumer *consumer) Set(property string, value any) {
 	case "args":
 		if value != nil {
 			consumer.args = value.(amqp.Table)
+		}
+	case "closingHandler":
+		if value != nil {
+			consumer.closingHandler = value.(ClosingHandler)
+		}
+	case "messageProcessor":
+		if value != nil {
+			consumer.messageProcessor = value.(MessageProcessor)
 		}
 	}
 }
