@@ -3,9 +3,11 @@ package rabbitmq
 import (
 	"context"
 	"fmt"
+
+	"github.com/qmdx00/lifecycle"
+
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
-	"github.com/qmdx00/lifecycle"
 )
 
 func BuildConsumerServer(consumers ...Consumer) (string, lifecycle.Server) {
