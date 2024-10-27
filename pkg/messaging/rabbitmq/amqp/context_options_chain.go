@@ -4,7 +4,7 @@ type contextOptionsChain struct {
 	chain []ContextOptions
 }
 
-func NewContextOptionChain() *contextOptionsChain {
+func ContextOptionBuilder() *contextOptionsChain {
 	return &contextOptionsChain{
 		chain: make([]ContextOptions, 0),
 	}

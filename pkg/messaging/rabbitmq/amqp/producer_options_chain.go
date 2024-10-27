@@ -4,7 +4,7 @@ type producerOptionsChain struct {
 	chain []ProducerOptions
 }
 
-func ProducerOptionsChainBuilder() *producerOptionsChain {
+func ProducerOptionsBuilder() *producerOptionsChain {
 	return &producerOptionsChain{
 		chain: make([]ProducerOptions, 0),
 	}

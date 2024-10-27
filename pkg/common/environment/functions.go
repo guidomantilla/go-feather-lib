@@ -17,7 +17,7 @@ func instance() Environment {
 }
 
 func Load(cmdArgs ...[]string) Environment {
-	builder := OptionsChainBuilder().WithSSL().WithOs()
+	builder := OptionsBuilder().WithSSL().WithOs()
 	if len(cmdArgs) >= 1 {
 		builder.WithCmd(cmdArgs[0])
 	}

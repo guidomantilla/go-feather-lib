@@ -28,7 +28,7 @@ func main() {
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
 		messagingContext := rabbitmqamqp.NewContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", rabbitmqamqp.NewContextOptionChain().WithVhost("/").Build())
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", rabbitmqamqp.ContextOptionBuilder().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the consumer
 

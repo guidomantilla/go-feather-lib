@@ -6,17 +6,17 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-type JwtTokenManagerOptionsChain struct {
+type jwtTokenManagerOptionsChain struct {
 	chain []JwtTokenManagerOptions
 }
 
-func JwtTokenManagerOptionsChainBuilder() *JwtTokenManagerOptionsChain {
-	return &JwtTokenManagerOptionsChain{
+func JwtTokenManagerOptionsBuilder() *jwtTokenManagerOptionsChain {
+	return &jwtTokenManagerOptionsChain{
 		chain: make([]JwtTokenManagerOptions, 0),
 	}
 }
 
-func (options *JwtTokenManagerOptionsChain) Build() JwtTokenManagerOptions {
+func (options *jwtTokenManagerOptionsChain) Build() JwtTokenManagerOptions {
 	return func(tokenManager TokenManager) {
 		for _, option := range options.chain {
 			option(tokenManager)
@@ -24,27 +24,27 @@ func (options *JwtTokenManagerOptionsChain) Build() JwtTokenManagerOptions {
 	}
 }
 
-func (options *JwtTokenManagerOptionsChain) WithIssuer(issuer string) *JwtTokenManagerOptionsChain {
+func (options *jwtTokenManagerOptionsChain) WithIssuer(issuer string) *jwtTokenManagerOptionsChain {
 	options.chain = append(options.chain, jwtTokenManagerOptions.WithIssuer(issuer))
 	return options
 }
 
-func (options *JwtTokenManagerOptionsChain) WithTimeout(timeout time.Duration) *JwtTokenManagerOptionsChain {
+func (options *jwtTokenManagerOptionsChain) WithTimeout(timeout time.Duration) *jwtTokenManagerOptionsChain {
 	options.chain = append(options.chain, jwtTokenManagerOptions.WithTimeout(timeout))
 	return options
 }
 
-func (options *JwtTokenManagerOptionsChain) WithSigningMethod(signingMethod jwt.SigningMethod) *JwtTokenManagerOptionsChain {
+func (options *jwtTokenManagerOptionsChain) WithSigningMethod(signingMethod jwt.SigningMethod) *jwtTokenManagerOptionsChain {
 	options.chain = append(options.chain, jwtTokenManagerOptions.WithSigningMethod(signingMethod))
 	return options
 }
 
-func (options *JwtTokenManagerOptionsChain) WithSigningKey(signingKey any) *JwtTokenManagerOptionsChain {
+func (options *jwtTokenManagerOptionsChain) WithSigningKey(signingKey any) *jwtTokenManagerOptionsChain {
 	options.chain = append(options.chain, jwtTokenManagerOptions.WithSigningKey(signingKey))
 	return options
 }
 
-func (options *JwtTokenManagerOptionsChain) WithVerifyingKey(verifyingKey any) *JwtTokenManagerOptionsChain {
+func (options *jwtTokenManagerOptionsChain) WithVerifyingKey(verifyingKey any) *jwtTokenManagerOptionsChain {
 	options.chain = append(options.chain, jwtTokenManagerOptions.WithVerifyingKey(verifyingKey))
 	return options
 }

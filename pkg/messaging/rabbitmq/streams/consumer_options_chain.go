@@ -8,7 +8,7 @@ type consumerOptionsChain struct {
 	chain []ConsumerOptions
 }
 
-func ConsumerOptionsChainBuilder() *consumerOptionsChain {
+func ConsumerOptionsBuilder() *consumerOptionsChain {
 	return &consumerOptionsChain{
 		chain: make([]ConsumerOptions, 0),
 	}

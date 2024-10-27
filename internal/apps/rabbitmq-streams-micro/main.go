@@ -27,7 +27,7 @@ func main() {
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
 		messagingContext := rabbitmqstreams.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", rabbitmqstreams.NewContextOptionChain().WithVhost("/").Build())
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", rabbitmqstreams.ContextOptionBuilder().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the environment and the consumer
 

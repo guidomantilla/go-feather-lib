@@ -80,7 +80,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 	return &BeanBuilder{
 
 		Environment: func(appCtx *ApplicationContext) environment.Environment {
-			return environment.New(environment.OptionsChainBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())
+			return environment.New(environment.OptionsBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())
 		},
 		Config: func(appCtx *ApplicationContext) {
 			log.Warn("starting up - warning setting up configuration: config function not implemented")
@@ -151,7 +151,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return nil
 		},
 		TokenManager: func(appCtx *ApplicationContext) security.TokenManager {
-			options := security.JwtTokenManagerOptionsChainBuilder().WithIssuer(appCtx.AppName).
+			options := security.JwtTokenManagerOptionsBuilder().WithIssuer(appCtx.AppName).
 				WithSigningKey([]byte(*appCtx.SecurityConfig.TokenSignatureKey)).
 				WithVerifyingKey([]byte(*appCtx.SecurityConfig.TokenVerificationKey)).Build()
 			return security.NewJwtTokenManager(options)
