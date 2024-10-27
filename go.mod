@@ -11,7 +11,6 @@ require (
 	github.com/qmdx00/lifecycle v1.1.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/rabbitmq/rabbitmq-stream-go-client v1.4.10
-	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/slog-gin v1.13.5
 	github.com/sethvargo/go-envconfig v1.1.0
 	github.com/xorcare/pointer v1.2.2

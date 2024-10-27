@@ -11,6 +11,7 @@ package server
 
 import (
 	context "context"
+	net "net"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -66,4 +67,102 @@ func (m *MockServer) Stop(ctx context.Context) error {
 func (mr *MockServerMockRecorder) Stop(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockServer)(nil).Stop), ctx)
+}
+
+// MockCronServer is a mock of CronServer interface.
+type MockCronServer struct {
+	ctrl     *gomock.Controller
+	recorder *MockCronServerMockRecorder
+	isgomock struct{}
+}
+
+// MockCronServerMockRecorder is the mock recorder for MockCronServer.
+type MockCronServerMockRecorder struct {
+	mock *MockCronServer
+}
+
+// NewMockCronServer creates a new mock instance.
+func NewMockCronServer(ctrl *gomock.Controller) *MockCronServer {
+	mock := &MockCronServer{ctrl: ctrl}
+	mock.recorder = &MockCronServerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCronServer) EXPECT() *MockCronServerMockRecorder {
+	return m.recorder
+}
+
+// Start mocks base method.
+func (m *MockCronServer) Start() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Start")
+}
+
+// Start indicates an expected call of Start.
+func (mr *MockCronServerMockRecorder) Start() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockCronServer)(nil).Start))
+}
+
+// Stop mocks base method.
+func (m *MockCronServer) Stop() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Stop")
+}
+
+// Stop indicates an expected call of Stop.
+func (mr *MockCronServerMockRecorder) Stop() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockCronServer)(nil).Stop))
+}
+
+// MockGrpcServer is a mock of GrpcServer interface.
+type MockGrpcServer struct {
+	ctrl     *gomock.Controller
+	recorder *MockGrpcServerMockRecorder
+	isgomock struct{}
+}
+
+// MockGrpcServerMockRecorder is the mock recorder for MockGrpcServer.
+type MockGrpcServerMockRecorder struct {
+	mock *MockGrpcServer
+}
+
+// NewMockGrpcServer creates a new mock instance.
+func NewMockGrpcServer(ctrl *gomock.Controller) *MockGrpcServer {
+	mock := &MockGrpcServer{ctrl: ctrl}
+	mock.recorder = &MockGrpcServerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockGrpcServer) EXPECT() *MockGrpcServerMockRecorder {
+	return m.recorder
+}
+
+// GracefulStop mocks base method.
+func (m *MockGrpcServer) GracefulStop() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "GracefulStop")
+}
+
+// GracefulStop indicates an expected call of GracefulStop.
+func (mr *MockGrpcServerMockRecorder) GracefulStop() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GracefulStop", reflect.TypeOf((*MockGrpcServer)(nil).GracefulStop))
+}
+
+// Serve mocks base method.
+func (m *MockGrpcServer) Serve(lis net.Listener) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Serve", lis)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Serve indicates an expected call of Serve.
+func (mr *MockGrpcServerMockRecorder) Serve(lis any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Serve", reflect.TypeOf((*MockGrpcServer)(nil).Serve), lis)
 }

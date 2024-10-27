@@ -10,20 +10,20 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type HttpServer struct {
+type httpServer struct {
 	ctx      context.Context
 	internal *http.Server
 }
 
-func NewHttpServer(server *http.Server) *HttpServer {
+func NewHttpServer(server *http.Server) *httpServer {
 	assert.NotNil(server, "starting up - error setting up http server: server is nil")
 
-	return &HttpServer{
+	return &httpServer{
 		internal: server,
 	}
 }
 
-func (server *HttpServer) Run(ctx context.Context) error {
+func (server *httpServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "http server - error starting: context is nil")
 
 	server.ctx = ctx
@@ -36,7 +36,7 @@ func (server *HttpServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *HttpServer) Stop(ctx context.Context) error {
+func (server *httpServer) Stop(ctx context.Context) error {
 	assert.NotNil(ctx, "http server - error shutting down: context is nil")
 
 	log.Info("shutting down - stopping http server")

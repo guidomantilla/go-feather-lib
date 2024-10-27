@@ -7,29 +7,27 @@ import (
 	"net"
 	"net/http"
 
-	"google.golang.org/grpc"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type GrpcServer struct {
+type grpcServer struct {
 	ctx      context.Context
 	address  string
-	internal *grpc.Server
+	internal GrpcServer
 }
 
-func NewGrpcServer(address string, server *grpc.Server) *GrpcServer {
+func NewGrpcServer(address string, server GrpcServer) *grpcServer {
 	assert.NotEmpty(address, "starting up - error setting up grpc server: address is empty")
 	assert.NotNil(server, "starting up - error setting up grpc server: server is nil")
 
-	return &GrpcServer{
+	return &grpcServer{
 		address:  address,
 		internal: server,
 	}
 }
 
-func (server *GrpcServer) Run(ctx context.Context) error {
+func (server *grpcServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "grpc server - error starting up: context is nil")
 
 	server.ctx = ctx
@@ -49,7 +47,7 @@ func (server *GrpcServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *GrpcServer) Stop(ctx context.Context) error {
+func (server *grpcServer) Stop(ctx context.Context) error {
 	assert.NotNil(ctx, "grpc server - error shutting down: context is nil")
 
 	log.Info("shutting down - stopping grpc server")
