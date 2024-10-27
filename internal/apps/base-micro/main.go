@@ -38,11 +38,12 @@ func main() {
 
 func case_gorm() error {
 
+	ctx := context.TODO()
 	gormCtx := dgorm.NewContext("../resources/db/chinook.db?cache=shared&_pragma=foreign_keys(1)", "user", "pass", "localhost", "sqlite")
 	connection := dgorm.NewConnection(gormCtx, sqlite.Open)
+	defer connection.Close(ctx)
 	transactionHandler := dgorm.NewTransactionHandler(connection)
 
-	ctx := context.TODO()
 	err := transactionHandler.HandleTransaction(ctx, func(ctx context.Context, tx *gorm.DB) error {
 
 		insert := &Artist{Name: "D42"}
