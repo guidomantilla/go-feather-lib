@@ -24,7 +24,7 @@ func main() {
 		var sender messaging.SenderChannel[string]
 
 		{
-			options := messaging.HeadersOptionsChainBuilder().ErrorChannel("error-channel").ReplyChannel("reply-channel").
+			options := messaging.HeadersOptionsBuilder().ErrorChannel("error-channel").ReplyChannel("reply-channel").
 				Add("property", "value").Build()
 			headers = messaging.NewBaseHeaders(options)
 			log.Info(fmt.Sprintf("Headers: %+v", headers))

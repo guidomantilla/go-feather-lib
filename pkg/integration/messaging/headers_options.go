@@ -20,7 +20,7 @@ func NewHeadersOptions() HeadersOptions {
 
 func NewHeadersOptionsFromConfig(config *HeadersConfig) HeadersOptions {
 	assert.NotNil(config, fmt.Sprintf("integration messaging: %s error - config is required", "headers-options"))
-	builder := HeadersOptionsChainBuilder().Id(config.Id).MessageType(config.MessageType).Timestamp(config.Timestamp).
+	builder := HeadersOptionsBuilder().Id(config.Id).MessageType(config.MessageType).Timestamp(config.Timestamp).
 		Expired(config.Expired).TimeToLive(config.TimeToLive).ContentType(config.ContentType).
 		OriginChannel(config.OriginChannel).DestinationChannel(config.DestinationChannel).
 		ReplyChannel(config.ReplyChannel).ErrorChannel(config.ErrorChannel)
