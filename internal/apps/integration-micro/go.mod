@@ -2,7 +2,9 @@ module go-feather-lib/internal/apps/integration-micro
 
 go 1.23.1
 
-require github.com/guidomantilla/go-feather-lib v0.0.0-20241025221703-4877f23db717
+require github.com/guidomantilla/go-feather-lib v0.0.0
+
+replace github.com/guidomantilla/go-feather-lib v0.0.0 => ../../../
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect

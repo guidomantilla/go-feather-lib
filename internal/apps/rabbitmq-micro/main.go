@@ -11,8 +11,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
-	"github.com/guidomantilla/go-feather-lib/pkg/server"
+	rabbitmqamqp "github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq/amqp"
 )
 
 func main() {
@@ -28,20 +27,20 @@ func main() {
 		clientKey := environment.Value(environment.SslClientKey).AsString()
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-		messagingContext := rabbitmq.NewContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", rabbitmq.NewContextOptionChain().WithVhost("/").Build())
+		messagingContext := rabbitmqamqp.NewContext("amqps://:username::password@:server:vhost", //?auth_mechanism=EXTERNAL
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5671", rabbitmqamqp.NewContextOptionChain().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the consumer
 
-			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.AMQPDialerTLS(tlsConfig))
-			consumer := rabbitmq.NewAmqpConsumer(connection, name)
+			connection := rabbitmqamqp.NewConnection(messagingContext, rabbitmqamqp.DialerTLS(tlsConfig))
+			consumer := rabbitmqamqp.NewConsumer(connection, name)
 
-			application.Attach(server.BuildRabbitMQServer(consumer))
+			application.Attach(rabbitmqamqp.BuildConsumerServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the connection, the channel and the publisher
-			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.AMQPDialerTLS(tlsConfig))
-			producer := rabbitmq.NewAmqpProducer(connection, name)
+			connection := rabbitmqamqp.NewConnection(messagingContext, rabbitmqamqp.DialerTLS(tlsConfig))
+			producer := rabbitmqamqp.NewProducer(connection, name)
 
 			if err := producer.Produce(context.Background(), &amqp.Publishing{
 				Headers:         nil,

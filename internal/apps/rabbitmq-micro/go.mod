@@ -3,11 +3,11 @@ module go-feather-lib/internal/apps/rabbitmq-micro
 go 1.23.1
 
 require (
-	github.com/guidomantilla/go-feather-lib v0.0.0-20241025221703-4877f23db717
+	github.com/guidomantilla/go-feather-lib v0.0.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 )
 
-replace github.com/guidomantilla/go-feather-lib v0.0.0-20240918195235-31ef8cafaaf1 => ../../../
+replace github.com/guidomantilla/go-feather-lib v0.0.0 => ../../../
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0 // indirect

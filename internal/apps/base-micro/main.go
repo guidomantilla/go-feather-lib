@@ -8,13 +8,14 @@ import (
 	"os"
 
 	"github.com/glebarez/sqlite"
-	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
-	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
-	dmongo "github.com/guidomantilla/go-feather-lib/pkg/datasource/mongo"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"gorm.io/gorm"
+
+	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
+	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
+	dmongo "github.com/guidomantilla/go-feather-lib/pkg/datasource/mongo"
 )
 
 type Artist struct {

@@ -10,8 +10,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	cserver "github.com/guidomantilla/go-feather-lib/pkg/common/server"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/ssl"
-	"github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq"
-	"github.com/guidomantilla/go-feather-lib/pkg/server"
+	rabbitmqstreams "github.com/guidomantilla/go-feather-lib/pkg/messaging/rabbitmq/streams"
 )
 
 func main() {
@@ -27,20 +26,20 @@ func main() {
 		clientKey := environment.Value(environment.SslClientKey).AsString()
 		tlsConfig, _ := ssl.TLS(serverName, caCertificate, clientCertificate, clientKey)
 
-		messagingContext := rabbitmq.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
-			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", rabbitmq.NewContextOptionChain().WithVhost("/").Build())
+		messagingContext := rabbitmqstreams.NewContext("rabbitmq-stream+tls://:username::password@:server:vhost",
+			"raven-dev", "raven-dev*+", "ubuntu-us-southeast:5551", rabbitmqstreams.NewContextOptionChain().WithVhost("/").Build())
 
 		{ // Keep an 1:1 relationship between the environment and the consumer
 
-			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
-			consumer := rabbitmq.NewStreamsConsumer(connection, name)
+			connection := rabbitmqstreams.NewConnection(messagingContext, rabbitmqstreams.DialerTLS(tlsConfig))
+			consumer := rabbitmqstreams.NewConsumer(connection, name)
 
-			application.Attach(server.BuildRabbitMQServer(consumer))
+			application.Attach(rabbitmqstreams.BuildConsumerServer(consumer))
 		}
 
 		{ // Keep an 1:1 relationship between the environment and the publisher
-			connection := rabbitmq.NewConnection(messagingContext, rabbitmq.StreamsDialerTLS(tlsConfig))
-			producer := rabbitmq.NewStreamsProducer(connection, name)
+			connection := rabbitmqstreams.NewConnection(messagingContext, rabbitmqstreams.DialerTLS(tlsConfig))
+			producer := rabbitmqstreams.NewProducer(connection, name)
 			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
 				log.Fatal("Error producing message: %v", err)
 			}

@@ -19,7 +19,8 @@ graph:
 	godepgraph -s ./pkg/datasource/mongo | dot -Tpng -o ./pkg/datasource/mongo/datasource.png
 	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
 	godepgraph -s ./pkg/integration/messaging | dot -Tpng -o ./pkg/integration/messaging/messaging.png
-	godepgraph -s ./pkg/messaging/rabbitmq | dot -Tpng -o ./pkg/messaging/rabbitmq/rabbitmq.png
+	godepgraph -s ./pkg/messaging/rabbitmq/amqp | dot -Tpng -o ./pkg/messaging/rabbitmq/amqp/amqp.png
+	godepgraph -s ./pkg/messaging/rabbitmq/streams | dot -Tpng -o ./pkg/messaging/rabbitmq/streams/streams.png
 	godepgraph -s ./pkg/security | dot -Tpng -o ./pkg/security/security.png
 	godepgraph -s ./pkg/server | dot -Tpng -o ./pkg/server/server.png
 
