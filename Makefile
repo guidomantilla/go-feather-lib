@@ -42,8 +42,10 @@ test:
 	go test -covermode atomic -coverprofile .reports/coverage.out.tmp ./pkg/...
 	cat .reports/coverage.out.tmp | grep -v "mocks.go" > .reports/coverage.out && rm .reports/coverage.out.tmp
 
-coverage: test
+coverage-report: test
 	gocov .reports/coverage.out && rm -R .reports/coverage || true  && cp -R coverage .reports && rm -R coverage
+
+coverage-check: coverage-report
 	go-test-coverage --config=.testcoverage.yml
 
 check: fetch-dependencies generate graph imports format vet lint test
