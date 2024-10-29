@@ -50,7 +50,7 @@ coverage-check: coverage-report
 
 check: fetch-dependencies generate graph imports format vet lint test
 
-validate: check coverage
+validate: check coverage-check
 
 ##
 
