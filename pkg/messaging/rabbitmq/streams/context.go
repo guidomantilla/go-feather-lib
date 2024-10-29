@@ -68,8 +68,8 @@ func (context *context_) Set(property string, value string) {
 
 	switch property {
 	case "service":
-		context.service = strings.TrimSpace(value)
+		context.service = utils.ToString(value)
 	case "vhost":
-		context.vhost = strings.TrimSpace(value)
+		context.vhost = utils.ToString(value)
 	}
 }

@@ -54,4 +54,5 @@ type Producer interface {
 	Context() Context
 	Produce(ctx context.Context, message *samqp.AMQP10) error
 	Close()
+	Set(property string, value any)
 }

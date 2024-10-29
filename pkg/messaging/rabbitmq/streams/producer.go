@@ -3,6 +3,7 @@ package streams
 import (
 	"context"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 	"sync"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type streamsProducer struct {
+type producer struct {
 	connection      Connection
 	environment     *stream.Environment
 	name            string
@@ -22,11 +23,11 @@ type streamsProducer struct {
 	mu              sync.RWMutex
 }
 
-func NewProducer(connection Connection, name string, options ...ProducerOptions) *streamsProducer {
+func NewProducer(connection Connection, name string, options ...ProducerOptions) *producer {
 	assert.NotNil(connection, "starting up - error setting up rabbitmq streams producer: connection is nil")
 	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams producer: name is empty")
 
-	producer := &streamsProducer{
+	producer := &producer{
 		connection:      connection,
 		name:            name,
 		streamOptions:   stream.NewStreamOptions(),
@@ -40,7 +41,7 @@ func NewProducer(connection Connection, name string, options ...ProducerOptions)
 	return producer
 }
 
-func (streams *streamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {
+func (streams *producer) Produce(ctx context.Context, message *samqp.AMQP10) error {
 	streams.mu.Lock()
 	defer streams.mu.Unlock()
 
@@ -78,7 +79,7 @@ func (streams *streamsProducer) Produce(ctx context.Context, message *samqp.AMQP
 	return nil
 }
 
-func (streams *streamsProducer) Close() {
+func (streams *producer) Close() {
 	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
@@ -92,6 +93,20 @@ func (streams *streamsProducer) Close() {
 	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
-func (streams *streamsProducer) Context() Context {
+func (streams *producer) Context() Context {
 	return streams.connection.Context()
+}
+
+func (streams *producer) Set(property string, value any) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
+	}
+
+	switch property {
+	case "producerOptions":
+		streams.producerOptions = utils.ToType[*stream.ProducerOptions](value)
+	case "streamOptions":
+		streams.streamOptions = utils.ToType[*stream.StreamOptions](value)
+	}
+
 }

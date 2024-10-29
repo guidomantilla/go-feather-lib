@@ -53,4 +53,5 @@ type Producer interface {
 	Context() Context
 	Produce(ctx context.Context, message *amqp.Publishing) error
 	Close()
+	Set(property string, value any)
 }

@@ -324,3 +324,15 @@ func (mr *MockProducerMockRecorder) Produce(ctx, message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Produce", reflect.TypeOf((*MockProducer)(nil).Produce), ctx, message)
 }
+
+// Set mocks base method.
+func (m *MockProducer) Set(property string, value any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Set", property, value)
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockProducerMockRecorder) Set(property, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockProducer)(nil).Set), property, value)
+}

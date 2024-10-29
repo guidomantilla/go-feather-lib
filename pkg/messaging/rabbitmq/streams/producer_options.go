@@ -13,12 +13,12 @@ type ProducerOptions func(producer Producer)
 
 func (options ProducerOptions) WithProducerOptions(poptions *stream.ProducerOptions) ProducerOptions {
 	return func(producer Producer) {
-		//producer.producerOptions = poptions
+		producer.Set("producerOptions", poptions)
 	}
 }
 
 func (options ProducerOptions) WithStreamOptions(soptions *stream.StreamOptions) ProducerOptions {
 	return func(producer Producer) {
-		//producer.streamOptions = soptions
+		producer.Set("streamOptions", soptions)
 	}
 }

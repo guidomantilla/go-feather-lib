@@ -122,32 +122,24 @@ func (consumer *consumer) Set(property string, value any) {
 
 	switch property {
 	case "listener":
-		if value != nil {
-			consumer.listener = value.(Listener)
-		}
+		consumer.listener = utils.ToType[Listener](value)
 	case "autoAck":
-		consumer.autoAck = value.(bool)
+		consumer.autoAck = utils.ToBool(value)
 	case "noLocal":
-		consumer.noLocal = value.(bool)
+		consumer.noLocal = utils.ToBool(value)
 	case "durable":
-		consumer.durable = value.(bool)
+		consumer.durable = utils.ToBool(value)
 	case "autoDelete":
-		consumer.autoDelete = value.(bool)
+		consumer.autoDelete = utils.ToBool(value)
 	case "exclusive":
-		consumer.exclusive = value.(bool)
+		consumer.exclusive = utils.ToBool(value)
 	case "noWait":
-		consumer.noWait = value.(bool)
+		consumer.noWait = utils.ToBool(value)
 	case "args":
-		if value != nil {
-			consumer.args = value.(amqp.Table)
-		}
+		consumer.args = utils.ToType[amqp.Table](value)
 	case "closingHandler":
-		if value != nil {
-			consumer.closingHandler = value.(ClosingHandler)
-		}
+		consumer.closingHandler = utils.ToType[ClosingHandler](value)
 	case "messageProcessor":
-		if value != nil {
-			consumer.messageProcessor = value.(MessageProcessor)
-		}
+		consumer.messageProcessor = utils.ToType[MessageProcessor](value)
 	}
 }

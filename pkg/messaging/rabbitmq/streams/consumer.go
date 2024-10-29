@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"sync"
 	"time"
@@ -125,5 +126,16 @@ func (streams *consumer) Context() Context {
 }
 
 func (streams *consumer) Set(property string, value any) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
+	}
 
+	switch property {
+	case "listener":
+		streams.listener = utils.ToType[Listener](value)
+	case "streamOptions":
+		streams.streamOptions = utils.ToType[*stream.StreamOptions](value)
+	case "consumerOptions":
+		streams.consumerOptions = utils.ToType[*stream.ConsumerOptions](value)
+	}
 }

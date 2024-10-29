@@ -3,6 +3,7 @@ package amqp
 import (
 	"context"
 	"fmt"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 	"sync"
 	"time"
 
@@ -84,4 +85,19 @@ func (producer *producer) Close() {
 
 func (producer *producer) Context() Context {
 	return producer.connection.Context()
+}
+
+func (producer *producer) Set(property string, value any) {
+	if utils.IsEmpty(property) || utils.IsEmpty(value) {
+		return
+	}
+
+	switch property {
+	case "exchange":
+		producer.exchange = utils.ToString(value)
+	case "mandatory":
+		producer.mandatory = utils.ToBool(value)
+	case "immediate":
+		producer.immediate = utils.ToBool(value)
+	}
 }

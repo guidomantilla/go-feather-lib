@@ -3,11 +3,9 @@ package streams
 import (
 	"context"
 	"fmt"
-
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 var consumerOptions = NewConsumerOptions()
@@ -19,18 +17,6 @@ func NewConsumerOptions() ConsumerOptions {
 
 type ConsumerOptions func(*consumer)
 
-func (options ConsumerOptions) WithStreamOptions(soptions *stream.StreamOptions) ConsumerOptions {
-	return func(consumer *consumer) {
-		consumer.streamOptions = soptions
-	}
-}
-
-func (options ConsumerOptions) WithConsumerOptions(coptions *stream.ConsumerOptions) ConsumerOptions {
-	return func(consumer *consumer) {
-		consumer.consumerOptions = coptions
-	}
-}
-
 func (options ConsumerOptions) WithListener(listener Listener) ConsumerOptions {
 	return func(consumer *consumer) {
 		consumer.listener = listener
@@ -40,5 +26,17 @@ func (options ConsumerOptions) WithListener(listener Listener) ConsumerOptions {
 				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
 			}
 		}
+	}
+}
+
+func (options ConsumerOptions) WithStreamOptions(soptions *stream.StreamOptions) ConsumerOptions {
+	return func(consumer *consumer) {
+		consumer.streamOptions = soptions
+	}
+}
+
+func (options ConsumerOptions) WithConsumerOptions(coptions *stream.ConsumerOptions) ConsumerOptions {
+	return func(consumer *consumer) {
+		consumer.consumerOptions = coptions
 	}
 }
