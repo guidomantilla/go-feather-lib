@@ -1,9 +1,7 @@
 package rest
 
-import "net/http"
-
 type Context interface {
-	Request() *http.Request
+	//Request() *http.Request
 	FullPath() string
 	Set(key string, value any)
 	Get(key string) (value any, exists bool)

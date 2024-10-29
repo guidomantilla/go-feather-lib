@@ -3,7 +3,7 @@ package security
 import (
 	"context"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 type ResourceCtxKey struct{}
 
 type AuthorizationFilter interface {
-	Authorize(ctx rest.Context)
+	Authorize(ctx *gin.Context)
 }
 
 type AuthorizationService interface {

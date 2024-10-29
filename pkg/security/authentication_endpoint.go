@@ -3,6 +3,8 @@ package security
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 )
@@ -19,7 +21,7 @@ func NewDefaultAuthenticationEndpoint(authenticationService AuthenticationServic
 	}
 }
 
-func (endpoint *DefaultAuthenticationEndpoint) Authenticate(ctx rest.Context) {
+func (endpoint *DefaultAuthenticationEndpoint) Authenticate(ctx *gin.Context) {
 	assert.NotNil(ctx, "authentication endpoint - error authenticating: context is nil")
 
 	var err error
@@ -36,7 +38,7 @@ func (endpoint *DefaultAuthenticationEndpoint) Authenticate(ctx rest.Context) {
 		return
 	}
 
-	if err = endpoint.authenticationService.Authenticate(ctx.Request().Context(), principal); err != nil {
+	if err = endpoint.authenticationService.Authenticate(ctx.Request.Context(), principal); err != nil {
 		ex := rest.UnauthorizedException(err.Error())
 		ctx.AbortWithStatusJSON(ex.Code, ex)
 		return

@@ -3,7 +3,7 @@ package security
 import (
 	"context"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 )
 
 type AuthenticationEndpoint interface {
-	Authenticate(ctx rest.Context)
+	Authenticate(ctx *gin.Context)
 }
 
 type AuthenticationService interface {
