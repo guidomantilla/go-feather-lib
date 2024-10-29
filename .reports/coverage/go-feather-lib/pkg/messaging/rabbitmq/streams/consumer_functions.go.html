@@ -2,31 +2,31 @@
     <html lang="en">
 
     <head>
-        <title>Code coverage report for go-feather-lib/pkg/messaging/rabbitmq/listener_streams.go</title><meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../../prettify.css" />
-    <link rel="stylesheet" href="../../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+        <title>Code coverage report for go-feather-lib/pkg/messaging/rabbitmq/streams/consumer_functions.go</title><meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../../sort-arrow-sprite.png);
+            background-image: url(../../../../../sort-arrow-sprite.png);
         }
     </style>
     </head>
 
     <body><div class='wrapper'><div class='pad1'>
-    <h1><a href="../../../../index.html">All files</a> / <a href="index.html">go-feather-lib/pkg/messaging/rabbitmq</a> listener_streams.go</h1>
+    <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">go-feather-lib/pkg/messaging/rabbitmq/streams</a> consumer_functions.go</h1>
     <div class='clearfix'>
         <div class='fl pad1y space-right2'>
             <span class="strong">0.00% </span>
             <span class="quiet">Branches</span>
-            <span class='fraction'>0/9</span>
+            <span class='fraction'>0/14</span>
         </div>
 
         <div class='fl pad1y space-right2'>
             <span class="strong">66.67% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>22/33</span>
+            <span class='fraction'>28/42</span>
         </div>
     </div>
 
@@ -72,6 +72,15 @@
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -87,12 +96,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -105,13 +109,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-</td><td class="text"><pre class="prettyprint lang-go">package rabbitmq
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+</td><td class="text"><pre class="prettyprint lang-go">package streams
 
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
@@ -119,38 +136,48 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
-type streamsListener struct {
+type ClosingHandler func(consumer *stream.Consumer, stream string, closeChannel chan string)
+
+<span class="cstat-no" title="not covered" >func closingHandler(consumer *stream.Consumer, stream string, closeChannel chan string) {</span>
+<span class="cstat-no" title="not covered" >	var err error</span>
+<span class="cstat-no" title="not covered" >	for range consumer.NotifyClose() {</span>
+<span class="cstat-no" title="not covered" >		if err := consumer.StoreOffset(); err != nil {</span>
+<span class="cstat-no" title="not covered" >			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to store consumer offset from stream %s: %s", stream, err.Error()))</span>
+<span class="cstat-no" title="not covered" >			return</span>
+<span class="cstat-no" title="not covered" >		}</span>
+<span class="cstat-no" title="not covered" >		if err = consumer.Close(); err != nil {</span>
+<span class="cstat-no" title="not covered" >			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to close consumer from stream %s: %s", stream, err.Error()))</span>
+<span class="cstat-no" title="not covered" >			return</span>
+<span class="cstat-no" title="not covered" >		}</span>
+<span class="cstat-no" title="not covered" >		close(closeChannel)</span>
+	}
+<span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("rabbitmq streams consumer - disconected from stream %s", stream))</span>
 }
 
-<span class="cstat-no" title="not covered" >func NewStreamsListener() *streamsListener {</span>
-<span class="cstat-no" title="not covered" >	return &streamsListener{}</span>
-<span class="cstat-no" title="not covered" >}</span>
+//
 
-<span class="cstat-no" title="not covered" >func (listener *streamsListener) OnMessage(ctx context.Context, message *amqp.Message) error {</span>
-<span class="cstat-no" title="not covered" ></span>
-<span class="cstat-no" title="not covered" >	var consumerContext stream.ConsumerContext</span>
-<span class="cstat-no" title="not covered" >	anyContext := ctx.Value(stream.ConsumerContext{})</span>
-<span class="cstat-no" title="not covered" >	if anyContext != nil {</span>
-<span class="cstat-no" title="not covered" >		consumerContext = anyContext.(stream.ConsumerContext)</span>
+type MessageProcessor func(consumerContext stream.ConsumerContext, listener Listener, message *amqp.Message)
+
+<span class="cstat-no" title="not covered" >func messageProcessor(consumerContext stream.ConsumerContext, listener Listener, message *amqp.Message) {</span>
+<span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))</span>
+<span class="cstat-no" title="not covered" >	ctx := context.WithValue(context.Background(), stream.ConsumerContext{}, consumerContext)</span>
+<span class="cstat-no" title="not covered" >	if err := listener.OnMessage(ctx, message); err != nil {</span>
+<span class="cstat-no" title="not covered" >		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))</span>
 <span class="cstat-no" title="not covered" >	}</span>
-<span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("Received a consumerContext: %s", consumerContext.Consumer.GetName()))</span>
-<span class="cstat-no" title="not covered" >	log.Info(fmt.Sprintf("Received a message: %s", message.Data))</span>
-<span class="cstat-no" title="not covered" >	time.Sleep(5 * time.Second)</span>
-<span class="cstat-no" title="not covered" >	return nil</span>
 }
 
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-27T00:33:24.009Z
+at 2024-10-29T22:25:51.156Z
 </div>
-    <script src="../../../../prettify.js"></script>
+    <script src="../../../../../prettify.js"></script>
     <script>
     window.onload = function () {
     prettyPrint();
     };
     </script>
-    <script src="../../../../sorter.js"></script>
-    <script src="../../../../block-navigation.js"></script>
+    <script src="../../../../../sorter.js"></script>
+    <script src="../../../../../block-navigation.js"></script>
 </body>
 </html>

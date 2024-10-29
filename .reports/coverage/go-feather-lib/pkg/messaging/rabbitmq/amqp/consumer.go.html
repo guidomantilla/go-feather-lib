@@ -20,13 +20,13 @@
         <div class='fl pad1y space-right2'>
             <span class="strong">0.00% </span>
             <span class="quiet">Branches</span>
-            <span class='fraction'>0/71</span>
+            <span class='fraction'>0/51</span>
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">47.06% </span>
+            <span class="strong">50.00% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>80/170</span>
+            <span class='fraction'>73/146</span>
         </div>
     </div>
 
@@ -185,30 +185,6 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a>
-<a name='L148'></a><a href='#L148'>148</a>
-<a name='L149'></a><a href='#L149'>149</a>
-<a name='L150'></a><a href='#L150'>150</a>
-<a name='L151'></a><a href='#L151'>151</a>
-<a name='L152'></a><a href='#L152'>152</a>
-<a name='L153'></a><a href='#L153'>153</a>
-<a name='L154'></a><a href='#L154'>154</a>
-<a name='L155'></a><a href='#L155'>155</a>
-<a name='L156'></a><a href='#L156'>156</a>
-<a name='L157'></a><a href='#L157'>157</a>
-<a name='L158'></a><a href='#L158'>158</a>
-<a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a>
-<a name='L161'></a><a href='#L161'>161</a>
-<a name='L162'></a><a href='#L162'>162</a>
-<a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -242,6 +218,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -301,34 +281,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -396,20 +348,22 @@ import (
 )
 
 type consumer struct {
-	connection Connection
-	listener   Listener
-	channel    *amqp.Channel
-	queue      amqp.Queue
-	name       string
-	consumer   string
-	autoAck    bool
-	noLocal    bool
-	durable    bool
-	autoDelete bool
-	exclusive  bool
-	noWait     bool
-	args       amqp.Table
-	mu         sync.RWMutex
+	connection       Connection
+	listener         Listener
+	channel          *amqp.Channel
+	queue            amqp.Queue
+	name             string
+	consumer         string
+	autoAck          bool
+	noLocal          bool
+	durable          bool
+	autoDelete       bool
+	exclusive        bool
+	noWait           bool
+	args             amqp.Table
+	closingHandler   ClosingHandler
+	messageProcessor MessageProcessor
+	mu               sync.RWMutex
 }
 
 <span class="cstat-no" title="not covered" >func NewConsumer(connection Connection, name string, options ...ConsumerOptions) *consumer {</span>
@@ -417,17 +371,19 @@ type consumer struct {
 <span class="cstat-no" title="not covered" >	assert.NotEmpty(name, "starting up - error setting up rabbitmq amqp consumer: name is empty")</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	consumer := &consumer{</span>
-<span class="cstat-no" title="not covered" >		connection: connection,</span>
-<span class="cstat-no" title="not covered" >		listener:   NewListener(),</span>
-<span class="cstat-no" title="not covered" >		name:       name,</span>
-<span class="cstat-no" title="not covered" >		consumer:   "consumer-" + name,</span>
-<span class="cstat-no" title="not covered" >		autoAck:    false,</span>
-<span class="cstat-no" title="not covered" >		noLocal:    false,</span>
-<span class="cstat-no" title="not covered" >		durable:    false,</span>
-<span class="cstat-no" title="not covered" >		autoDelete: false,</span>
-<span class="cstat-no" title="not covered" >		exclusive:  false,</span>
-<span class="cstat-no" title="not covered" >		noWait:     false,</span>
-<span class="cstat-no" title="not covered" >		args:       nil,</span>
+<span class="cstat-no" title="not covered" >		connection:       connection,</span>
+<span class="cstat-no" title="not covered" >		listener:         NewListener(),</span>
+<span class="cstat-no" title="not covered" >		name:             name,</span>
+<span class="cstat-no" title="not covered" >		consumer:         "consumer-" + name,</span>
+<span class="cstat-no" title="not covered" >		autoAck:          false,</span>
+<span class="cstat-no" title="not covered" >		noLocal:          false,</span>
+<span class="cstat-no" title="not covered" >		durable:          false,</span>
+<span class="cstat-no" title="not covered" >		autoDelete:       false,</span>
+<span class="cstat-no" title="not covered" >		exclusive:        false,</span>
+<span class="cstat-no" title="not covered" >		noWait:           false,</span>
+<span class="cstat-no" title="not covered" >		args:             nil,</span>
+<span class="cstat-no" title="not covered" >		closingHandler:   closingHandler,</span>
+<span class="cstat-no" title="not covered" >		messageProcessor: messageProcessor,</span>
 <span class="cstat-no" title="not covered" >	}</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	for _, option := range options {</span>
@@ -470,36 +426,8 @@ type consumer struct {
 <span class="cstat-no" title="not covered" >		return nil, err</span>
 <span class="cstat-no" title="not covered" >	}</span>
 
-<span class="cstat-no" title="not covered" >	closeChannel := make(chan string)</span>
-<span class="cstat-no" title="not covered" >	closeHandler := func(ctx context.Context, listener Listener, channel *amqp.Channel, queue string, closeChannel chan string) {</span>
-<span class="cstat-no" title="not covered" >		var err error</span>
-<span class="cstat-no" title="not covered" >		for message := range deliveries {</span>
-<span class="cstat-no" title="not covered" >			go func(ctx context.Context, message amqp.Delivery) {</span>
-<span class="cstat-no" title="not covered" >				log.Debug(fmt.Sprintf("rabbitmq consumer - message received: %s", message.Body))</span>
-<span class="cstat-no" title="not covered" >				if err := listener.OnMessage(ctx, &message); err != nil {</span>
-<span class="cstat-no" title="not covered" >					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to process message: %s", err.Error()))</span>
-<span class="cstat-no" title="not covered" >					if err := message.Nack(false, true); err != nil {</span>
-<span class="cstat-no" title="not covered" >						log.Debug(fmt.Sprintf("rabbitmq consumer - failed to nack message: %s", err.Error()))</span>
-<span class="cstat-no" title="not covered" >					}</span>
-<span class="cstat-no" title="not covered" >					log.Debug(fmt.Sprintf("rabbitmq consumer - nack message: %s", err.Error()))</span>
-<span class="cstat-no" title="not covered" >					return</span>
-				}
-<span class="cstat-no" title="not covered" >				if err := message.Ack(false); err != nil {</span>
-<span class="cstat-no" title="not covered" >					log.Debug(fmt.Sprintf("rabbitmq consumer - failed to ack message: %s", err.Error()))</span>
-<span class="cstat-no" title="not covered" >					return</span>
-<span class="cstat-no" title="not covered" >				}</span>
-<span class="cstat-no" title="not covered" >				log.Debug(fmt.Sprintf("rabbitmq consumer - ack message: %s", err.Error()))</span>
-			}(ctx, message)
-		}
-<span class="cstat-no" title="not covered" >		if err = channel.Close(); err != nil {</span>
-<span class="cstat-no" title="not covered" >			log.Debug(fmt.Sprintf("rabbitmq consumer - failed to close channel to queue %s: %s", queue, err.Error()))</span>
-<span class="cstat-no" title="not covered" >			return</span>
-<span class="cstat-no" title="not covered" >		}</span>
-<span class="cstat-no" title="not covered" >		close(closeChannel)</span>
-<span class="cstat-no" title="not covered" >		log.Debug(fmt.Sprintf("rabbitmq consumer - disconected from queue %s", queue))</span>
-	}
-
-<span class="cstat-no" title="not covered" >	go closeHandler(ctx, consumer.listener, consumer.channel, consumer.name, closeChannel)</span>
+<span class="cstat-no" title="not covered" >	closeChannel := make(Event)</span>
+<span class="cstat-no" title="not covered" >	go consumer.closingHandler(ctx, consumer.name, consumer.channel, deliveries, consumer.listener, closeChannel, consumer.messageProcessor)</span>
 <span class="cstat-no" title="not covered" >	return closeChannel, nil</span>
 }
 
@@ -528,32 +456,32 @@ type consumer struct {
 
 <span class="cstat-no" title="not covered" >	switch property {</span>
 <span class="cstat-no" title="not covered" >	case "listener":</span>
-<span class="cstat-no" title="not covered" >		if value != nil {</span>
-<span class="cstat-no" title="not covered" >			consumer.listener = value.(Listener)</span>
-<span class="cstat-no" title="not covered" >		}</span>
+<span class="cstat-no" title="not covered" >		consumer.listener = utils.ToType[Listener](value)</span>
 <span class="cstat-no" title="not covered" >	case "autoAck":</span>
-<span class="cstat-no" title="not covered" >		consumer.autoAck = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.autoAck = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "noLocal":</span>
-<span class="cstat-no" title="not covered" >		consumer.noLocal = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.noLocal = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "durable":</span>
-<span class="cstat-no" title="not covered" >		consumer.durable = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.durable = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "autoDelete":</span>
-<span class="cstat-no" title="not covered" >		consumer.autoDelete = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.autoDelete = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "exclusive":</span>
-<span class="cstat-no" title="not covered" >		consumer.exclusive = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.exclusive = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "noWait":</span>
-<span class="cstat-no" title="not covered" >		consumer.noWait = value.(bool)</span>
+<span class="cstat-no" title="not covered" >		consumer.noWait = utils.ToBool(value)</span>
 <span class="cstat-no" title="not covered" >	case "args":</span>
-<span class="cstat-no" title="not covered" >		if value != nil {</span>
-<span class="cstat-no" title="not covered" >			consumer.args = value.(amqp.Table)</span>
-<span class="cstat-no" title="not covered" >		}</span>
+<span class="cstat-no" title="not covered" >		consumer.args = utils.ToType[amqp.Table](value)</span>
+<span class="cstat-no" title="not covered" >	case "closingHandler":</span>
+<span class="cstat-no" title="not covered" >		consumer.closingHandler = utils.ToType[ClosingHandler](value)</span>
+<span class="cstat-no" title="not covered" >	case "messageProcessor":</span>
+<span class="cstat-no" title="not covered" >		consumer.messageProcessor = utils.ToType[MessageProcessor](value)</span>
 	}
 }
 
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-27T01:48:41.457Z
+at 2024-10-29T22:25:51.182Z
 </div>
     <script src="../../../../../prettify.js"></script>
     <script>

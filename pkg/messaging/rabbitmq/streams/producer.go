@@ -3,7 +3,6 @@ package streams
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 	"sync"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 type producer struct {

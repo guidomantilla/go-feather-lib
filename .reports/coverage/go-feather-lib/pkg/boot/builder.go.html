@@ -20,13 +20,13 @@
         <div class='fl pad1y space-right2'>
             <span class="strong">0.00% </span>
             <span class="quiet">Branches</span>
-            <span class='fraction'>0/62</span>
+            <span class='fraction'>0/64</span>
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">60.87% </span>
+            <span class="strong">60.19% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>126/207</span>
+            <span class='fraction'>127/211</span>
         </div>
     </div>
 
@@ -246,6 +246,10 @@
 <a name='L205'></a><a href='#L205'>205</a>
 <a name='L206'></a><a href='#L206'>206</a>
 <a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -441,7 +445,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -536,7 +544,7 @@ type BeanBuilder struct {
 <span class="cstat-no" title="not covered" >	return &BeanBuilder{</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >		Environment: func(appCtx *ApplicationContext) environment.Environment {</span>
-<span class="cstat-no" title="not covered" >			return environment.New(environment.OptionsChainBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())</span>
+<span class="cstat-no" title="not covered" >			return environment.New(environment.OptionsBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())</span>
 <span class="cstat-no" title="not covered" >		},</span>
 <span class="cstat-no" title="not covered" >		Config: func(appCtx *ApplicationContext) {</span>
 <span class="cstat-no" title="not covered" >			log.Warn("starting up - warning setting up configuration: config function not implemented")</span>
@@ -607,7 +615,7 @@ type BeanBuilder struct {
 <span class="cstat-no" title="not covered" >			return nil</span>
 		},
 <span class="cstat-no" title="not covered" >		TokenManager: func(appCtx *ApplicationContext) security.TokenManager {</span>
-<span class="cstat-no" title="not covered" >			options := security.JwtTokenManagerOptionsChainBuilder().WithIssuer(appCtx.AppName).</span>
+<span class="cstat-no" title="not covered" >			options := security.JwtTokenManagerOptionsBuilder().WithIssuer(appCtx.AppName).</span>
 <span class="cstat-no" title="not covered" >				WithSigningKey([]byte(*appCtx.SecurityConfig.TokenSignatureKey)).</span>
 <span class="cstat-no" title="not covered" >				WithVerifyingKey([]byte(*appCtx.SecurityConfig.TokenVerificationKey)).Build()</span>
 <span class="cstat-no" title="not covered" >			return security.NewJwtTokenManager(options)</span>
@@ -632,13 +640,15 @@ type BeanBuilder struct {
 <span class="cstat-no" title="not covered" >			recoveryFilter := gin.Recovery()</span>
 <span class="cstat-no" title="not covered" >			loggerFilter := sloggin.New(log.AsSlogLogger().WithGroup("http"))</span>
 <span class="cstat-no" title="not covered" >			customFilter := func(ctx *gin.Context) {</span>
-<span class="cstat-no" title="not covered" >				security.AddApplicationToContext(ctx, appCtx.AppName)</span>
+<span class="cstat-no" title="not covered" >				security.AddApplicationToContext(nil, appCtx.AppName)</span>
 <span class="cstat-no" title="not covered" >				ctx.Next()</span>
 <span class="cstat-no" title="not covered" >			}</span>
 
 <span class="cstat-no" title="not covered" >			engine := gin.New()</span>
 <span class="cstat-no" title="not covered" >			engine.Use(loggerFilter, recoveryFilter, customFilter)</span>
-<span class="cstat-no" title="not covered" >			engine.POST("/login", appCtx.AuthenticationEndpoint.Authenticate)</span>
+<span class="cstat-no" title="not covered" >			engine.POST("/login", func(ctx *gin.Context) {</span>
+<span class="cstat-no" title="not covered" >				appCtx.AuthenticationEndpoint.Authenticate(nil)</span>
+<span class="cstat-no" title="not covered" >			})</span>
 <span class="cstat-no" title="not covered" >			engine.GET("/health", func(ctx *gin.Context) {</span>
 <span class="cstat-no" title="not covered" >				ctx.JSON(http.StatusOK, gin.H{"status": "alive"})</span>
 <span class="cstat-no" title="not covered" >			})</span>
@@ -649,7 +659,9 @@ type BeanBuilder struct {
 <span class="cstat-no" title="not covered" >				ctx.JSON(http.StatusOK, gin.H{"appName": appCtx.AppName})</span>
 <span class="cstat-no" title="not covered" >			})</span>
 
-<span class="cstat-no" title="not covered" >			return engine, engine.Group("/api", appCtx.AuthorizationFilter.Authorize)</span>
+<span class="cstat-no" title="not covered" >			return engine, engine.Group("/api", func(ctx *gin.Context) {</span>
+<span class="cstat-no" title="not covered" >				appCtx.AuthorizationFilter.Authorize(nil)</span>
+<span class="cstat-no" title="not covered" >			})</span>
 		},
 <span class="cstat-no" title="not covered" >		GrpcServer: func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any) {</span>
 <span class="cstat-no" title="not covered" >			if !appCtx.Enablers.GrpcServerEnabled {</span>
@@ -664,7 +676,7 @@ type BeanBuilder struct {
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-27T01:48:41.470Z
+at 2024-10-29T22:25:51.234Z
 </div>
     <script src="../../../prettify.js"></script>
     <script>

@@ -1,7 +1,7 @@
 package security
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 )
 
 const (
@@ -9,15 +9,15 @@ const (
 	PrincipalCtxKey   = "principal"
 )
 
-func AddPrincipalToContext(ctx *gin.Context, principal *Principal) {
+func AddPrincipalToContext(ctx rest.Context, principal *Principal) {
 	ctx.Set(PrincipalCtxKey, principal)
 }
 
-func AddApplicationToContext(ctx *gin.Context, application string) {
+func AddApplicationToContext(ctx rest.Context, application string) {
 	ctx.Set(ApplicationCtxKey, application)
 }
 
-func GetPrincipalFromContext(ctx *gin.Context) (*Principal, bool) {
+func GetPrincipalFromContext(ctx rest.Context) (*Principal, bool) {
 	var exists bool
 	var value any
 	if value, exists = ctx.Get(PrincipalCtxKey); !exists {
@@ -26,7 +26,7 @@ func GetPrincipalFromContext(ctx *gin.Context) (*Principal, bool) {
 	return value.(*Principal), true
 }
 
-func GetApplicationFromContext(ctx *gin.Context) (string, bool) {
+func GetApplicationFromContext(ctx rest.Context) (string, bool) {
 	var exists bool
 	var value any
 	if value, exists = ctx.Get(ApplicationCtxKey); !exists {

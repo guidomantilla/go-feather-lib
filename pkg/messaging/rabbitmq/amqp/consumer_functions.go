@@ -3,8 +3,10 @@ package amqp
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 type ClosingHandler func(ctx context.Context, queue string, channel *amqp.Channel, deliveries <-chan amqp.Delivery, listener Listener, closeChannel chan string, fn MessageProcessor)

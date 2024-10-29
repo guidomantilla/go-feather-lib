@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gin "github.com/gin-gonic/gin"
+	rest "github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,7 +42,7 @@ func (m *MockAuthenticationEndpoint) EXPECT() *MockAuthenticationEndpointMockRec
 }
 
 // Authenticate mocks base method.
-func (m *MockAuthenticationEndpoint) Authenticate(ctx *gin.Context) {
+func (m *MockAuthenticationEndpoint) Authenticate(ctx rest.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Authenticate", ctx)
 }

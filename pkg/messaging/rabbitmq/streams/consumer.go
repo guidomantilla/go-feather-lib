@@ -4,15 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
-	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"sync"
 	"time"
 
+	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
 type consumer struct {

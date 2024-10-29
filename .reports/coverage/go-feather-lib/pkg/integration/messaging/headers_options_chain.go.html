@@ -210,17 +210,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type BaseHeadersOptionsChain struct {
+type headersOptionsChain struct {
 	chain []HeadersOptions
 }
 
-<span class="cstat-no" title="not covered" >func HeadersOptionsChainBuilder() HeadersOptionsChain {</span>
-<span class="cstat-no" title="not covered" >	return &BaseHeadersOptionsChain{</span>
+<span class="cstat-no" title="not covered" >func HeadersOptionsBuilder() HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >	return &headersOptionsChain{</span>
 <span class="cstat-no" title="not covered" >		chain: make([]HeadersOptions, 0),</span>
 <span class="cstat-no" title="not covered" >	}</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) Build() HeadersOptions {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) Build() HeadersOptions {</span>
 <span class="cstat-no" title="not covered" >	return func(headers Headers) {</span>
 <span class="cstat-no" title="not covered" >		for _, option := range options.chain {</span>
 <span class="cstat-no" title="not covered" >			option(headers)</span>
@@ -228,57 +228,57 @@ type BaseHeadersOptionsChain struct {
 	}
 }
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) Id(id uuid.UUID) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) Id(id uuid.UUID) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.Id(id))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) MessageType(messageType string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) MessageType(messageType string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.MessageType(messageType))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) Timestamp(timestamp time.Time) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) Timestamp(timestamp time.Time) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.Timestamp(timestamp))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) Expired(expired bool) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) Expired(expired bool) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.Expired(expired))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) TimeToLive(timeToLive time.Duration) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) TimeToLive(timeToLive time.Duration) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.TimeToLive(timeToLive))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) ContentType(contentType string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) ContentType(contentType string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.ContentType(contentType))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) OriginChannel(originChannel string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) OriginChannel(originChannel string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.OriginChannel(originChannel))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) DestinationChannel(destinationChannel string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) DestinationChannel(destinationChannel string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.DestinationChannel(destinationChannel))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) ReplyChannel(replyChannel string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) ReplyChannel(replyChannel string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.ReplyChannel(replyChannel))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) ErrorChannel(errorChannel string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) ErrorChannel(errorChannel string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.ErrorChannel(errorChannel))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
 
-<span class="cstat-no" title="not covered" >func (options *BaseHeadersOptionsChain) Add(property string, value string) HeadersOptionsChain {</span>
+<span class="cstat-no" title="not covered" >func (options *headersOptionsChain) Add(property string, value string) HeadersOptionsChain {</span>
 <span class="cstat-no" title="not covered" >	options.chain = append(options.chain, headersOptions.Add(property, value))</span>
 <span class="cstat-no" title="not covered" >	return options</span>
 <span class="cstat-no" title="not covered" >}</span>
@@ -286,7 +286,7 @@ type BaseHeadersOptionsChain struct {
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-27T01:48:41.459Z
+at 2024-10-29T22:25:51.188Z
 </div>
     <script src="../../../../prettify.js"></script>
     <script>

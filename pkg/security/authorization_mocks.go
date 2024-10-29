@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gin "github.com/gin-gonic/gin"
+	rest "github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,7 +42,7 @@ func (m *MockAuthorizationFilter) EXPECT() *MockAuthorizationFilterMockRecorder 
 }
 
 // Authorize mocks base method.
-func (m *MockAuthorizationFilter) Authorize(ctx *gin.Context) {
+func (m *MockAuthorizationFilter) Authorize(ctx rest.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Authorize", ctx)
 }

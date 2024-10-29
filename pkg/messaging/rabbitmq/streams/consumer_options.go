@@ -3,9 +3,11 @@ package streams
 import (
 	"context"
 	"fmt"
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/amqp"
 	"github.com/rabbitmq/rabbitmq-stream-go-client/pkg/stream"
+
+	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
 )
 
 var consumerOptions = NewConsumerOptions()

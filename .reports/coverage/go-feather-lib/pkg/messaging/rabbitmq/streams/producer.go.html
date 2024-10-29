@@ -20,13 +20,13 @@
         <div class='fl pad1y space-right2'>
             <span class="strong">0.00% </span>
             <span class="quiet">Branches</span>
-            <span class='fraction'>0/39</span>
+            <span class='fraction'>0/44</span>
         </div>
 
         <div class='fl pad1y space-right2'>
-            <span class="strong">50.00% </span>
+            <span class="strong">52.21% </span>
             <span class="quiet">Lines</span>
-            <span class='fraction'>49/98</span>
+            <span class='fraction'>59/113</span>
         </div>
     </div>
 
@@ -137,6 +137,21 @@
 <a name='L96'></a><a href='#L96'>96</a>
 <a name='L97'></a><a href='#L97'>97</a>
 <a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
 </td>
 <td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,6 +177,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -235,6 +251,20 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 </td><td class="text"><pre class="prettyprint lang-go">package streams
 
@@ -249,9 +279,10 @@ import (
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/utils"
 )
 
-type streamsProducer struct {
+type producer struct {
 	connection      Connection
 	environment     *stream.Environment
 	name            string
@@ -260,11 +291,11 @@ type streamsProducer struct {
 	mu              sync.RWMutex
 }
 
-<span class="cstat-no" title="not covered" >func NewProducer(connection Connection, name string, options ...ProducerOptions) *streamsProducer {</span>
+<span class="cstat-no" title="not covered" >func NewProducer(connection Connection, name string, options ...ProducerOptions) *producer {</span>
 <span class="cstat-no" title="not covered" >	assert.NotNil(connection, "starting up - error setting up rabbitmq streams producer: connection is nil")</span>
 <span class="cstat-no" title="not covered" >	assert.NotEmpty(name, "starting up - error setting up rabbitmq streams producer: name is empty")</span>
 <span class="cstat-no" title="not covered" ></span>
-<span class="cstat-no" title="not covered" >	producer := &streamsProducer{</span>
+<span class="cstat-no" title="not covered" >	producer := &producer{</span>
 <span class="cstat-no" title="not covered" >		connection:      connection,</span>
 <span class="cstat-no" title="not covered" >		name:            name,</span>
 <span class="cstat-no" title="not covered" >		streamOptions:   stream.NewStreamOptions(),</span>
@@ -278,7 +309,7 @@ type streamsProducer struct {
 <span class="cstat-no" title="not covered" >	return producer</span>
 }
 
-<span class="cstat-no" title="not covered" >func (streams *streamsProducer) Produce(ctx context.Context, message *samqp.AMQP10) error {</span>
+<span class="cstat-no" title="not covered" >func (streams *producer) Produce(ctx context.Context, message *samqp.AMQP10) error {</span>
 <span class="cstat-no" title="not covered" >	streams.mu.Lock()</span>
 <span class="cstat-no" title="not covered" >	defer streams.mu.Unlock()</span>
 <span class="cstat-no" title="not covered" ></span>
@@ -316,7 +347,7 @@ type streamsProducer struct {
 <span class="cstat-no" title="not covered" >	return nil</span>
 }
 
-<span class="cstat-no" title="not covered" >func (streams *streamsProducer) Close() {</span>
+<span class="cstat-no" title="not covered" >func (streams *producer) Close() {</span>
 <span class="cstat-no" title="not covered" >	time.Sleep(Delay)</span>
 <span class="cstat-no" title="not covered" ></span>
 <span class="cstat-no" title="not covered" >	if streams.environment != nil && !streams.environment.IsClosed() {</span>
@@ -330,14 +361,28 @@ type streamsProducer struct {
 <span class="cstat-no" title="not covered" >	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))</span>
 }
 
-<span class="cstat-no" title="not covered" >func (streams *streamsProducer) Context() Context {</span>
+<span class="cstat-no" title="not covered" >func (streams *producer) Context() Context {</span>
 <span class="cstat-no" title="not covered" >	return streams.connection.Context()</span>
 <span class="cstat-no" title="not covered" >}</span>
+
+<span class="cstat-no" title="not covered" >func (streams *producer) Set(property string, value any) {</span>
+<span class="cstat-no" title="not covered" >	if utils.IsEmpty(property) || utils.IsEmpty(value) {</span>
+<span class="cstat-no" title="not covered" >		return</span>
+<span class="cstat-no" title="not covered" >	}</span>
+
+<span class="cstat-no" title="not covered" >	switch property {</span>
+<span class="cstat-no" title="not covered" >	case "producerOptions":</span>
+<span class="cstat-no" title="not covered" >		streams.producerOptions = utils.ToType[*stream.ProducerOptions](value)</span>
+<span class="cstat-no" title="not covered" >	case "streamOptions":</span>
+<span class="cstat-no" title="not covered" >		streams.streamOptions = utils.ToType[*stream.StreamOptions](value)</span>
+	}
+
+}
 
 </pre></td></tr></table></pre><div class='push'></div><!-- for sticky footer --></div><!-- /wrapper --><div class='footer quiet pad2 space-top1 center small'>
 Code coverage generated by
 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-at 2024-10-27T01:48:41.451Z
+at 2024-10-29T22:25:51.150Z
 </div>
     <script src="../../../../../prettify.js"></script>
     <script>

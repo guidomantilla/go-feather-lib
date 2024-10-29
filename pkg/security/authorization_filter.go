@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 )
@@ -22,10 +20,10 @@ func NewDefaultAuthorizationFilter(authorizationService AuthorizationService) *D
 	}
 }
 
-func (filter *DefaultAuthorizationFilter) Authorize(ctx *gin.Context) {
+func (filter *DefaultAuthorizationFilter) Authorize(ctx rest.Context) {
 	assert.NotNil(ctx, "authorization filter - error authorizing: context is nil")
 
-	header := ctx.Request.Header.Get("Authorization")
+	header := ctx.Request().Header.Get("Authorization")
 	if !strings.HasPrefix(header, "Bearer ") {
 		ex := rest.UnauthorizedException("invalid authorization header")
 		ctx.AbortWithStatusJSON(ex.Code, ex)
@@ -46,11 +44,11 @@ func (filter *DefaultAuthorizationFilter) Authorize(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(ex.Code, ex)
 		return
 	}
-	resource := []string{application, ctx.Request.Method, ctx.FullPath()}
+	resource := []string{application, ctx.Request().Method, ctx.FullPath()}
 
 	var err error
 	var principal *Principal
-	ctxWithResource := context.WithValue(ctx.Request.Context(), ResourceCtxKey{}, strings.Join(resource, " "))
+	ctxWithResource := context.WithValue(ctx.Request().Context(), ResourceCtxKey{}, strings.Join(resource, " "))
 	if principal, err = filter.authorizationService.Authorize(ctxWithResource, token); err != nil {
 		ex := rest.UnauthorizedException(err.Error())
 		ctx.AbortWithStatusJSON(ex.Code, ex)
