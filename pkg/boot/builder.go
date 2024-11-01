@@ -176,14 +176,14 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			recoveryFilter := gin.Recovery()
 			loggerFilter := sloggin.New(log.AsSlogLogger().WithGroup("http"))
 			customFilter := func(ctx *gin.Context) {
-				security.AddApplicationToContext(nil, appCtx.AppName)
+				security.AddApplicationToContext(ctx, appCtx.AppName)
 				ctx.Next()
 			}
 
 			engine := gin.New()
 			engine.Use(loggerFilter, recoveryFilter, customFilter)
 			engine.POST("/login", func(ctx *gin.Context) {
-				appCtx.AuthenticationEndpoint.Authenticate(nil)
+				gin.WrapF(appCtx.AuthenticationEndpoint.Authenticate)
 			})
 			engine.GET("/health", func(ctx *gin.Context) {
 				ctx.JSON(http.StatusOK, gin.H{"status": "alive"})
@@ -196,7 +196,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			})
 
 			return engine, engine.Group("/api", func(ctx *gin.Context) {
-				appCtx.AuthorizationFilter.Authorize(nil)
+				gin.WrapF(appCtx.AuthorizationFilter.Authorize)
 			})
 		},
 		GrpcServer: func(appCtx *ApplicationContext) (*grpc.ServiceDesc, any) {

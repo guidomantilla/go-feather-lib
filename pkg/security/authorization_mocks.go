@@ -11,9 +11,9 @@ package security
 
 import (
 	context "context"
+	http "net/http"
 	reflect "reflect"
 
-	gin "github.com/gin-gonic/gin"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,15 +42,15 @@ func (m *MockAuthorizationFilter) EXPECT() *MockAuthorizationFilterMockRecorder 
 }
 
 // Authorize mocks base method.
-func (m *MockAuthorizationFilter) Authorize(ctx *gin.Context) {
+func (m *MockAuthorizationFilter) Authorize(response http.ResponseWriter, request *http.Request) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Authorize", ctx)
+	m.ctrl.Call(m, "Authorize", response, request)
 }
 
 // Authorize indicates an expected call of Authorize.
-func (mr *MockAuthorizationFilterMockRecorder) Authorize(ctx any) *gomock.Call {
+func (mr *MockAuthorizationFilterMockRecorder) Authorize(response, request any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authorize", reflect.TypeOf((*MockAuthorizationFilter)(nil).Authorize), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authorize", reflect.TypeOf((*MockAuthorizationFilter)(nil).Authorize), response, request)
 }
 
 // MockAuthorizationService is a mock of AuthorizationService interface.

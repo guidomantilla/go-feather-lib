@@ -11,9 +11,9 @@ package security
 
 import (
 	context "context"
+	http "net/http"
 	reflect "reflect"
 
-	gin "github.com/gin-gonic/gin"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,15 +42,15 @@ func (m *MockAuthenticationEndpoint) EXPECT() *MockAuthenticationEndpointMockRec
 }
 
 // Authenticate mocks base method.
-func (m *MockAuthenticationEndpoint) Authenticate(ctx *gin.Context) {
+func (m *MockAuthenticationEndpoint) Authenticate(response http.ResponseWriter, request *http.Request) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Authenticate", ctx)
+	m.ctrl.Call(m, "Authenticate", response, request)
 }
 
 // Authenticate indicates an expected call of Authenticate.
-func (mr *MockAuthenticationEndpointMockRecorder) Authenticate(ctx any) *gomock.Call {
+func (mr *MockAuthenticationEndpointMockRecorder) Authenticate(response, request any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockAuthenticationEndpoint)(nil).Authenticate), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockAuthenticationEndpoint)(nil).Authenticate), response, request)
 }
 
 // MockAuthenticationService is a mock of AuthenticationService interface.

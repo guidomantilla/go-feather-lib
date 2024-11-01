@@ -2,8 +2,7 @@ package security
 
 import (
 	"context"
-
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 var (
@@ -14,7 +13,7 @@ var (
 )
 
 type AuthenticationEndpoint interface {
-	Authenticate(ctx *gin.Context)
+	Authenticate(response http.ResponseWriter, request *http.Request)
 }
 
 type AuthenticationService interface {

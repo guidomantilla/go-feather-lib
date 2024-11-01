@@ -1,7 +1,9 @@
 package rest
 
+type ContextKey struct {
+}
+
 type Context interface {
-	//Request() *http.Request
 	FullPath() string
 	Set(key string, value any)
 	Get(key string) (value any, exists bool)

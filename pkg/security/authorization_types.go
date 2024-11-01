@@ -2,8 +2,7 @@ package security
 
 import (
 	"context"
-
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 var (
@@ -16,7 +15,7 @@ var (
 type ResourceCtxKey struct{}
 
 type AuthorizationFilter interface {
-	Authorize(ctx *gin.Context)
+	Authorize(response http.ResponseWriter, request *http.Request)
 }
 
 type AuthorizationService interface {
