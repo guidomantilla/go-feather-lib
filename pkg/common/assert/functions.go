@@ -31,6 +31,18 @@ func NotEqual(val1 any, val2 any, message string) {
 	}
 }
 
+func True(condition bool, message string) {
+	if !condition {
+		log.Fatal(message)
+	}
+}
+
+func False(condition bool, message string) {
+	if condition {
+		log.Fatal(message)
+	}
+}
+
 //
 
 func nil(object any) bool {

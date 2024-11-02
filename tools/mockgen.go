@@ -5,6 +5,7 @@ package tools
 //go:generate mockgen -package=log 	 		-destination ../pkg/common/log/mocks.go					-source ../pkg/common/log/types.go
 //go:generate mockgen -package=properties   -destination ../pkg/common/properties/mocks.go			-source ../pkg/common/properties/types.go
 
+//go:generate mockgen -package=gocql 		-destination ../pkg/datasource/gocql/mocks.go 			-source ../pkg/datasource/gocql/types.go
 //go:generate mockgen -package=gorm 		-destination ../pkg/datasource/gorm/mocks.go 			-source ../pkg/datasource/gorm/types.go
 //go:generate mockgen -package=mongo 		-destination ../pkg/datasource/mongo/mocks.go 			-source ../pkg/datasource/mongo/types.go
 //go:generate mockgen -package=security 	-destination ../pkg/security/authentication_mocks.go	-source ../pkg/security/authentication_types.go

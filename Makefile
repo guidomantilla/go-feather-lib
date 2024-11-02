@@ -15,6 +15,7 @@ generate:
 	go generate ./pkg/... ./tools/...
 
 graph:
+	godepgraph -s ./pkg/datasource/gocql | dot -Tpng -o ./pkg/datasource/gocql/gocql.png
 	godepgraph -s ./pkg/datasource/gorm | dot -Tpng -o ./pkg/datasource/gorm/gorm.png
 	godepgraph -s ./pkg/datasource/mongo | dot -Tpng -o ./pkg/datasource/mongo/mongo.png
 	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png

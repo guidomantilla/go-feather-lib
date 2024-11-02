@@ -9,7 +9,6 @@ import (
 type context_ struct {
 	url    string
 	server string
-	//service string
 }
 
 func NewContext(url string, username string, password string, server string) Context {
@@ -17,17 +16,14 @@ func NewContext(url string, username string, password string, server string) Con
 	assert.NotEmpty(username, "starting up - error setting up datasource context: username is empty")
 	assert.NotEmpty(password, "starting up - error setting up datasource context: password is empty")
 	assert.NotEmpty(server, "starting up - error setting up datasource context: server is empty")
-	//assert.NotEmpty(service, "starting up - error setting up datasource context: service is empty")
 
 	url = strings.Replace(url, ":username", username, 1)
 	url = strings.Replace(url, ":password", password, 1)
 	url = strings.Replace(url, ":server", server, 1)
-	//url = strings.Replace(url, ":service", service, 1)
 
 	return &context_{
 		url:    url,
 		server: server,
-		//service: service,
 	}
 }
 
