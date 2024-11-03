@@ -3,8 +3,6 @@ package gocql
 import (
 	"context"
 	"fmt"
-	"time"
-
 	retry "github.com/avast/retry-go/v4"
 	"github.com/gocql/gocql"
 
@@ -14,18 +12,24 @@ import (
 )
 
 type connection struct {
-	context  Context
-	database *gocql.Session
-	dialer   gocql.HostDialer
+	context       Context
+	database      *gocql.Session
+	clusterConfig *gocql.ClusterConfig
+	dialer        gocql.HostDialer
 }
 
 func NewConnection(context Context, options ...ConnectionOptions) Connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
 
+	servers := context.Server().([]string)
+	clusterConfig := gocql.NewCluster(servers...)
+	clusterConfig.Authenticator = gocql.PasswordAuthenticator{Username: context.User(), Password: context.Password()}
+
 	connection := &connection{
-		context:  context,
-		database: nil,
-		dialer:   nil,
+		context:       context,
+		database:      nil,
+		clusterConfig: clusterConfig,
+		dialer:        nil,
 	}
 
 	for _, option := range options {
@@ -56,15 +60,8 @@ func (datasource *connection) Connect(_ context.Context) (*gocql.Session, error)
 
 func (datasource *connection) connect() error {
 
-	servers := datasource.context.Server().([]string)
-	clusterConfig := gocql.NewCluster(servers...)
-	clusterConfig.Consistency = gocql.Quorum
-	clusterConfig.ProtoVersion = 4
-	clusterConfig.ConnectTimeout = time.Second * 10
-	clusterConfig.Authenticator = gocql.PasswordAuthenticator{Username: datasource.context.User(), Password: datasource.context.Password()}
-
 	var err error
-	if datasource.database, err = clusterConfig.CreateSession(); err != nil {
+	if datasource.database, err = datasource.clusterConfig.CreateSession(); err != nil {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
