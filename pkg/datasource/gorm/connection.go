@@ -21,7 +21,6 @@ type connection struct {
 func NewConnection(context Context, openFn OpenFn, opts ...gorm.Option) *connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
 	assert.NotNil(openFn, "starting up - error setting up datasource connection: open is nil")
-	//assert.NotEmpty(opts, "starting up - error setting up datasource connection: opts is empty")
 
 	return &connection{
 		context:  context,

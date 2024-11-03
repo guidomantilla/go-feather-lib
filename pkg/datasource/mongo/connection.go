@@ -36,8 +36,7 @@ func (datasource *connection) Connect(_ context.Context) (*mongo.Client, error) 
 		err := retry.Do(datasource.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
 				log.Info("datasource connection - failed to connect")
-				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s", datasource.context.Server()))
-				//log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.context.Server(), datasource.context.Service()))
+				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.context.Server(), datasource.context.Service()))
 			}),
 		)
 
@@ -56,8 +55,8 @@ func (datasource *connection) connect() error {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Info(fmt.Sprintf("datasource connection - connected to %s", datasource.context.Server()))
-	//log.Info(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.context.Server(), datasource.context.Service()))
+	log.Info(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.context.Server(), datasource.context.Service()))
+
 	return nil
 }
 
@@ -66,13 +65,11 @@ func (datasource *connection) Close(ctx context.Context) {
 	if datasource.database != nil {
 		log.Debug("datasource connection - closing connection")
 		if err := datasource.database.Disconnect(ctx); err != nil {
-			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s: %s", datasource.context.Server(), err.Error()))
-			//log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.context.Server(), datasource.context.Service(), err.Error()))
+			log.Error(fmt.Sprintf("datasource connection - failed to close connection to %s/%s: %s", datasource.context.Server(), datasource.context.Service(), err.Error()))
 		}
 	}
 	datasource.database = nil
-	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s", datasource.context.Server()))
-	//log.Debug(fmt.Sprintf("datasource connection - closed connection to %s/%s", datasource.context.Server(), datasource.context.Service()))
+	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s/%s", datasource.context.Server(), datasource.context.Service()))
 }
 
 func (datasource *connection) Context() Context {

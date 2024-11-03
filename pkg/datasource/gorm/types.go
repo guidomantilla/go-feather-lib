@@ -19,7 +19,9 @@ type OpenFn func(dsn string) gorm.Dialector
 
 type Context interface {
 	Url() string
-	Server() string
+	User() string
+	Password() string
+	Server() any
 	Service() string
 }
 

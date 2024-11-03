@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
-	gocqlastra "github.com/datastax/gocql-astra"
 	"github.com/glebarez/sqlite"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -130,18 +128,9 @@ func case_mongo() error {
 func case_gocql() error {
 
 	ctx := context.TODO()
-	gocqlCtx := dgocql.NewContext("PublicIP", "Username", "PublicIP;PublicIP;PublicIP")
-	dialer, _ := gocqlastra.NewDialerFromURL(gocqlastra.AstraAPIURL, "<astra-database-id>", "<astra-token", 10*time.Second)
-	connection := dgocql.NewConnection(gocqlCtx, dgocql.ConnectionOptionsBuilder().WithDialer(dialer).Build())
+	gocqlCtx := dgocql.NewContext("root", "Raven123qweasd*", "170.187.157.212")
+	connection := dgocql.NewConnection(gocqlCtx)
 	defer connection.Close(ctx)
-
-	//cluster, err := gocqlastra.NewClusterFromURL(gocqlastra.AstraAPIURL, "<astra-database-id>", "<astra-token>", 10*time.Second)
-	//cluster, err = gocqlastra.NewClusterFromBundle("/path/to/your/bundle.zip", "<username>", "<password>", 10*time.Second)
-	//cluster := gocql.NewCluster("PublicIP", "PublicIP", "PublicIP") //replace PublicIP with the IP addresses used by your cluster.
-	//cluster.Consistency = gocql.Quorum
-	//cluster.ProtoVersion = 4
-	//cluster.ConnectTimeout = time.Second * 10
-	//cluster.Authenticator = gocql.PasswordAuthenticator{Username: "Username", Password: "Password", AllowedAuthenticators: []string{"com.instaclustr.cassandra.auth.InstaclustrPasswordAuthenticator"}} //replace the username and password fields with their real settings, you will need to allow the use of the Instaclustr Password Authenticator.
 
 	session, err := connection.Connect(ctx)
 	if err != nil {
@@ -149,13 +138,6 @@ func case_gocql() error {
 		return err
 	}
 	defer session.Close()
-
-	// create keyspaces
-	err = session.Query("CREATE KEYSPACE IF NOT EXISTS sleep_centre WITH REPLICATION = {'class' : 'NetworkTopologyStrategy', 'AWS_VPC_US_WEST_2' : 3};").Exec() //Replace AWS_VPC_US_WEST_2 with the name of the DataCentre you are connecting to.
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 
 	// create table
 	err = session.Query("CREATE TABLE IF NOT EXISTS sleep_centre.sleep_study (name text, study_date date, sleep_time_hours float, PRIMARY KEY (name, study_date));").Exec()

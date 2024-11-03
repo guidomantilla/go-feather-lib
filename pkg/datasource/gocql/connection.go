@@ -3,6 +3,7 @@ package gocql
 import (
 	"context"
 	"fmt"
+	"time"
 
 	retry "github.com/avast/retry-go/v4"
 	"github.com/gocql/gocql"
@@ -20,7 +21,6 @@ type connection struct {
 
 func NewConnection(context Context, options ...ConnectionOptions) Connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
-	assert.NotEmpty(options, "starting up - error setting up datasource connection: options is empty")
 
 	connection := &connection{
 		context:  context,
@@ -42,7 +42,7 @@ func (datasource *connection) Connect(_ context.Context) (*gocql.Session, error)
 		err := retry.Do(datasource.connect, retry.Attempts(5),
 			retry.OnRetry(func(n uint, err error) {
 				log.Info("datasource connection - failed to connect")
-				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s", datasource.context.Server()))
+				log.Info(fmt.Sprintf("datasource connection - trying reconnection to %s/%s", datasource.context.Server(), datasource.context.Service()))
 			}),
 		)
 
@@ -56,12 +56,19 @@ func (datasource *connection) Connect(_ context.Context) (*gocql.Session, error)
 
 func (datasource *connection) connect() error {
 
+	servers := datasource.context.Server().([]string)
+	clusterConfig := gocql.NewCluster(servers...)
+	clusterConfig.Consistency = gocql.Quorum
+	clusterConfig.ProtoVersion = 4
+	clusterConfig.ConnectTimeout = time.Second * 10
+	clusterConfig.Authenticator = gocql.PasswordAuthenticator{Username: datasource.context.User(), Password: datasource.context.Password()}
+
 	var err error
-	if datasource.database, err = gocql.NewCluster(datasource.context.Server()...).CreateSession(); err != nil {
+	if datasource.database, err = clusterConfig.CreateSession(); err != nil {
 		log.Error(err.Error())
 		return ErrDBConnectionFailed(err)
 	}
-	log.Info(fmt.Sprintf("datasource connection - connected to %s", datasource.context.Server()))
+	log.Info(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.context.Server(), datasource.context.Service()))
 
 	return nil
 }
@@ -73,7 +80,7 @@ func (datasource *connection) Close(_ context.Context) {
 		datasource.database.Close()
 	}
 	datasource.database = nil
-	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s", datasource.context.Server()))
+	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s/%s", datasource.context.Server(), datasource.context.Service()))
 }
 
 func (datasource *connection) Context() Context {

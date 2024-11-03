@@ -41,11 +41,25 @@ func (m *MockContext) EXPECT() *MockContextMockRecorder {
 	return m.recorder
 }
 
+// Password mocks base method.
+func (m *MockContext) Password() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Password")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Password indicates an expected call of Password.
+func (mr *MockContextMockRecorder) Password() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Password", reflect.TypeOf((*MockContext)(nil).Password))
+}
+
 // Server mocks base method.
-func (m *MockContext) Server() string {
+func (m *MockContext) Server() any {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Server")
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(any)
 	return ret0
 }
 
@@ -53,6 +67,20 @@ func (m *MockContext) Server() string {
 func (mr *MockContextMockRecorder) Server() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Server", reflect.TypeOf((*MockContext)(nil).Server))
+}
+
+// Service mocks base method.
+func (m *MockContext) Service() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Service")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Service indicates an expected call of Service.
+func (mr *MockContextMockRecorder) Service() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Service", reflect.TypeOf((*MockContext)(nil).Service))
 }
 
 // Url mocks base method.
@@ -67,6 +95,20 @@ func (m *MockContext) Url() string {
 func (mr *MockContextMockRecorder) Url() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Url", reflect.TypeOf((*MockContext)(nil).Url))
+}
+
+// User mocks base method.
+func (m *MockContext) User() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "User")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// User indicates an expected call of User.
+func (mr *MockContextMockRecorder) User() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "User", reflect.TypeOf((*MockContext)(nil).User))
 }
 
 // MockConnection is a mock of Connection interface.

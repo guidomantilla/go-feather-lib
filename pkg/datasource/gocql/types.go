@@ -14,7 +14,11 @@ var (
 )
 
 type Context interface {
-	Server() []string
+	Url() string
+	User() string
+	Password() string
+	Server() any
+	Service() string
 }
 
 type Connection interface {

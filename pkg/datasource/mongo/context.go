@@ -7,8 +7,10 @@ import (
 )
 
 type context_ struct {
-	url    string
-	server string
+	url      string
+	username string
+	password string
+	server   string
 }
 
 func NewContext(url string, username string, password string, server string) Context {
@@ -22,8 +24,10 @@ func NewContext(url string, username string, password string, server string) Con
 	url = strings.Replace(url, ":server", server, 1)
 
 	return &context_{
-		url:    url,
-		server: server,
+		url:      url,
+		username: username,
+		password: password,
+		server:   server,
 	}
 }
 
@@ -31,12 +35,18 @@ func (context *context_) Url() string {
 	return context.url
 }
 
-func (context *context_) Server() string {
+func (context *context_) User() string {
+	return context.username
+}
+
+func (context *context_) Password() string {
+	return context.password
+}
+
+func (context *context_) Server() any {
 	return context.server
 }
 
-/*
 func (context *context_) Service() string {
-	return context.service
+	return ""
 }
-*/
