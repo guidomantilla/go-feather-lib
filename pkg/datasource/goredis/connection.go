@@ -1,11 +1,11 @@
-package gocql
+package goredis
 
 import (
 	"context"
 	"fmt"
 
 	retry "github.com/avast/retry-go/v4"
-	"github.com/gocql/gocql"
+	redis "github.com/redis/go-redis/v9"
 
 	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
@@ -14,23 +14,23 @@ import (
 
 type connection struct {
 	context       Context
-	database      *gocql.Session
-	clusterConfig *gocql.ClusterConfig
-	dialer        gocql.HostDialer
+	database      redis.UniversalClient
+	clusterConfig *redis.UniversalOptions
 }
 
 func NewConnection(context Context, options ...ConnectionOptions) Connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
 
-	servers := context.Server().([]string)
-	clusterConfig := gocql.NewCluster(servers...)
-	clusterConfig.Authenticator = gocql.PasswordAuthenticator{Username: context.User(), Password: context.Password()}
-
 	connection := &connection{
-		context:       context,
-		database:      nil,
-		clusterConfig: clusterConfig,
-		dialer:        nil,
+		context:  context,
+		database: nil,
+		clusterConfig: &redis.UniversalOptions{
+			Addrs:    context.Server().([]string),
+			Username: context.User(),
+			Password: context.Password(),
+			DB:       0,
+			Protocol: 2,
+		},
 	}
 
 	for _, option := range options {
@@ -40,7 +40,7 @@ func NewConnection(context Context, options ...ConnectionOptions) Connection {
 	return connection
 }
 
-func (datasource *connection) Connect(_ context.Context) (*gocql.Session, error) {
+func (datasource *connection) Connect(_ context.Context) (redis.UniversalClient, error) {
 
 	if datasource.database == nil {
 
@@ -61,11 +61,8 @@ func (datasource *connection) Connect(_ context.Context) (*gocql.Session, error)
 
 func (datasource *connection) connect() error {
 
-	var err error
-	if datasource.database, err = datasource.clusterConfig.CreateSession(); err != nil {
-		log.Error(err.Error())
-		return ErrDBConnectionFailed(err)
-	}
+	datasource.database = redis.NewUniversalClient(datasource.clusterConfig)
+
 	log.Info(fmt.Sprintf("datasource connection - connected to %s/%s", datasource.context.Server(), datasource.context.Service()))
 
 	return nil
@@ -73,9 +70,12 @@ func (datasource *connection) connect() error {
 
 func (datasource *connection) Close(_ context.Context) {
 
-	if datasource.database != nil && !datasource.database.Closed() {
+	if datasource.database != nil {
 		log.Debug("datasource connection - closing connection")
-		datasource.database.Close()
+		if err := datasource.database.Close(); err != nil {
+			log.Error(fmt.Sprintf("datasource connection - error closing connection: %v", err))
+			return
+		}
 	}
 	datasource.database = nil
 	log.Debug(fmt.Sprintf("datasource connection - closed connection to %s/%s", datasource.context.Server(), datasource.context.Service()))
@@ -88,10 +88,5 @@ func (datasource *connection) Context() Context {
 func (datasource *connection) Set(property string, value any) {
 	if utils.IsEmpty(property) || utils.IsEmpty(value) {
 		return
-	}
-
-	switch property {
-	case "dialer":
-		datasource.dialer = utils.ToType[gocql.HostDialer](value)
 	}
 }

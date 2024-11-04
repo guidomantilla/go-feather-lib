@@ -16,6 +16,7 @@ generate:
 
 graph:
 	godepgraph -s ./pkg/datasource/gocql | dot -Tpng -o ./pkg/datasource/gocql/gocql.png
+	godepgraph -s ./pkg/datasource/goredis | dot -Tpng -o ./pkg/datasource/goredis/goredis.png
 	godepgraph -s ./pkg/datasource/gorm | dot -Tpng -o ./pkg/datasource/gorm/gorm.png
 	godepgraph -s ./pkg/datasource/mongo | dot -Tpng -o ./pkg/datasource/mongo/mongo.png
 	godepgraph -s ./pkg/integration | dot -Tpng -o ./pkg/integration/integration.png
