@@ -35,7 +35,7 @@ func (server *ConsumerServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "rabbitmq server - error starting up: context is nil")
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].Context().Server()))
+	log.Info(ctx, fmt.Sprintf("starting up - starting rabbitmq server: %s", server.consumers[0].Context().Server()))
 
 	for _, consumer := range server.consumers {
 		go func(ctx context.Context, consumer Consumer, closeChannel chan struct{}) {
@@ -48,7 +48,7 @@ func (server *ConsumerServer) Run(ctx context.Context) error {
 					var err error
 					var closeChannel chan string
 					if closeChannel, err = consumer.Consume(ctx); err != nil {
-						log.Error(fmt.Sprintf("rabbitmq server - error: %s", err.Error()))
+						log.Error(ctx, fmt.Sprintf("rabbitmq server - error: %s", err.Error()))
 						continue
 					}
 					<-closeChannel
@@ -60,14 +60,14 @@ func (server *ConsumerServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (server *ConsumerServer) Stop(_ context.Context) error {
+func (server *ConsumerServer) Stop(ctx context.Context) error {
 	assert.NotNil(server.ctx, "rabbitmq server - error shutting down: context is nil")
 
-	log.Debug("server shutting down - stopping rabbitmq server")
+	log.Debug(ctx, "server shutting down - stopping rabbitmq server")
 	close(server.closeChannel)
 	for _, consumer := range server.consumers {
-		consumer.Close()
+		consumer.Close(ctx)
 	}
-	log.Debug("server shutting down - rabbitmq server stopped")
+	log.Debug(ctx, "server shutting down - rabbitmq server stopped")
 	return nil
 }

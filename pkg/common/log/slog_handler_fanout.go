@@ -43,12 +43,12 @@ func (h *SlogFanoutHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	for _, handler := range h.handlers {
 		handler.WithAttrs(attrs)
 	}
-	return NewSlogFanoutHandler(h.handlers...)
+	return h
 }
 
 func (h *SlogFanoutHandler) WithGroup(name string) slog.Handler {
 	for _, handler := range h.handlers {
 		handler.WithGroup(name)
 	}
-	return NewSlogFanoutHandler(h.handlers...)
+	return h
 }

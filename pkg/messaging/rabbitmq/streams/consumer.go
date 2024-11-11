@@ -45,7 +45,7 @@ func NewConsumer(connection Connection, name string, options ...ConsumerOptions)
 	}
 
 	consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-		go messageProcessor(consumerContext, consumer.listener, message)
+		go messageProcessor(context.Background(), consumerContext, consumer.listener, message)
 	}
 
 	for _, option := range options {
@@ -63,62 +63,62 @@ func (streams *consumer) Consume(ctx context.Context) (Event, error) {
 	defer streams.mu.Unlock()
 
 	var err error
-	if streams.environment, err = streams.connection.Connect(); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
+	if streams.environment, err = streams.connection.Connect(ctx); err != nil {
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
 
 	var streamExists bool
 	if streamExists, err = streams.environment.StreamExists(streams.name); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
 
 	if !streamExists {
 		if err = streams.environment.DeclareStream(streams.name, streams.streamOptions); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 			return nil, err
 		}
 	}
 
-	log.Debug(fmt.Sprintf("rabbitmq streams consumer - connected to stream %s", streams.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - connected to stream %s", streams.name))
 
 	var storedOffset int64
 	if storedOffset, err = streams.environment.QueryOffset(streams.consumer, streams.name); err != nil {
 		if errors.Is(err, stream.OffsetNotFoundError) {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to query offset from stream %s: %s", streams.name, err.Error()))
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - setting up offset to FIRST from stream %s", streams.name))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed to query offset from stream %s: %s", streams.name, err.Error()))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - setting up offset to FIRST from stream %s", streams.name))
 			streams.consumerOptions.SetOffset(stream.OffsetSpecification{}.First())
 		} else {
 			newOffset := storedOffset + 1
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - setting up offset to %d from stream %s", newOffset, streams.name))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - setting up offset to %d from stream %s", newOffset, streams.name))
 			streams.consumerOptions.SetOffset(stream.OffsetSpecification{}.Offset(newOffset))
 		}
 	}
 
 	var consumer *stream.Consumer
 	if consumer, err = streams.environment.NewConsumer(streams.name, streams.messagesHandler, streams.consumerOptions); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed comsuming from stream %s: %s", streams.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed comsuming from stream %s: %s", streams.name, err.Error()))
 		return nil, err
 	}
 
 	closeChannel := make(Event)
-	go closingHandler(consumer, streams.name, closeChannel)
+	go closingHandler(ctx, consumer, streams.name, closeChannel)
 	return closeChannel, nil
 }
 
-func (streams *consumer) Close() {
+func (streams *consumer) Close(ctx context.Context) {
 	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
-		log.Debug("rabbitmq streams consumer - closing connection")
+		log.Debug(ctx, "rabbitmq streams consumer - closing connection")
 		if err := streams.environment.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq streams consumer - failed to close connection to stream %s: %s", streams.name, err.Error()))
+			log.Error(ctx, fmt.Sprintf("rabbitmq streams consumer - failed to close connection to stream %s: %s", streams.name, err.Error()))
 		}
 	}
 	streams.environment = nil
-	streams.connection.Close()
-	log.Debug(fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
+	streams.connection.Close(ctx)
+	log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - closed connection to stream %s", streams.name))
 }
 
 func (streams *consumer) Context() Context {

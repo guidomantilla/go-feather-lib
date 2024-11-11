@@ -25,8 +25,8 @@ func (listener *listener) OnMessage(ctx context.Context, message *amqp.Message) 
 	if anyContext != nil {
 		consumerContext = anyContext.(stream.ConsumerContext)
 	}
-	log.Debug(fmt.Sprintf("Received a consumerContext: %s", consumerContext.Consumer.GetName()))
-	log.Info(fmt.Sprintf("Received a message: %s", message.Data))
+	log.Debug(ctx, fmt.Sprintf("Received a consumerContext: %s", consumerContext.Consumer.GetName()))
+	log.Info(ctx, fmt.Sprintf("Received a message: %s", message.Data))
 	time.Sleep(5 * time.Second)
 	return nil
 }

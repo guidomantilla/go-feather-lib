@@ -22,7 +22,7 @@ func (server *BaseServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "base server - error starting up: context is nil")
 
 	server.ctx = ctx
-	log.Info("starting up - starting base server")
+	log.Info(ctx, "starting up - starting base server")
 	<-server.closeChannel
 	return nil
 }
@@ -30,8 +30,8 @@ func (server *BaseServer) Run(ctx context.Context) error {
 func (server *BaseServer) Stop(ctx context.Context) error {
 	assert.NotNil(ctx, "base server - error shutting down: context is nil")
 
-	log.Info("shutting down - stopping base server")
+	log.Info(ctx, "shutting down - stopping base server")
 	close(server.closeChannel)
-	log.Debug("shutting down - default base stopped")
+	log.Debug(ctx, "shutting down - default base stopped")
 	return nil
 }

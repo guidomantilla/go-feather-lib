@@ -48,39 +48,39 @@ func (producer *producer) Produce(ctx context.Context, message *amqp.Publishing)
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = producer.connection.Connect(); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq producer - failed connection to queue %s: %s", producer.name, err.Error()))
+	if connection, err = producer.connection.Connect(ctx); err != nil {
+		log.Debug(ctx, fmt.Sprintf("rabbitmq producer - failed connection to queue %s: %s", producer.name, err.Error()))
 		return err
 	}
 
 	if !(producer.channel != nil && !producer.channel.IsClosed()) {
 		if producer.channel, err = connection.Channel(); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq producer - failed connection to queue %s: %s", producer.name, err.Error()))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq producer - failed connection to queue %s: %s", producer.name, err.Error()))
 			return err
 		}
 	}
 
-	log.Debug(fmt.Sprintf("rabbitmq producer - publishing to queue %s", producer.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq producer - publishing to queue %s", producer.name))
 	if err = producer.channel.PublishWithContext(ctx, producer.exchange, producer.name, producer.mandatory, producer.immediate, *message); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq producer - failed publishing to queue: %s", err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq producer - failed publishing to queue: %s", err.Error()))
 		return err
 	}
-	log.Debug(fmt.Sprintf("rabbitmq producer - published to queue %s", producer.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq producer - published to queue %s", producer.name))
 	return nil
 }
 
-func (producer *producer) Close() {
+func (producer *producer) Close(ctx context.Context) {
 	time.Sleep(Delay)
 
 	if producer.channel != nil && !producer.channel.IsClosed() {
-		log.Debug("rabbitmq producer - closing connection")
+		log.Debug(ctx, "rabbitmq producer - closing connection")
 		if err := producer.channel.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq producer - failed to close connection to queue %s: %s", producer.name, err.Error()))
+			log.Error(ctx, fmt.Sprintf("rabbitmq producer - failed to close connection to queue %s: %s", producer.name, err.Error()))
 		}
 	}
 	producer.channel = nil
-	producer.connection.Close()
-	log.Debug(fmt.Sprintf("rabbitmq producer - closed connection to queue %s", producer.name))
+	producer.connection.Close(ctx)
+	log.Debug(ctx, fmt.Sprintf("rabbitmq producer - closed connection to queue %s", producer.name))
 }
 
 func (producer *producer) Context() Context {

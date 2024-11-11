@@ -33,8 +33,8 @@ type ConnectionDialer func(url string) (*stream.Environment, error)
 
 type Connection interface {
 	Context() Context
-	Connect() (*stream.Environment, error)
-	Close()
+	Connect(ctx context.Context) (*stream.Environment, error)
+	Close(ctx context.Context)
 }
 
 type Listener interface {
@@ -46,13 +46,13 @@ type Event = chan string
 type Consumer interface {
 	Context() Context
 	Consume(ctx context.Context) (Event, error)
-	Close()
+	Close(ctx context.Context)
 	Set(property string, value any)
 }
 
 type Producer interface {
 	Context() Context
 	Produce(ctx context.Context, message *samqp.AMQP10) error
-	Close()
+	Close(ctx context.Context)
 	Set(property string, value any)
 }

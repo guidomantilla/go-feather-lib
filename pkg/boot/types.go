@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 	"github.com/guidomantilla/go-feather-lib/pkg/common/environment"
 	log "github.com/guidomantilla/go-feather-lib/pkg/common/log"
 	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
@@ -84,25 +85,14 @@ type ApplicationContext struct {
 
 func NewApplicationContext(appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder) *ApplicationContext {
 
-	if appName == "" {
-		log.Fatal("starting up - error setting up the ApplicationContext: appName is empty")
-	}
-
-	if version == "" {
-		log.Fatal("starting up - error setting up the ApplicationContext: version is empty")
-	}
-
-	if args == nil {
-		log.Fatal("starting up - error setting up the ApplicationContext: args is nil")
-	}
+	assert.NotEmpty(appName, "starting up - error setting up the ApplicationContext: appName is empty")
+	assert.NotEmpty(version, "starting up - error setting up the ApplicationContext: version is empty")
+	assert.NotNil(args, "starting up - error setting up the ApplicationContext: args is nil")
+	assert.NotNil(enablers, "starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
+	assert.NotNil(builder, "starting up - error setting up the ApplicationContext: builder is nil")
 
 	if enablers == nil {
-		log.Warn("starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
 		enablers = &Enablers{}
-	}
-
-	if builder == nil { //nolint:staticcheck
-		log.Fatal("starting up - error setting up the ApplicationContext: builder is nil")
 	}
 
 	ctx := &ApplicationContext{
@@ -124,23 +114,23 @@ func NewApplicationContext(appName string, version string, args []string, enable
 		},
 	}
 
-	log.Debug("starting up - setting up environment variables")
+	log.Debug(context.Background(), "starting up - setting up environment variables")
 	ctx.Environment = builder.Environment(ctx) //nolint:staticcheck
 
-	log.Debug("starting up - setting up configuration")
+	log.Debug(context.Background(), "starting up - setting up configuration")
 	builder.Config(ctx) //nolint:staticcheck
 
 	if ctx.Enablers.DatabaseEnabled {
-		log.Debug("starting up - setting up db connectivity")
+		log.Debug(context.Background(), "starting up - setting up db connectivity")
 		ctx.DatasourceOpenFn = builder.DatasourceOpenFn(ctx)                         //nolint:staticcheck
 		ctx.DatasourceContext = builder.DatasourceContext(ctx)                       //nolint:staticcheck
 		ctx.DatasourceConnection = builder.DatasourceConnection(ctx)                 //nolint:staticcheck
 		ctx.DatasourceTransactionHandler = builder.DatasourceTransactionHandler(ctx) //nolint:staticcheck
 	} else {
-		log.Warn("starting up - warning setting up database configuration. database connectivity is disabled")
+		log.Warn(context.Background(), "starting up - warning setting up database configuration. database connectivity is disabled")
 	}
 
-	log.Debug("starting up - setting up security")
+	log.Debug(context.Background(), "starting up - setting up security")
 	ctx.PasswordEncoder = builder.PasswordEncoder(ctx)                                                                          //nolint:staticcheck
 	ctx.PasswordGenerator = builder.PasswordGenerator(ctx)                                                                      //nolint:staticcheck
 	ctx.PasswordManager = builder.PasswordManager(ctx)                                                                          //nolint:staticcheck
@@ -149,17 +139,17 @@ func NewApplicationContext(appName string, version string, args []string, enable
 	ctx.AuthenticationEndpoint, ctx.AuthorizationFilter = builder.AuthenticationEndpoint(ctx), builder.AuthorizationFilter(ctx) //nolint:staticcheck
 
 	if ctx.Enablers.HttpServerEnabled {
-		log.Debug("starting up - setting up http server")
+		log.Debug(context.Background(), "starting up - setting up http server")
 		ctx.PublicRouter, ctx.PrivateRouter = builder.HttpServer(ctx) //nolint:staticcheck
 	} else {
-		log.Warn("starting up - warning setting up http configuration. http server is disabled")
+		log.Warn(context.Background(), "starting up - warning setting up http configuration. http server is disabled")
 	}
 
 	if ctx.Enablers.GrpcServerEnabled {
-		log.Debug("starting up - setting up grpc server")
+		log.Debug(context.Background(), "starting up - setting up grpc server")
 		ctx.GrpcServiceDesc, ctx.GrpcServiceServer = builder.GrpcServer(ctx) //nolint:staticcheck
 	} else {
-		log.Warn("starting up - warning setting up grpc configuration. grpc server is disabled")
+		log.Warn(context.Background(), "starting up - warning setting up grpc configuration. grpc server is disabled")
 	}
 
 	return ctx
@@ -172,26 +162,26 @@ func (actx *ApplicationContext) Stop(ctx context.Context) {
 	if actx.DatasourceConnection != nil && actx.DatasourceContext != nil {
 
 		var database *gorm.DB
-		log.Debug("shutting down - closing up db connection")
+		log.Debug(ctx, "shutting down - closing up db connection")
 
 		if database, err = actx.DatasourceConnection.Connect(ctx); err != nil {
-			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
+			log.Error(ctx, fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}
 
 		var db *sql.DB
 		if db, err = database.DB(); err != nil {
-			log.Error(fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
+			log.Error(ctx, fmt.Sprintf("shutting down - error db connection: %s", err.Error()))
 			return
 		}
 
 		if err = db.Close(); err != nil {
-			log.Error(fmt.Sprintf("shutting down - error closing db connection: %s", err.Error()))
+			log.Error(ctx, fmt.Sprintf("shutting down - error closing db connection: %s", err.Error()))
 			return
 		}
 
-		log.Debug("shutting down - db connection closed")
+		log.Debug(ctx, "shutting down - db connection closed")
 	}
 
-	log.Info(fmt.Sprintf("Application %s stopped", strings.Join([]string{actx.AppName, actx.AppVersion}, " - ")))
+	log.Info(ctx, fmt.Sprintf("Application %s stopped", strings.Join([]string{actx.AppName, actx.AppVersion}, " - ")))
 }

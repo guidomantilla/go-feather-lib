@@ -25,17 +25,17 @@ func NewCronServer(cron CronServer) *cronServer {
 func (server *cronServer) Run(ctx context.Context) error {
 
 	server.ctx = ctx
-	log.Info("starting up - starting cron server")
+	log.Info(ctx, "starting up - starting cron server")
 	server.internal.Start()
 	<-server.closeChannel
 	return nil
 }
 
-func (server *cronServer) Stop(_ context.Context) error {
+func (server *cronServer) Stop(ctx context.Context) error {
 
-	log.Info("shutting down - stopping cron server")
+	log.Info(ctx, "shutting down - stopping cron server")
 	close(server.closeChannel)
 	server.internal.Stop()
-	log.Debug("shutting down - cron server stopped")
+	log.Debug(ctx, "shutting down - cron server stopped")
 	return nil
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"syscall"
 
 	"github.com/qmdx00/lifecycle"
@@ -11,7 +12,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/server"
 )
 
-func Run(name string, version string, fn func(application Application) error) {
+func Run(name string, version string, fn func(ctx context.Context, application Application) error) {
 	assert.NotEmpty(name, "server - error running: name is empty")
 	assert.NotEmpty(version, "server - error running: version is empty")
 	assert.NotNil(fn, "server - error running: function is nil")
@@ -25,11 +26,13 @@ func Run(name string, version string, fn func(application Application) error) {
 	)
 
 	app.Attach(server.BuildBaseServer())
-	if err := fn(app); err != nil {
-		log.Fatal(err.Error())
+
+	ctx := context.Background()
+	if err := fn(ctx, app); err != nil {
+		log.Fatal(ctx, err.Error())
 	}
 
 	if err := app.Run(); err != nil {
-		log.Fatal(err.Error())
+		log.Fatal(ctx, err.Error())
 	}
 }

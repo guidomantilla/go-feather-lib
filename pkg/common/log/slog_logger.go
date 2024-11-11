@@ -13,26 +13,13 @@ type slogLogger struct {
 	internal *slog.Logger
 }
 
-func New(level SlogLevel, writers ...io.Writer) Logger[*slog.Logger] {
+func New(level SlogLevel, handlers ...slog.Handler) Logger[*slog.Logger] {
 	assert.NotNil(level, "starting up - error setting up logger: level is nil")
-	//assert.NotEmpty(writers, "starting up - error setting up logger: writers is empty")
 
-	opts := &slog.HandlerOptions{
-		Level: level.ToSlogLevel(),
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			if a.Key == slog.LevelKey {
-				level := a.Value.Any().(slog.Level)
-				a.Value = slog.StringValue(SlogLevelOff.ValueFromSlogLevel(level).String())
-			}
-			return a
-		},
+	if len(handlers) == 0 {
+		handlers = append(handlers, SlogTextFormat.Handler(os.Stdout, &slog.HandlerOptions{Level: level.ToSlogLevel()}))
 	}
 
-	handlers := make([]slog.Handler, 0)
-	handlers = append(handlers, SlogTextFormat.Handler(os.Stdout, opts))
-	for _, writer := range writers {
-		handlers = append(handlers, SlogJsonFormat.Handler(writer, opts))
-	}
 	internal := slog.New(NewSlogFanoutHandler(handlers...))
 	slog.SetDefault(internal)
 
@@ -230,4 +217,16 @@ func (enum SlogFormat) Handler(w io.Writer, opts *slog.HandlerOptions) slog.Hand
 		return slog.NewJSONHandler(w, opts)
 	}
 	return slog.NewTextHandler(w, opts)
+}
+
+//
+
+type ReplaceAttrFn func(groups []string, a slog.Attr) slog.Attr
+
+func ReplaceAttr(groups []string, a slog.Attr) slog.Attr {
+	if a.Key == slog.LevelKey {
+		level := a.Value.Any().(slog.Level)
+		a.Value = slog.StringValue(SlogLevelOff.ValueFromSlogLevel(level).String())
+	}
+	return a
 }

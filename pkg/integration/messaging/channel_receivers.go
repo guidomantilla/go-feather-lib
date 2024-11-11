@@ -208,13 +208,13 @@ func (channel *LoggedReceiverChannel[T]) Receive(ctx context.Context, timeout ti
 
 	var err error
 	var message Message[T]
-	log.Trace(fmt.Sprintf("integration messaging: %s receiving message", channel.name))
+	log.Trace(ctx, fmt.Sprintf("integration messaging: %s receiving message", channel.name))
 	if message, err = channel.receiver.Receive(ctx, timeout); err != nil {
-		log.Trace(fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
+		log.Trace(ctx, fmt.Sprintf("integration messaging: %s error - message not received", channel.name))
 		return nil, err
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
+	log.Trace(ctx, fmt.Sprintf("integration messaging: %s message received: %v", channel.name, message))
 	return message, nil
 }
 

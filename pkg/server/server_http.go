@@ -27,10 +27,10 @@ func (server *httpServer) Run(ctx context.Context) error {
 	assert.NotNil(ctx, "http server - error starting: context is nil")
 
 	server.ctx = ctx
-	log.Info(fmt.Sprintf("starting up - starting http server: %s", server.internal.Addr))
+	log.Info(ctx, fmt.Sprintf("starting up - starting http server: %s", server.internal.Addr))
 
 	if err := server.internal.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Error(fmt.Sprintf("starting up - starting http server error: %s", err.Error()))
+		log.Error(ctx, fmt.Sprintf("starting up - starting http server error: %s", err.Error()))
 		return err
 	}
 	return nil
@@ -39,11 +39,11 @@ func (server *httpServer) Run(ctx context.Context) error {
 func (server *httpServer) Stop(ctx context.Context) error {
 	assert.NotNil(ctx, "http server - error shutting down: context is nil")
 
-	log.Info("shutting down - stopping http server")
+	log.Info(ctx, "shutting down - stopping http server")
 	if err := server.internal.Shutdown(ctx); err != nil {
-		log.Error(fmt.Sprintf("shutting down - forced shutdown: %s", err.Error()))
+		log.Error(ctx, fmt.Sprintf("shutting down - forced shutdown: %s", err.Error()))
 		return err
 	}
-	log.Debug("shutting down - http server stopped")
+	log.Debug(ctx, "shutting down - http server stopped")
 	return nil
 }

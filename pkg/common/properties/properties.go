@@ -1,6 +1,7 @@
 package properties
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -13,7 +14,7 @@ func FromSlice(array []string) Option {
 		for _, env := range array {
 			pair := strings.SplitN(env, "=", 2)
 			if len(pair) != 2 {
-				log.Error(fmt.Sprintf("[%s=??] not a key value parameter. expected [key=value]", pair[0]))
+				log.Error(context.Background(), fmt.Sprintf("[%s=??] not a key value parameter. expected [key=value]", pair[0]))
 				continue
 			}
 			properties.Add(pair[0], pair[1])

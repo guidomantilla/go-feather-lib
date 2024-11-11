@@ -23,9 +23,10 @@ func (options ConsumerOptions) WithListener(listener Listener) ConsumerOptions {
 	return func(consumer *consumer) {
 		consumer.listener = listener
 		consumer.messagesHandler = func(consumerContext stream.ConsumerContext, message *amqp.Message) {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
+			ctx := context.Background()
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - message received: %s", message.Data))
 			if err := listener.OnMessage(context.Background(), message); err != nil {
-				log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
+				log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed to process message: %s", err.Error()))
 			}
 		}
 	}

@@ -46,51 +46,51 @@ func (streams *producer) Produce(ctx context.Context, message *samqp.AMQP10) err
 	defer streams.mu.Unlock()
 
 	var err error
-	if streams.environment, err = streams.connection.Connect(); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
+	if streams.environment, err = streams.connection.Connect(ctx); err != nil {
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return err
 	}
 
 	var streamExists bool
 	if streamExists, err = streams.environment.StreamExists(streams.name); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return err
 	}
 
 	if !streamExists {
 		if err = streams.environment.DeclareStream(streams.name, streams.streamOptions); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - failed connection to stream %s: %s", streams.name, err.Error()))
 			return err
 		}
 	}
 
 	var producer *stream.Producer
 	if producer, err = streams.environment.NewProducer(streams.name, streams.producerOptions); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams producer - failed connection to stream %s: %s", streams.name, err.Error()))
 		return err
 	}
 
-	log.Debug(fmt.Sprintf("rabbitmq producer - publishing to stream %s", streams.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq producer - publishing to stream %s", streams.name))
 	if err = producer.Send(message); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq streams producer - failed publishing message to stream %s: %s", streams.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq streams producer - failed publishing message to stream %s: %s", streams.name, err.Error()))
 		return err
 	}
-	log.Debug(fmt.Sprintf("rabbitmq producer - published to stream %s", streams.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq producer - published to stream %s", streams.name))
 	return nil
 }
 
-func (streams *producer) Close() {
+func (streams *producer) Close(ctx context.Context) {
 	time.Sleep(Delay)
 
 	if streams.environment != nil && !streams.environment.IsClosed() {
-		log.Debug("rabbitmq streams producer - closing connection")
+		log.Debug(ctx, "rabbitmq streams producer - closing connection")
 		if err := streams.environment.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq streams producer - failed to close connection to stream %s: %s", streams.name, err.Error()))
+			log.Error(ctx, fmt.Sprintf("rabbitmq streams producer - failed to close connection to stream %s: %s", streams.name, err.Error()))
 		}
 	}
 	streams.environment = nil
-	streams.connection.Close()
-	log.Debug(fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
+	streams.connection.Close(ctx)
+	log.Debug(ctx, fmt.Sprintf("rabbitmq streams consumer - producer connection to stream %s", streams.name))
 }
 
 func (streams *producer) Context() Context {

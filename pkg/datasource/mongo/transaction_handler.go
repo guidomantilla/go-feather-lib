@@ -23,13 +23,13 @@ func (handler *transactionHandler) HandleTransaction(ctx context.Context, fn Tra
 
 	dbx, err := handler.connection.Connect(ctx)
 	if err != nil {
-		log.Error(err.Error())
+		log.Error(ctx, err.Error())
 		return nil, err
 	}
 
 	session, err := dbx.StartSession()
 	if err != nil {
-		log.Error(err.Error())
+		log.Error(ctx, err.Error())
 		return nil, err
 	}
 	defer session.EndSession(ctx)

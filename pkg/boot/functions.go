@@ -20,28 +20,28 @@ type InitDelegateFunc func(ctx ApplicationContext) error
 
 func Init(ctx context.Context, appName string, version string, args []string, enablers *Enablers, builder *BeanBuilder, fn InitDelegateFunc) error {
 
-	log.Info(fmt.Sprintf("Application %s", strings.Join([]string{appName, version}, " - ")))
+	log.Info(ctx, fmt.Sprintf("Application %s", strings.Join([]string{appName, version}, " - ")))
 
 	if appName == "" {
-		log.Fatal("starting up - error setting up the application: appName is empty")
+		log.Fatal(ctx, "starting up - error setting up the application: appName is empty")
 	}
 
 	if args == nil {
-		log.Warn("starting up - warning setting up the application: args is nil")
+		log.Warn(ctx, "starting up - warning setting up the application: args is nil")
 		args = make([]string, 0)
 	}
 
 	if enablers == nil {
-		log.Warn("starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
+		log.Warn(ctx, "starting up - warning setting up the application: http server, grpc server and database connectivity are disabled")
 		enablers = &Enablers{}
 	}
 
 	if builder == nil {
-		log.Fatal("starting up - error setting up the application: builder is nil")
+		log.Fatal(ctx, "starting up - error setting up the application: builder is nil")
 	}
 
 	if fn == nil {
-		log.Fatal("starting up - error setting up the application: fn is nil")
+		log.Fatal(ctx, "starting up - error setting up the application: fn is nil")
 	}
 
 	app := lifecycle.NewApp(
@@ -54,12 +54,12 @@ func Init(ctx context.Context, appName string, version string, args []string, en
 	defer actx.Stop(ctx)
 
 	if err := fn(*actx); err != nil {
-		log.Fatal(fmt.Sprintf("starting up - error setting up the application: %s", err.Error()))
+		log.Fatal(ctx, fmt.Sprintf("starting up - error setting up the application: %s", err.Error()))
 	}
 
 	if actx.Enablers.HttpServerEnabled {
 		if actx.PublicRouter == nil || actx.HttpConfig == nil || actx.HttpConfig.Host == nil || actx.HttpConfig.Port == nil {
-			log.Fatal("starting up - error setting up the application: http server is enabled but no public router or http config is provided")
+			log.Fatal(ctx, "starting up - error setting up the application: http server is enabled but no public router or http config is provided")
 		}
 		httpServer := &http.Server{
 			Addr:              net.JoinHostPort(*actx.HttpConfig.Host, *actx.HttpConfig.Port),
@@ -71,7 +71,7 @@ func Init(ctx context.Context, appName string, version string, args []string, en
 
 	if actx.Enablers.GrpcServerEnabled {
 		if actx.GrpcServiceDesc == nil || actx.GrpcServiceServer == nil || actx.GrpcConfig == nil || actx.GrpcConfig.Host == nil || actx.GrpcConfig.Port == nil {
-			log.Fatal("starting up - error setting up the application: grpc server is enabled but no grpc service descriptor, grpc service server or grpc config is provided")
+			log.Fatal(ctx, "starting up - error setting up the application: grpc server is enabled but no grpc service descriptor, grpc service server or grpc config is provided")
 		}
 		srv := grpc.NewServer()
 		srv.RegisterService(actx.GrpcServiceDesc, actx.GrpcServiceServer)
@@ -79,6 +79,6 @@ func Init(ctx context.Context, appName string, version string, args []string, en
 		app.Attach(server.BuildGrpcServer(net.JoinHostPort(*actx.GrpcConfig.Host, *actx.GrpcConfig.Port), srv))
 	}
 
-	log.Info(fmt.Sprintf("Application %s started", strings.Join([]string{appName, version}, " - ")))
+	log.Info(ctx, fmt.Sprintf("Application %s started", strings.Join([]string{appName, version}, " - ")))
 	return app.Run()
 }

@@ -74,7 +74,7 @@ type BeanBuilder struct {
 func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 
 	if ctx == nil {
-		log.Fatal("starting up - error setting up builder: context is nil")
+		log.Fatal(ctx, "starting up - error setting up builder: context is nil")
 	}
 
 	return &BeanBuilder{
@@ -83,10 +83,10 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			return environment.New(environment.OptionsBuilder().WithSSL().WithCmd(appCtx.CmdArgs).Build())
 		},
 		Config: func(appCtx *ApplicationContext) {
-			log.Warn("starting up - warning setting up configuration: config function not implemented")
+			log.Warn(ctx, "starting up - warning setting up configuration: config function not implemented")
 		},
 		DatasourceOpenFn: func(appCtx *ApplicationContext) dgorm.OpenFn {
-			log.Warn("starting up - warning setting up configuration: datasource OpenFn function not implemented")
+			log.Warn(ctx, "starting up - warning setting up configuration: datasource OpenFn function not implemented")
 			return nil
 		},
 		DatasourceContext: func(appCtx *ApplicationContext) dgorm.Context {
@@ -98,7 +98,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				return dgorm.NewContext(*appCtx.DatabaseConfig.DatasourceUrl, *appCtx.DatabaseConfig.DatasourceUsername, *appCtx.DatabaseConfig.DatasourcePassword, *appCtx.DatabaseConfig.DatasourceServer, *appCtx.DatabaseConfig.DatasourceService)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
+			log.Fatal(ctx, "starting up - error setting up configuration: database config or openFn is nil")
 			return nil
 		},
 		DatasourceConnection: func(appCtx *ApplicationContext) dgorm.Connection {
@@ -114,7 +114,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				return dgorm.NewConnection(appCtx.DatasourceContext, appCtx.DatasourceOpenFn, config)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
+			log.Fatal(ctx, "starting up - error setting up configuration: database config or openFn is nil")
 			return nil
 		},
 		DatasourceTransactionHandler: func(appCtx *ApplicationContext) dgorm.TransactionHandler {
@@ -126,7 +126,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				return dgorm.NewTransactionHandler(appCtx.DatasourceConnection)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config or openFn is nil")
+			log.Fatal(ctx, "starting up - error setting up configuration: database config or openFn is nil")
 			return nil
 		},
 		PasswordEncoder: func(appCtx *ApplicationContext) security.PasswordEncoder {
@@ -147,7 +147,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				return security.NewGormPrincipalManager(appCtx.DatasourceTransactionHandler, appCtx.PasswordManager)
 			}
 
-			log.Fatal("starting up - error setting up configuration: database config is nil")
+			log.Fatal(ctx, "starting up - error setting up configuration: database config is nil")
 			return nil
 		},
 		TokenManager: func(appCtx *ApplicationContext) security.TokenManager {
@@ -203,7 +203,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			if !appCtx.Enablers.GrpcServerEnabled {
 				return nil, nil
 			}
-			log.Fatal("starting up - error setting up grpc configuration: grpc server function not implemented")
+			log.Fatal(ctx, "starting up - error setting up grpc configuration: grpc server function not implemented")
 			return nil, nil
 		},
 	}

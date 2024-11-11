@@ -67,28 +67,28 @@ func (consumer *consumer) Consume(ctx context.Context) (Event, error) {
 
 	var err error
 	var connection *amqp.Connection
-	if connection, err = consumer.connection.Connect(); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
+	if connection, err = consumer.connection.Connect(ctx); err != nil {
+		log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 		return nil, err
 	}
 
 	if !(consumer.channel != nil && !consumer.channel.IsClosed()) {
 		if consumer.channel, err = connection.Channel(); err != nil {
-			log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
+			log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 			return nil, err
 		}
 	}
 
 	if consumer.queue, err = consumer.channel.QueueDeclare(consumer.name, consumer.durable, consumer.autoDelete, consumer.exclusive, consumer.noWait, consumer.args); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - failed connection to queue %s: %s", consumer.name, err.Error()))
 		return nil, err
 	}
 
-	log.Debug(fmt.Sprintf("rabbitmq consumer - connected to queue %s", consumer.name))
+	log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - connected to queue %s", consumer.name))
 
 	var deliveries <-chan amqp.Delivery
 	if deliveries, err = consumer.channel.ConsumeWithContext(ctx, consumer.name, consumer.consumer, consumer.autoAck, consumer.exclusive, consumer.noLocal, consumer.noWait, consumer.args); err != nil {
-		log.Debug(fmt.Sprintf("rabbitmq consumer - failed comsuming from queue: %s", err.Error()))
+		log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - failed comsuming from queue: %s", err.Error()))
 		return nil, err
 	}
 
@@ -97,18 +97,18 @@ func (consumer *consumer) Consume(ctx context.Context) (Event, error) {
 	return closeChannel, nil
 }
 
-func (consumer *consumer) Close() {
+func (consumer *consumer) Close(ctx context.Context) {
 	time.Sleep(Delay)
 
 	if consumer.channel != nil && !consumer.channel.IsClosed() {
-		log.Debug("rabbitmq consumer - closing connection")
+		log.Debug(ctx, "rabbitmq consumer - closing connection")
 		if err := consumer.channel.Close(); err != nil {
-			log.Error(fmt.Sprintf("rabbitmq consumer - failed to close connection to queue %s: %s", consumer.name, err.Error()))
+			log.Error(ctx, fmt.Sprintf("rabbitmq consumer - failed to close connection to queue %s: %s", consumer.name, err.Error()))
 		}
 	}
 	consumer.channel = nil
-	consumer.connection.Close()
-	log.Debug(fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
+	consumer.connection.Close(ctx)
+	log.Debug(ctx, fmt.Sprintf("rabbitmq consumer - closed connection to queue %s", consumer.name))
 }
 
 func (consumer *consumer) Context() Context {

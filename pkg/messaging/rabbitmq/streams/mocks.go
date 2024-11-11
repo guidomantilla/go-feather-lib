@@ -107,30 +107,30 @@ func (m *MockConnection) EXPECT() *MockConnectionMockRecorder {
 }
 
 // Close mocks base method.
-func (m *MockConnection) Close() {
+func (m *MockConnection) Close(ctx context.Context) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Close")
+	m.ctrl.Call(m, "Close", ctx)
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockConnectionMockRecorder) Close() *gomock.Call {
+func (mr *MockConnectionMockRecorder) Close(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockConnection)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockConnection)(nil).Close), ctx)
 }
 
 // Connect mocks base method.
-func (m *MockConnection) Connect() (*stream.Environment, error) {
+func (m *MockConnection) Connect(ctx context.Context) (*stream.Environment, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Connect")
+	ret := m.ctrl.Call(m, "Connect", ctx)
 	ret0, _ := ret[0].(*stream.Environment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Connect indicates an expected call of Connect.
-func (mr *MockConnectionMockRecorder) Connect() *gomock.Call {
+func (mr *MockConnectionMockRecorder) Connect(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockConnection)(nil).Connect))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockConnection)(nil).Connect), ctx)
 }
 
 // Context mocks base method.
@@ -210,15 +210,15 @@ func (m *MockConsumer) EXPECT() *MockConsumerMockRecorder {
 }
 
 // Close mocks base method.
-func (m *MockConsumer) Close() {
+func (m *MockConsumer) Close(ctx context.Context) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Close")
+	m.ctrl.Call(m, "Close", ctx)
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockConsumerMockRecorder) Close() *gomock.Call {
+func (mr *MockConsumerMockRecorder) Close(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockConsumer)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockConsumer)(nil).Close), ctx)
 }
 
 // Consume mocks base method.
@@ -287,15 +287,15 @@ func (m *MockProducer) EXPECT() *MockProducerMockRecorder {
 }
 
 // Close mocks base method.
-func (m *MockProducer) Close() {
+func (m *MockProducer) Close(ctx context.Context) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Close")
+	m.ctrl.Call(m, "Close", ctx)
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockProducerMockRecorder) Close() *gomock.Call {
+func (mr *MockProducerMockRecorder) Close(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockProducer)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockProducer)(nil).Close), ctx)
 }
 
 // Context mocks base method.

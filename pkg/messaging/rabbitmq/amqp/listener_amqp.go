@@ -19,7 +19,7 @@ func NewListener() *listener {
 
 func (listener *listener) OnMessage(ctx context.Context, message *amqp.Delivery) error {
 
-	log.Info(fmt.Sprintf("Received a message: %s", message.Body))
+	log.Info(ctx, fmt.Sprintf("Received a message: %s", message.Body))
 	time.Sleep(5 * time.Second)
 	return nil
 }

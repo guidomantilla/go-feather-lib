@@ -3,7 +3,7 @@ package security
 import (
 	"strings"
 
-	"github.com/guidomantilla/go-feather-lib/pkg/common/log"
+	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
 
 var SupportedDecoders = map[string]PasswordEncoder{
@@ -22,9 +22,7 @@ type DelegatingPasswordEncoder struct {
 
 func NewDelegatingPasswordEncoder(encoder PasswordEncoder, options ...DelegatingPasswordEncoderOption) *DelegatingPasswordEncoder {
 
-	if encoder == nil {
-		log.Fatal("starting up - error setting up delegating password encoder: encoder is nil")
-	}
+	assert.NotNil(encoder, "starting up - error setting up delegating password encoder: encoder is nil")
 
 	delegator := &DelegatingPasswordEncoder{
 		encoder:  encoder,

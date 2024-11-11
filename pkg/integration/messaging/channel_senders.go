@@ -194,13 +194,13 @@ func (channel *LoggedSenderChannel[T]) Send(ctx context.Context, timeout time.Du
 		return fmt.Errorf("integration messaging: %s error - for sending a message, message is required", channel.name)
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: sending message: %v", message))
+	log.Trace(ctx, fmt.Sprintf("integration messaging: sending message: %v", message))
 	if err := channel.sender.Send(ctx, timeout, message); err != nil {
-		log.Trace(fmt.Sprintf("integration messaging: error - message not sent: %v", message))
+		log.Trace(ctx, fmt.Sprintf("integration messaging: error - message not sent: %v", message))
 		return err
 	}
 
-	log.Trace(fmt.Sprintf("integration messaging: message sent: %v", message))
+	log.Trace(ctx, fmt.Sprintf("integration messaging: message sent: %v", message))
 	return nil
 }
 
