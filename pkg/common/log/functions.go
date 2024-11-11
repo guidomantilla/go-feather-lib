@@ -55,8 +55,10 @@ func Fatal(ctx context.Context, msg string, args ...any) {
 	os.Exit(1)
 }
 
-//
+func Handler() slog.Handler {
+	return instance().Handler()
+}
 
-func AsSlogLogger() *slog.Logger {
+func Ref() *slog.Logger {
 	return instance().Logger()
 }

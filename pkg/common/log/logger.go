@@ -34,7 +34,6 @@ func New(level SlogLevel, handlers ...slog.Handler) Logger {
 
 	internal := slog.New(NewFanoutHandler(handlers...))
 	slog.SetDefault(internal)
-
 	return &logger{internal: internal}
 }
 
@@ -61,6 +60,10 @@ func (logger *logger) Error(ctx context.Context, msg string, args ...any) {
 func (logger *logger) Fatal(ctx context.Context, msg string, args ...any) {
 	logger.internal.Log(ctx, SlogLevelFatal.ToSlogLevel(), msg, args...)
 	os.Exit(1)
+}
+
+func (logger *logger) Handler() slog.Handler {
+	return logger.internal.Handler()
 }
 
 func (logger *logger) Logger() *slog.Logger {

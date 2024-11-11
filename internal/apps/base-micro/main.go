@@ -39,9 +39,9 @@ func (Artist) TableName() string {
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "TRACE")
-	cserver.Run("base-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("base-micro", "1.0.0", func(ctx context.Context, application cserver.Application) error {
 
-		return case_goredis()
+		return case_mongo()
 	})
 }
 
@@ -76,7 +76,10 @@ func case_mongo() error {
 
 	ctx := context.TODO()
 	mongoCtx := dmongo.NewContext("mongodb://:username::password@:server", "root", "Raven123qweasd*+", "170.187.157.212:27017")
-	opts := options.Client()
+	loggerOptions := options.Logger().SetSink(dmongo.Logger()).
+		SetComponentLevel(options.LogComponentCommand, options.LogLevelInfo).
+		SetComponentLevel(options.LogComponentConnection, options.LogLevelDebug)
+	opts := options.Client().SetLoggerOptions(loggerOptions)
 	connection := dmongo.NewConnection(mongoCtx, opts)
 	defer connection.Close(ctx)
 	transactionHandler := dmongo.NewTransactionHandler(connection)

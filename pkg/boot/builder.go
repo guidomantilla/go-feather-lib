@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	slogGorm "github.com/orandin/slog-gorm"
-	sloggin "github.com/samber/slog-gin"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 
@@ -15,6 +13,7 @@ import (
 	"github.com/guidomantilla/go-feather-lib/pkg/common/rest"
 	dgorm "github.com/guidomantilla/go-feather-lib/pkg/datasource/gorm"
 	"github.com/guidomantilla/go-feather-lib/pkg/security"
+	"github.com/guidomantilla/go-feather-lib/pkg/web"
 )
 
 type EnvironmentBuilderFunc func(appCtx *ApplicationContext) environment.Environment
@@ -109,7 +108,7 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 			if appCtx.DatabaseConfig != nil && appCtx.DatasourceOpenFn != nil {
 				config := &gorm.Config{
 					SkipDefaultTransaction: true,
-					Logger:                 slogGorm.New(slogGorm.WithHandler(log.AsSlogLogger().Handler()), slogGorm.WithTraceAll(), slogGorm.WithRecordNotFoundError()),
+					Logger:                 dgorm.Logger(),
 				}
 				return dgorm.NewConnection(appCtx.DatasourceContext, appCtx.DatasourceOpenFn, config)
 			}
@@ -173,15 +172,11 @@ func NewBeanBuilder(ctx context.Context) *BeanBuilder {
 				return nil, nil
 			}
 
-			recoveryFilter := gin.Recovery()
-			loggerFilter := sloggin.New(log.AsSlogLogger().WithGroup("http"))
-			customFilter := func(ctx *gin.Context) {
+			engine := gin.New()
+			engine.Use(web.Logger(), gin.Recovery(), func(ctx *gin.Context) {
 				security.AddApplicationToContext(ctx, appCtx.AppName)
 				ctx.Next()
-			}
-
-			engine := gin.New()
-			engine.Use(loggerFilter, recoveryFilter, customFilter)
+			})
 			engine.POST("/login", func(ctx *gin.Context) {
 				gin.WrapF(appCtx.AuthenticationEndpoint.Authenticate)
 			})

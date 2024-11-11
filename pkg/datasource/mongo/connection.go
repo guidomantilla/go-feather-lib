@@ -18,7 +18,7 @@ type connection struct {
 	opts     *options.ClientOptionsBuilder
 }
 
-func NewConnection(context Context, opts *options.ClientOptionsBuilder) *connection {
+func NewConnection(context Context, opts *options.ClientOptionsBuilder) Connection {
 	assert.NotNil(context, "starting up - error setting up datasource connection: context is nil")
 	assert.NotEmpty(opts, "starting up - error setting up datasource connection: opts is empty")
 

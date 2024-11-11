@@ -92,6 +92,20 @@ func (mr *MockLoggerMockRecorder) Fatal(ctx, msg any, args ...any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fatal", reflect.TypeOf((*MockLogger)(nil).Fatal), varargs...)
 }
 
+// Handler mocks base method.
+func (m *MockLogger) Handler() slog.Handler {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Handler")
+	ret0, _ := ret[0].(slog.Handler)
+	return ret0
+}
+
+// Handler indicates an expected call of Handler.
+func (mr *MockLoggerMockRecorder) Handler() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Handler", reflect.TypeOf((*MockLogger)(nil).Handler))
+}
+
 // Info mocks base method.
 func (m *MockLogger) Info(ctx context.Context, msg string, args ...any) {
 	m.ctrl.T.Helper()
