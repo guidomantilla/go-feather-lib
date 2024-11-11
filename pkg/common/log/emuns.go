@@ -1,61 +1,9 @@
 package log
 
 import (
-	"context"
 	"io"
 	"log/slog"
-	"os"
-
-	"github.com/guidomantilla/go-feather-lib/pkg/common/assert"
 )
-
-type slogLogger struct {
-	internal *slog.Logger
-}
-
-func New(level SlogLevel, handlers ...slog.Handler) Logger[*slog.Logger] {
-	assert.NotNil(level, "starting up - error setting up logger: level is nil")
-
-	if len(handlers) == 0 {
-		handlers = append(handlers, SlogTextFormat.Handler(os.Stdout, &slog.HandlerOptions{Level: level.ToSlogLevel()}))
-	}
-
-	internal := slog.New(NewSlogFanoutHandler(handlers...))
-	slog.SetDefault(internal)
-
-	return &slogLogger{internal: internal}
-}
-
-func (logger *slogLogger) Trace(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelTrace.ToSlogLevel(), msg, args...)
-}
-
-func (logger *slogLogger) Debug(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelDebug.ToSlogLevel(), msg, args...)
-}
-
-func (logger *slogLogger) Info(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelInfo.ToSlogLevel(), msg, args...)
-}
-
-func (logger *slogLogger) Warn(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelWarning.ToSlogLevel(), msg, args...)
-}
-
-func (logger *slogLogger) Error(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelError.ToSlogLevel(), msg, args...)
-}
-
-func (logger *slogLogger) Fatal(ctx context.Context, msg string, args ...any) {
-	logger.internal.Log(ctx, SlogLevelFatal.ToSlogLevel(), msg, args...)
-	os.Exit(1)
-}
-
-func (logger *slogLogger) Logger() *slog.Logger {
-	return logger.internal
-}
-
-//
 
 const (
 	SlogLevelTrace SlogLevel = iota
@@ -217,16 +165,4 @@ func (enum SlogFormat) Handler(w io.Writer, opts *slog.HandlerOptions) slog.Hand
 		return slog.NewJSONHandler(w, opts)
 	}
 	return slog.NewTextHandler(w, opts)
-}
-
-//
-
-type ReplaceAttrFn func(groups []string, a slog.Attr) slog.Attr
-
-func ReplaceAttr(groups []string, a slog.Attr) slog.Attr {
-	if a.Key == slog.LevelKey {
-		level := a.Value.Any().(slog.Level)
-		a.Value = slog.StringValue(SlogLevelOff.ValueFromSlogLevel(level).String())
-	}
-	return a
 }

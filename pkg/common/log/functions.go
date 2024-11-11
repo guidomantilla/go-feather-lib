@@ -10,15 +10,15 @@ import (
 
 var singleton atomic.Value
 
-func instance() Logger[*slog.Logger] {
+func instance() Logger {
 	value := singleton.Load()
 	if value == nil {
 		return Slog()
 	}
-	return value.(Logger[*slog.Logger])
+	return value.(Logger)
 }
 
-func Slog(handlers ...slog.Handler) Logger[*slog.Logger] {
+func Slog(handlers ...slog.Handler) Logger {
 	level := os.Getenv("LOG_LEVEL")
 	if level == "" {
 		level = "INFO"

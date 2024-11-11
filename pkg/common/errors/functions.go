@@ -6,5 +6,9 @@ import (
 )
 
 func ErrJoin(errs ...error) error {
-	return errors.New(strings.Replace(errors.Join(errs...).Error(), "\n", ": ", -1))
+	var err error
+	if err = errors.Join(errs...); err == nil {
+		return nil
+	}
+	return errors.New(strings.Replace(err.Error(), "\n", ": ", -1))
 }
