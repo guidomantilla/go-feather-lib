@@ -41,7 +41,7 @@ func main() {
 	_ = os.Setenv("LOG_LEVEL", "TRACE")
 	cserver.Run("base-micro", "1.0.0", func(ctx context.Context, application cserver.Application) error {
 
-		return case_mongo()
+		return case_gocql()
 	})
 }
 
