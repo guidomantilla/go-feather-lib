@@ -16,7 +16,7 @@ import (
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "DEBUG")
-	cserver.Run("rabbitmq-stream-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("rabbitmq-stream-micro", "1.0.0", func(ctx context.Context, application cserver.Application) error {
 
 		name := "rabbitmq-stream-micro-stream"
 
@@ -41,9 +41,9 @@ func main() {
 			connection := rabbitmqstreams.NewConnection(messagingContext, rabbitmqstreams.DialerTLS(tlsConfig))
 			producer := rabbitmqstreams.NewProducer(connection, name)
 			if err := producer.Produce(context.Background(), samqp.NewMessage([]byte("Hello, World!"))); err != nil {
-				log.Fatal("Error producing message: %v", err)
+				log.Fatal(ctx, "Error producing message: %v", err)
 			}
-			connection.Close()
+			connection.Close(ctx)
 		}
 
 		return nil

@@ -15,7 +15,7 @@ import (
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "TRACE")
-	cserver.Run("integration-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("integration-micro", "1.0.0", func(ctx context.Context, application cserver.Application) error {
 
 		var err error
 		var headers messaging.Headers
@@ -27,11 +27,11 @@ func main() {
 			options := messaging.HeadersOptionsBuilder().ErrorChannel("error-channel").ReplyChannel("reply-channel").
 				Add("property", "value").Build()
 			headers = messaging.NewBaseHeaders(options)
-			log.Info(fmt.Sprintf("Headers: %+v", headers))
+			log.Info(ctx, fmt.Sprintf("Headers: %+v", headers))
 
 			options = messaging.NewHeadersOptions()
 			headers = messaging.NewBaseHeaders(options.ErrorChannel("error-channel"), options.ReplyChannel("reply-channel"))
-			log.Info(fmt.Sprintf("Headers: %v", headers))
+			log.Info(ctx, fmt.Sprintf("Headers: %v", headers))
 
 			config := &messaging.HeadersConfig{
 				ReplyChannel: "reply-channel",
@@ -40,17 +40,17 @@ func main() {
 
 			options = messaging.NewHeadersOptionsFromConfig(config)
 			headers = messaging.NewBaseHeaders(options)
-			log.Info(fmt.Sprintf("Headers: %v", headers))
+			log.Info(ctx, fmt.Sprintf("Headers: %v", headers))
 
 			headers = messaging.NewBaseHeadersFromConfig(config)
-			log.Info(fmt.Sprintf("Headers: %v", headers))
+			log.Info(ctx, fmt.Sprintf("Headers: %v", headers))
 
 			message = messaging.NewBaseMessage(headers, "Hola Mundo")
-			log.Info(fmt.Sprintf("Message: %v", message))
+			log.Info(ctx, fmt.Sprintf("Message: %v", message))
 
 			payload := messaging.NewBaseErrorPayload("code", "message", "error")
 			errMessage := messaging.NewBaseErrorMessage(headers, payload, message)
-			log.Info(fmt.Sprintf("Error: %v", errMessage))
+			log.Info(ctx, fmt.Sprintf("Error: %v", errMessage))
 		}
 
 		fmt.Println()
@@ -64,22 +64,22 @@ func main() {
 		{
 			message = messaging.NewBaseMessage(headers, "Hola Mundo")
 			receiverHandler := func(ctx context.Context, timeout time.Duration) (messaging.Message[string], error) {
-				log.Debug(fmt.Sprintf("integration messaging: message arriving"))
+				log.Debug(ctx, fmt.Sprintf("integration messaging: message arriving"))
 				return message, nil
 			}
 
 			receiver = integration.BaseReceiverChannel("base-receiver-01", receiverHandler)
 			message, err = receiver.Receive(context.Background(), 10*time.Second)
-			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+			log.Info(ctx, fmt.Sprintf("Done: %v, Err: %v", message, err))
 
 			receiverHandler = func(ctx context.Context, timeout time.Duration) (messaging.Message[string], error) {
-				log.Debug(fmt.Sprintf("integration messaging: message arriving"))
+				log.Debug(ctx, fmt.Sprintf("integration messaging: message arriving"))
 				<-time.After(10 * time.Second)
 				return message, nil
 			}
 			receiver = integration.BaseReceiverChannel("base-receiver-02", receiverHandler)
 			message, err = receiver.Receive(context.Background(), 5*time.Second)
-			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+			log.Info(ctx, fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}
 
 		fmt.Println()
@@ -93,23 +93,23 @@ func main() {
 		{
 			message = messaging.NewBaseMessage(headers, "Hola Mundo")
 			senderHandler := func(ctx context.Context, timeout time.Duration, message messaging.Message[string]) error {
-				log.Debug(fmt.Sprintf("integration messaging: message traveling: %v", message))
+				log.Debug(ctx, fmt.Sprintf("integration messaging: message traveling: %v", message))
 				return nil
 			}
 
 			sender = integration.BaseSenderChannel("based-sender-01", senderHandler)
 			err = sender.Send(context.Background(), 10*time.Second, message)
-			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+			log.Info(ctx, fmt.Sprintf("Done: %v, Err: %v", message, err))
 
 			senderHandler = func(ctx context.Context, timeout time.Duration, message messaging.Message[string]) error {
 				<-time.After(10 * time.Second)
-				log.Debug(fmt.Sprintf("integration messaging: message traveling: %v", message))
+				log.Debug(ctx, fmt.Sprintf("integration messaging: message traveling: %v", message))
 				return nil
 			}
 
 			sender = integration.BaseSenderChannel("based-sender-02", senderHandler)
 			err = sender.Send(context.Background(), 5*time.Second, message)
-			log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+			log.Info(ctx, fmt.Sprintf("Done: %v, Err: %v", message, err))
 		}
 
 		fmt.Println()
@@ -123,7 +123,7 @@ func main() {
 		{
 			message = messaging.NewBaseMessage(headers, "Hola Mundo")
 			consumerHandler := func(ctx context.Context, timeout time.Duration) (messaging.MessageStream[int], error) {
-				log.Debug(fmt.Sprintf("integration messaging: message arriving: %v", message))
+				log.Debug(ctx, fmt.Sprintf("integration messaging: message arriving: %v", message))
 				inputStream := make(messaging.MessageStream[int])
 				go func(inputStream messaging.MessageStream[int], headers messaging.Headers) {
 					defer close(inputStream)
@@ -138,7 +138,7 @@ func main() {
 			var inputStream messaging.MessageStream[int]
 			inputStream, err := consumerHandler(context.Background(), 10*time.Second)
 			for message := range inputStream {
-				log.Info(fmt.Sprintf("Done: %v, Err: %v", message, err))
+				log.Info(ctx, fmt.Sprintf("Done: %v, Err: %v", message, err))
 			}
 		}
 

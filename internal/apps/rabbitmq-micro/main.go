@@ -17,7 +17,7 @@ import (
 func main() {
 
 	_ = os.Setenv("LOG_LEVEL", "DEBUG")
-	cserver.Run("rabbitmq-micro", "1.0.0", func(application cserver.Application) error {
+	cserver.Run("rabbitmq-micro", "1.0.0", func(ctx context.Context, application cserver.Application) error {
 
 		name := "rabbitmq-micro-queue"
 
@@ -58,10 +58,10 @@ func main() {
 				AppId:           "",
 				Body:            []byte("Hello, World! xxx"),
 			}); err != nil {
-				log.Fatal("Error producing message: %v", err)
+				log.Fatal(ctx, "Error producing message: %v", err)
 			}
 
-			producer.Close()
+			producer.Close(ctx)
 		}
 
 		return nil
